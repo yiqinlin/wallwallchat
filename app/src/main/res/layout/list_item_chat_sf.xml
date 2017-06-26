@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginLeft="7dp">
+        <ImageView
+            android:id="@+id/list_chat_sf_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginEnd="70dp"
+        android:layout_marginRight="70dp"
+        android:minWidth="0dp"
+        android:maxWidth="210dp"
+        android:gravity="start|center_vertical"
+        android:textSize="@dimen/text_size_xmid"
+        android:background="@drawable/aio_friend_bg_nor"
+        android:textColor="#cc000000"
+        android:id="@+id/list_chat_sf_msg"
+        style="?android:attr/borderlessButtonStyle"/>
+</LinearLayout>

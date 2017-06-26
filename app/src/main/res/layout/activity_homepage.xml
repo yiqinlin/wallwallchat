@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/layout_homepage"
+    android:orientation="vertical"
+    android:background="@color/LayoutBackground"
+    tools:context="com.stark.yiyu.UIactivity.HomepageActivity">
+    <com.stark.yiyu.Listview.ElasticListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:divider="@drawable/list_driver_dark"
+        android:dividerHeight="1px"
+        android:listSelector="#00000000"
+        android:id="@+id/listView_homePage"
+        android:transcriptMode="disabled"
+        android:layout_gravity="top" >
+    </com.stark.yiyu.Listview.ElasticListView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="@dimen/magic_7margin">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/magic_0.5margin"
+            android:layout_marginBottom="@dimen/magic_0.5margin"
+            android:layout_marginLeft="@dimen/magic_margin"
+            android:layout_marginStart="@dimen/magic_margin"
+            android:layout_marginRight="@dimen/magic_0.5margin"
+            android:layout_marginEnd="@dimen/magic_0.5margin"
+            android:layout_weight="1"
+            android:background="@drawable/border_button"
+            android:id="@+id/button_homepage_left"
+            android:text="留  存"
+            style="?android:attr/borderlessButtonStyle"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/magic_0.5margin"
+            android:layout_marginBottom="@dimen/magic_0.5margin"
+            android:layout_marginLeft="@dimen/magic_0.5margin"
+            android:layout_marginStart="@dimen/magic_0.5margin"
+            android:layout_marginRight="@dimen/magic_margin"
+            android:layout_marginEnd="@dimen/magic_margin"
+            android:layout_weight="1"
+            android:background="@drawable/border_button"
+            android:id="@+id/button_homepage_right"
+            android:text="发消息"
+            style="?android:attr/borderlessButtonStyle"/>
+    </LinearLayout>
+</LinearLayout>

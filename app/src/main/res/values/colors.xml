@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#eeeeee</color>
+    <color name="colorPrimaryDark">@color/themeColor</color>
+    <color name="colorAccent">@color/themeColor</color>
+
+    <color name="themeColor">#ffd053</color>
+    <color name="themeColorBright">#ffe063</color>
+    <color name="themeColorDark">#efc043</color>
+
+    <color name="LayoutBackground">#fafafa</color>
+
+    <color name="black_overlay">#66000000</color>
+
+</resources>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#f5f5f5"
+    android:orientation="horizontal" >
+
+    <!-- 内容 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/head_contentLayout" >
+
+        <!-- 箭头头像、进度条 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true">
+                <!-- 箭头 -->
+                <ImageView
+                    android:layout_width="@dimen/magic_4margin"
+                    android:layout_height="@dimen/magic_4margin"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/magic_margin"
+                    android:layout_marginBottom="@dimen/magic_0.5margin"
+                    android:id="@+id/head_arrowImageView"
+                    android:src="@drawable/tianqing"/>
+
+                <!-- 进度条 -->
+                <com.stark.yiyu.toast.ListAnimImageView
+                    android:layout_width="@dimen/magic_4margin"
+                    android:layout_height="@dimen/magic_4margin"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:layout_marginTop="@dimen/magic_margin"
+                    android:layout_marginBottom="@dimen/magic_0.5margin"
+                    android:background="@drawable/bkg_circle_gray"
+                    android:src="@drawable/loading_progress_white_rotate"
+                    android:visibility="gone"
+                    android:id="@+id/head_progressBar"/>
+            </FrameLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/refresh_head_text"
+                android:layout_marginBottom="@dimen/magic_margin"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@android:color/secondary_text_dark"
+                android:text="下拉刷新" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

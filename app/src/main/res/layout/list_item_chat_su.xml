@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="end">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginStart="106dp"
+        android:layout_marginLeft="106dp">
+        <LinearLayout
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="@dimen/magic_margin"
+            android:layout_marginRight="@dimen/magic_margin"
+            android:layout_marginEnd="@dimen/magic_margin"
+            android:layout_gravity="right|bottom">
+            <com.stark.yiyu.toast.ListAnimImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/list_chat_su_ListAnim"
+                android:src="@drawable/loading_progress_grey_rotate"
+                android:visibility="gone"/>
+        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:maxWidth="210dp"
+            android:gravity="start|center_vertical"
+            android:textSize="@dimen/text_size_xmid"
+            android:background="@drawable/aio_user_bg_nor"
+            android:textColor="#ffffff"
+            android:id="@+id/list_chat_su_msg"
+            style="?android:attr/borderlessButtonStyle"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginLeft="7dp">
+        <ImageView
+            android:id="@+id/list_chat_su_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>
