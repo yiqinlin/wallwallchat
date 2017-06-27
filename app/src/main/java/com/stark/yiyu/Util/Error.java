@@ -11,7 +11,7 @@ public class Error {
             case 0:
                 return "账号不存在！";
             case 1:
-                return "密码错误";
+                return "密码错误！";
             case 2:
                 return "验证码有误！";
             case 3:
