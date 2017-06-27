@@ -51,7 +51,7 @@ public class TransferActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         Status.setTranslucentStatus(getWindow());
         setContentView(R.layout.activity_transfer);
-        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
+        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));//设置最上面状态栏为透明。
         This=TransferActivity.this;
         titleLeft=(ImageButton)findViewById(R.id.button_transfer_title_left);
         title=(TextView)findViewById(R.id.text_transfer_title);
