@@ -11,13 +11,13 @@ public class Error {
             case 0:
                 return "账号不存在！";
             case 1:
-                return "密码错误！";
+                return "密码错误";
             case 2:
                 return "验证码有误！";
             case 3:
                 return "已在其他设备登录";
             case 5:
-                return "服务器异常";
+                return "服务器网络异常";
             case 6:
                 return "数据异常,请稍后重试";
             case 101:
