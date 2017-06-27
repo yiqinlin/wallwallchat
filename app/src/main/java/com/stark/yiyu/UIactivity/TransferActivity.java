@@ -66,7 +66,7 @@ public class TransferActivity extends FragmentActivity{
 
         SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
         SharedPreferences sp=TransferActivity.this.getSharedPreferences("action", Context.MODE_PRIVATE);
-        final String SrcId=sp.getString("id", null);
+        final String SrcId=sp.getString("id", null);//用户帐号
         db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {

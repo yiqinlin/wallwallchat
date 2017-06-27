@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Listview.ElasticListView;
@@ -20,7 +19,6 @@ import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.json.JsonConvert;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,13 +38,13 @@ public class HomepageActivity extends Activity {
         super.onCreate(savedInstanceState);
         Status.setTranslucentStatus(getWindow());
         setContentView(R.layout.activity_homepage);
-        Button get=(Button)findViewById(R.id.button_homepage_left);
-        Button send=(Button)findViewById(R.id.button_homepage_right);
+        Button get=(Button)findViewById(R.id.button_homepage_left);//左边按钮
+        Button send=(Button)findViewById(R.id.button_homepage_right);//右边按钮
         Intent intent=getIntent();
         SrcID=HomepageActivity.this.getSharedPreferences("action",MODE_PRIVATE).getString("id", null);
         DesId=intent.getStringExtra("id");
-        Nick=intent.getStringExtra("nick");
-        Auto=intent.getStringExtra("auto");
+        Nick=intent.getStringExtra("nick");//昵称
+        Auto=intent.getStringExtra("auto");//签名
         mArrays=new ArrayList<BaseItem>();
         adapter=new MyAdapter(HomepageActivity.this,mArrays);
         ElasticListView listView=(ElasticListView)findViewById(R.id.listView_homePage);

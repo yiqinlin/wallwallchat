@@ -49,7 +49,7 @@ public class Login extends Activity {
         Button register=(Button)findViewById(R.id.button_to_register);
         Button forget=(Button)findViewById(R.id.button_to_forget);
         sp= this.getSharedPreferences("action", MODE_PRIVATE);
-        ID=sp.getString("id", null);
+        ID=sp.getString("id", null);//用户帐号
         PassWord=sp.getString("password",null);
         if(ID!=null) {
             IdEdit.setText(ID);
