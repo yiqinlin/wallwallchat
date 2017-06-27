@@ -43,8 +43,8 @@ public class HomepageActivity extends Activity {
         Intent intent=getIntent();
         SrcID=HomepageActivity.this.getSharedPreferences("action",MODE_PRIVATE).getString("id", null);
         DesId=intent.getStringExtra("id");
-        Nick=intent.getStringExtra("nick");
-        Auto=intent.getStringExtra("auto");
+        Nick=intent.getStringExtra("nick");//昵称
+        Auto=intent.getStringExtra("auto");//签名
         mArrays=new ArrayList<BaseItem>();
         adapter=new MyAdapter(HomepageActivity.this,mArrays);
         ElasticListView listView=(ElasticListView)findViewById(R.id.listView_homePage);
