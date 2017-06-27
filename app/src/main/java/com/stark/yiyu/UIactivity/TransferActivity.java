@@ -51,7 +51,7 @@ public class TransferActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         Status.setTranslucentStatus(getWindow());
         setContentView(R.layout.activity_transfer);
-        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
+        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));//设置最上面状态栏为透明。
         This=TransferActivity.this;
         titleLeft=(ImageButton)findViewById(R.id.button_transfer_title_left);
         title=(TextView)findViewById(R.id.text_transfer_title);
@@ -66,7 +66,7 @@ public class TransferActivity extends FragmentActivity{
 
         SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
         SharedPreferences sp=TransferActivity.this.getSharedPreferences("action", Context.MODE_PRIVATE);
-        final String SrcId=sp.getString("id", null);
+        final String SrcId=sp.getString("id", null);//用户帐号
         db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
