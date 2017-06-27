@@ -164,7 +164,7 @@ public class Register extends Activity {
                     publishProgress(10);/**告诉UI线程 更新*/
                 }
             }else {
-                publishProgress(-1);/**告诉UI线程 更新**/
+                publishProgress(-1);/**告诉UI线程 更新*/
             }
             return null;
         }
