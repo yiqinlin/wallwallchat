@@ -90,6 +90,7 @@ public class HomepageActivity extends Activity {
                     intent.putExtra("nick", Nick);
                     intent.putExtra("id", DesId);
                     startActivityForResult(intent, 0);
+                    ChatActivity.Tihs.finish();
                     finish();
                     break;
             }
