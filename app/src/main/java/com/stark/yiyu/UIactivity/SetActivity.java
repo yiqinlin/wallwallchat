@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -41,6 +42,7 @@ public class SetActivity extends Activity {
         mArrays.add(new ItemSimpleList(6, "退出当前账号", getResources().getDrawable(R.drawable.tianqing)));
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
+        left.setOnClickListener(Click);
         right.setOnClickListener(Click);
     }
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
@@ -63,6 +65,7 @@ public class SetActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.button_transfer_title_left:
+                    Log.e("SetActivity", "leftButton");
                     finish();
                     break;
                 case R.id.button_transfer_title_right:

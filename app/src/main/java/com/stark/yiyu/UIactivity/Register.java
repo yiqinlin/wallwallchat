@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.NetWork.MD5;
 import com.stark.yiyu.NetWork.NetPackage;
