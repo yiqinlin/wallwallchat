@@ -59,7 +59,7 @@ public class ChatActivity extends Activity {
     private MyAdapter adapter;
     private SQLiteDatabase db=null;
     private BroadcastReceiver mReceiver;
-    public static Activity Tihs=null;
+    public static Activity This=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +74,7 @@ public class ChatActivity extends Activity {
         listView=(MyListView)findViewById(R.id.list_chat);
         sp = ChatActivity.this.getSharedPreferences("action", MODE_PRIVATE);
         SrcId = sp.getString("id", null);
-        Tihs=ChatActivity.this;
+        This=ChatActivity.this;
         final Intent intent = getIntent();
         mid.setText(intent.getStringExtra("nick"));
         right.setText("更多");
