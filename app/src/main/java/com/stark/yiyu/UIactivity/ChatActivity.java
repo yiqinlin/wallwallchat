@@ -59,12 +59,12 @@ public class ChatActivity extends Activity {
     private MyAdapter adapter;
     private SQLiteDatabase db=null;
     private BroadcastReceiver mReceiver;
-    public static Activity Tihs=null;
+    public static Activity This=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
+//        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
         ImageButton left=(ImageButton)findViewById(R.id.button_transfer_title_left);
         TextView mid=(TextView)findViewById(R.id.text_transfer_title);
         Button right=(Button)findViewById(R.id.button_transfer_title_right);
@@ -74,7 +74,7 @@ public class ChatActivity extends Activity {
         listView=(MyListView)findViewById(R.id.list_chat);
         sp = ChatActivity.this.getSharedPreferences("action", MODE_PRIVATE);
         SrcId = sp.getString("id", null);
-        Tihs=ChatActivity.this;
+        This=ChatActivity.this;
         final Intent intent = getIntent();
         mid.setText(intent.getStringExtra("nick"));
         right.setText("更多");

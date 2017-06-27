@@ -84,8 +84,8 @@ public class TransferActivity extends FragmentActivity{
             public void onClick(View v) {
                 Intent intent =new Intent(TransferActivity.this,HomepageActivity.class);
                 intent.putExtra("id",SrcId);
-                intent.putExtra("Nick",Nick);
-                intent.putExtra("Auto",Auto);
+                intent.putExtra("Nick",Nick);//昵称
+                intent.putExtra("Auto",Auto);//签名
                 startActivity(intent);
             }
         });
@@ -101,12 +101,12 @@ public class TransferActivity extends FragmentActivity{
         //设定适配器
         vp = (ViewPager) findViewById(R.id.container);
         vp.setAdapter(adapter);
-        vp.setCurrentItem(1);
+        vp.setCurrentItem(1);//初始化页面
         vp.setOnPageChangeListener(new TabOnPageChangeListener());
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setViewPager(0);
+                setViewPager(0);//跳页数
             }
         });
         mid.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +122,7 @@ public class TransferActivity extends FragmentActivity{
             }
         });
     }
-    public static void setViewPager(int i){
+    public static void setViewPager(int i){//跳页数
         vp.setCurrentItem(i);
     }
     public class TabOnPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -161,21 +161,21 @@ public class TransferActivity extends FragmentActivity{
                     titleRight.setText("设置");
                     break;
             }
-            if(position==0&&mInputLine.getVisibility()==View.GONE){
-                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);
+            if(position==0&&mInputLine.getVisibility()==View.GONE){//第一页世界,输入框为不可见(默认也为不可见)。
+                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);//动画
                 Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
                 mTabLine.setAnimation(mtob);
                 mInputLine.setAnimation(btom);
-                mTabLine.setVisibility(View.GONE);
-                mInputLine.setVisibility(View.VISIBLE);
+                mTabLine.setVisibility(View.GONE);//换页的Tab消失。
+                mInputLine.setVisibility(View.VISIBLE);//让输入框为可见
             }
-            else if(mInputLine.getVisibility()==View.VISIBLE){
+            else if(mInputLine.getVisibility()==View.VISIBLE){//若输入框可见（即已不在‘世界’界面）
                 Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
                 Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);
                 mTabLine.setAnimation(btom);
                 mInputLine.setAnimation(mtob);
-                mTabLine.setVisibility(View.VISIBLE);
-                mInputLine.setVisibility(View.GONE);
+                mTabLine.setVisibility(View.VISIBLE);//换页Tab可见
+                mInputLine.setVisibility(View.GONE);//输入框消失
             }
         }
     }
@@ -186,7 +186,7 @@ public class TransferActivity extends FragmentActivity{
                 case 0:
                     setViewPager(1);
                     break;
-                case 1:
+                case 1://若在中间界面
                     Intent intent=new Intent(TransferActivity.this, AddActivity.class);
                     intent.putExtra("title","添 加");
                     intent.putExtra("Mode",1);
