@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,7 +20,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.print.PrintHelper;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -329,7 +327,7 @@ public class HomepageActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... values) {
-            ack = (Ack) NetPackage.getBag(NetSocket.Request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
+            ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
             //db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 2), "msgcode=?", new String[]{ack.MsgCode});
             if (!ack.Flag) {
                 publishProgress(-1);

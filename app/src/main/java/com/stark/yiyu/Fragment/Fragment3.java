@@ -80,7 +80,7 @@ public class Fragment3 extends Fragment {
         }
         @Override
         protected Void doInBackground(Void...values) {
-            JsonConvert.UpdateDB(db, (Get) NetPackage.getBag(NetSocket.Request(NetPackage.Get(sp.getString("id", null), 0, new JSONArray()))));
+            JsonConvert.UpdateDB(db, (Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(sp.getString("id", null), 0, new JSONArray()))));
             publishProgress(0);
             return null;
         }

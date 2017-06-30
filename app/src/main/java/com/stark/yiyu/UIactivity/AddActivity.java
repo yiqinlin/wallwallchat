@@ -107,7 +107,7 @@ public class AddActivity extends Activity {
         }
         @Override
         protected Void doInBackground(Void...values) {
-            get=(Get) NetPackage.getBag(NetSocket.Request(NetPackage.Get(info, Mode, new JSONArray())));
+            get=(Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(info, Mode, new JSONArray())));
             publishProgress(0);
             return null;
         }
