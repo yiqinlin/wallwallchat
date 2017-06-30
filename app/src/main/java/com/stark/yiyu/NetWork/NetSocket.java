@@ -14,7 +14,12 @@ import java.net.Socket;
 public class NetSocket {
     private static String IP="60.205.191.131";
     private static int PORT=12345;
-    public static String request(String Package)
+    private static int FILEPORT=12346;
+    public static String FileRequest()
+    {
+        return null;
+    }
+    public static String Request(String Package)
     {
         Socket socket= Try.getSocket(IP, PORT);////第一个服务器
         if(!SocketConnect(socket)) {//没连接起

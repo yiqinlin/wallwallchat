@@ -154,7 +154,7 @@ public class Register extends Activity {
         }
         @Override
         protected Void doInBackground(Void...values) { /**后台执行，不影响UI线程**/
-            String JsonMsg=NetSocket.request(NetPackage.Register(Nick, PassWord));
+            String JsonMsg=NetSocket.Request(NetPackage.Register(Nick, PassWord));
             if(JsonMsg!=null){
                 Ack result=(Ack)NetPackage.getBag(JsonMsg);/**解析服务器所传来的数据报*/
                 if(!result.Flag)//如果注册不成功

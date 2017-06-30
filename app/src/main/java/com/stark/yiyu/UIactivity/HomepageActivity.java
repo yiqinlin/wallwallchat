@@ -329,7 +329,7 @@ public class HomepageActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... values) {
-            ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
+            ack = (Ack) NetPackage.getBag(NetSocket.Request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
             //db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 2), "msgcode=?", new String[]{ack.MsgCode});
             if (!ack.Flag) {
                 publishProgress(-1);

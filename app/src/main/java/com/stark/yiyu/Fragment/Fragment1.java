@@ -89,7 +89,7 @@ public class Fragment1 extends Fragment {
         @Override
         protected Void doInBackground(String...values) {
             if(values[0]!=null) {
-                ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.SendGMsg(sp.getString("id", null), "10001", values[0], msgCode) + '\n'));
+                ack = (Ack) NetPackage.getBag(NetSocket.Request(NetPackage.SendGMsg(sp.getString("id", null), "10001", values[0], msgCode) + '\n'));
                 db.update("g" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 0), "msgcode=?", new String[]{ack.MsgCode});
                 if(!ack.Flag){
                     publishProgress(-1);

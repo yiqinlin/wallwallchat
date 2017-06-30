@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +30,6 @@ import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.Util.DateUtil;
 import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ListUtil;
-import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemSMsg;
@@ -107,7 +105,7 @@ public class ChatActivity extends Activity {
                                     }
                                     cr.close();
                                 }
-                                JsonConvert.UpdateDB(db, DesId, (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcId, DesId, start, 1, jsonArray) + '\n')));
+                                JsonConvert.UpdateDB(db, DesId, (Refresh) NetPackage.getBag(NetSocket.Request(NetPackage.Refresh(SrcId, DesId, start, 1, jsonArray) + '\n')));
                                 SelectionTemp = AddList();
                             }
                         } catch (Exception e) {
@@ -235,7 +233,7 @@ public class ChatActivity extends Activity {
         @Override
         protected Void doInBackground(Void...values) {
             if(MsgTemp!=null) {
-                ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.SendMsg(sp.getString("id", null), DesId, MsgTemp, msgCode) + '\n'));
+                ack = (Ack) NetPackage.getBag(NetSocket.Request(NetPackage.SendMsg(sp.getString("id", null), DesId, MsgTemp, msgCode) + '\n'));
                 db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 0), "msgcode=?", new String[]{ack.MsgCode});
                 if(!ack.Flag){
                     publishProgress(-1);
