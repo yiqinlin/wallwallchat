@@ -38,6 +38,7 @@ public class MyAdapter extends BaseAdapter {
     private Context mContext = null;//上下文
     private LayoutInflater mInflater = null;
     private ArrayList<BaseItem> mData = null;//要显示的数据
+    private Callback mCallback;
 
     public MyAdapter(Context context, ArrayList<BaseItem> data){
         this.mContext=context;
@@ -50,6 +51,11 @@ public class MyAdapter extends BaseAdapter {
         this.mData.add(newItem);
         this.notifyDataSetChanged();
     }
+
+public interface Callback{
+    public void click(View v);
+}
+
 
 
     @Override
@@ -230,6 +236,8 @@ public class MyAdapter extends BaseAdapter {
         }
         viewHolder.id=msg.getId();
         viewHolder.head.setBackgroundDrawable(msg.getHead());
+        mCallback = (Callback) mContext;
+        viewHolder.head.setOnClickListener(Click);
         viewHolder.nick.setText(msg.getNick());
         viewHolder.auto.setText(msg.getAuto());
         return convertView;
@@ -267,6 +275,9 @@ public class MyAdapter extends BaseAdapter {
                     intent.putExtra("TouchMode",WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                     mContext.startActivity(intent);
                 break;
+                case R.id.list_homepage_head:
+                    mCallback.click(v);
+                    break;
             }
         }
     };

@@ -13,14 +13,19 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -32,6 +37,7 @@ import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
 import com.stark.yiyu.Util.DateUtil;
+import com.stark.yiyu.Util.ImageRound;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
@@ -50,12 +56,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class HomepageActivity extends Activity {
+public class HomepageActivity extends Activity implements MyAdapter.Callback{
 
     private static int CAMERA_REQUEST_CODE = 1;
     private static int GALLERY_REQUEST_CODE = 2;
     private static int CROP_REQUEST_CODE = 3;
-    private static int MY_PERMISSIONS_REQUEST_CALL_PHONE = 4;
+    private static int MY_PERMISSIONS_REQUEST_CAMERA_GALLERY = 4;
+    private static int GOTO_APPSETTING = 5;
 
     private String SrcID = null;
     private String DesId = null;
@@ -63,14 +70,13 @@ public class HomepageActivity extends Activity {
     private String Auto = null;
     private ArrayList<BaseItem> mArrays = null;
     private MyAdapter adapter = null;
+    private AlertDialog dialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Status.setTranslucentStatus(getWindow());
         setContentView(R.layout.activity_homepage);
-
-        ImageButton imgHead = (ImageButton) findViewById(R.id.list_homepage_head);
 
         Button get = (Button) findViewById(R.id.button_homepage_left);//左边按钮
         Button send = (Button) findViewById(R.id.button_homepage_right);//右边按钮
@@ -88,8 +94,6 @@ public class HomepageActivity extends Activity {
             get.setOnClickListener(Click);
             send.setOnClickListener(Click);
         } else {
-            imgHead.setOnClickListener(Click);
-
             get.setText("待开发");
             send.setText("待开发");
         }
@@ -129,9 +133,6 @@ public class HomepageActivity extends Activity {
                     ChatActivity.This.finish();
                     finish();
                     break;
-                case R.id.list_homepage_head:
-                    showChoosePicDialog();
-                    break;
             }
         }
     };
@@ -146,19 +147,20 @@ public class HomepageActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        if (ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CALL_PHONE);
+                        Log.e("拍照", "选择本地照片");
+                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                             startActivityForResult(intent, CAMERA_REQUEST_CODE);
                         }
                         break;
                     case 1:
-                        if (ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CALL_PHONE);
+                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                            intent.setType("imgage/*");
+                            intent.setType("image/*");
                             startActivityForResult(intent, GALLERY_REQUEST_CODE);
                         }
                         break;
@@ -170,24 +172,64 @@ public class HomepageActivity extends Activity {
         builder.create().show();
     }
 
-    private Uri saveBitmap(Bitmap bm) {
-        File tmDir = new File(Environment.getExternalStorageDirectory() + "/com.stark.yiyu.UIactivity");
-        if (!tmDir.exists()) {
+    private String getphotoPath() {
+        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
+        return photoPath;
+    }
+
+    private Uri saveBitmap(Bitmap bm) {//将bitmap数据类型保存到sdk卡中
+        //获取保存图像的路径
+        File tmDir = new File(Environment.getExternalStorageDirectory() + "/com.stark.yiyu.UIactivity");//得到保存截图文件的地址
+        if (!tmDir.exists()) {//判断路径是否存在，若没有则创建一个文件夹使该路径可用的
             tmDir.mkdir();
         }
-        File img = new File(tmDir.getAbsolutePath() + "photo_upload.png");
+//        String cirHeadPath = getphotoPath();
+//        File filePath = new File(cirHeadPath);
+//        if (!filePath.exists()) {
+//            filePath.mkdir();
+//        }
+        //设定为了png文件
+        File img = new File(tmDir.getAbsolutePath() + "photo_head.png");
+//        File imgCirHead = new File(filePath, "image_cir_head.png");
+//        ImageRound imageRound = new ImageRound();
+//        Bitmap bitmap = imageRound.toRoundBitmap(bm);
         try {
+            //获取该文件的输出流
             FileOutputStream fos = new FileOutputStream(img);
-            bm.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
+//            FileOutputStream fos1 = new FileOutputStream(imgCirHead);
+            //Bitmap的CompressFormat函数将图像数据写入输出流中
+            bm.compress(Bitmap.CompressFormat.PNG, 85, fos);
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fos1);
+            fos.flush();//输出流刷新
             fos.close();
-            return Uri.fromFile(img);
+//            fos1.flush();
+//            fos1.close();
+            return Uri.fromFile(img);//产生一个返回File类型的Uri
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void saveCirBitmap(Bitmap bitmap) {
+        String cirHeadPath = getphotoPath();
+        File filePath = new File(cirHeadPath);
+        if (!filePath.exists()) {
+            filePath.mkdir();
+        }
+        File imgCirHead = new File(filePath, "image_cir_head.png");
+        try {
+            FileOutputStream fos = new FileOutputStream(imgCirHead);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fos);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -198,7 +240,7 @@ public class HomepageActivity extends Activity {
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);//裁剪的图片的宽高。最终得到的输出图片的宽高
+        intent.putExtra("outputY", 150);//裁剪的图片的宽高。最终得到的输出图片的宽高252
         intent.putExtra("circleCrop", true);
         intent.putExtra("return-data", true);//裁剪后的数据通过intent返回回来
         startActivityForResult(intent, CROP_REQUEST_CODE);
@@ -220,59 +262,6 @@ public class HomepageActivity extends Activity {
         }
     }
 
-    public Bitmap toRoundBitmap(Bitmap bitmap) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        float roundPx = 0.0f;
-        float left, top, right, bottom, dst_left, dst_top, dst_right, dst_bottom;
-        if (width <= height) {
-            roundPx = width / 2;
-            left = 0;
-            top = 0;
-            right = width;
-            bottom = width;
-            height = width;
-            dst_left = 0;
-            dst_top = 0;
-            dst_right = width;
-            dst_bottom = width;
-        } else {
-            roundPx = height / 2;
-            float clip = (width - height) / 2;
-            left = clip;
-            right = width - clip;
-            top = 0;
-            bottom = height;
-            width = height;
-            dst_left = 0;
-            dst_top = 0;
-            dst_right = height;
-            dst_bottom = height;
-        }
-
-        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect src = new Rect((int) left, (int) top, (int) right, (int) bottom);
-        final Rect dst = new Rect((int) dst_left, (int) dst_top, (int) dst_right, (int) dst_bottom);
-        //final RectF rectF = new RectF(dst);
-
-        paint.setAntiAlias(true);//设置画笔无锯齿
-
-        canvas.drawARGB(0, 0, 0, 0);//填充整个Canvas
-        paint.setColor(color);
-
-        //两种方法画圆,drawRounRect和drawCircle
-        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);// 画圆角矩形，第一个参数为图形显示区域，第二个参数和第三个参数分别是水平圆角半径和垂直圆角半径。
-        canvas.drawCircle(roundPx, roundPx, roundPx, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));// 设置两张图片相交时的模式,参考http://trylovecatch.iteye.com/blog/1189452
-        canvas.drawBitmap(bitmap, src, dst, paint);//以Mode.SRC_IN模式合并bitmap和已经draw了的Circle
-        return output;
-    }
-
     private void sendImage(Bitmap bm) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
@@ -285,15 +274,15 @@ public class HomepageActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == CAMERA_REQUEST_CODE) {//从摄像头中获取图像
             if (data == null) {
                 return;
-            } else {
-                Bundle extras = data.getExtras();
+            } else {//判断出是拍照
+                Bundle extras = data.getExtras();//从data中取出数据
                 if (extras != null) {
-                    Bitmap bm = extras.getParcelable("data");
-                    Uri uri = saveBitmap(bm);
-                    startImageZoom(uri);
+                    Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
+                    Uri uri = saveBitmap(bm);//将bitmap转化为uri
+                    startImageZoom(uri);//uri必须是File类型
                 }
             }
         } else if (requestCode == GALLERY_REQUEST_CODE) {
@@ -310,8 +299,87 @@ public class HomepageActivity extends Activity {
             }
             Bundle extras = data.getExtras();
             Bitmap bm = extras.getParcelable("data");
-            Bitmap roundbm = toRoundBitmap(bm);//将图片裁减为圆形
-            sendImage(roundbm);
+
+            ImageRound imageRound = new ImageRound();
+            Bitmap roundBitmap = imageRound.toRoundBitmap(bm);
+
+            saveCirBitmap(roundBitmap);//保存圆形图片到本地
+
+            sendImage(bm);
+            /**
+             * 设置头像
+             */
+
+        } else if (requestCode == GOTO_APPSETTING) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int i = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (i != PackageManager.PERMISSION_GRANTED) {
+                    showDialogTipUserGoToAppSetting();
+                } else {
+                    if (dialog != null && dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA_GALLERY) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    boolean b = shouldShowRequestPermissionRationale(permissions[0]);
+                    if (!b) {
+                        showDialogTipUserGoToAppSetting();
+                    } else {
+                        finish();
+                    }
+                } else {
+                    Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private void showDialogTipUserGoToAppSetting() {
+        dialog = new AlertDialog.Builder(this)
+                .setTitle("权限不可用")
+                .setMessage("请在-应用设置-权限中，获取权限。")
+                .setPositiveButton("接受", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        gotoAppSetting();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).setCancelable(false).show();
+    }
+
+    private void gotoAppSetting() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, GOTO_APPSETTING);
+    }
+
+    //头像的点击事件
+    @Override
+    public void click(View v) {
+        if (!DesId.equals(SrcID)) {
+            /***
+             * 待开发ing
+             */
+        } else {
+            showChoosePicDialog();
         }
     }
 
