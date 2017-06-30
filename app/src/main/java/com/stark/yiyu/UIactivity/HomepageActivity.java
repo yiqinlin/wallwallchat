@@ -183,27 +183,15 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         if (!tmDir.exists()) {//判断路径是否存在，若没有则创建一个文件夹使该路径可用的
             tmDir.mkdir();
         }
-//        String cirHeadPath = getphotoPath();
-//        File filePath = new File(cirHeadPath);
-//        if (!filePath.exists()) {
-//            filePath.mkdir();
-//        }
         //设定为了png文件
         File img = new File(tmDir.getAbsolutePath() + "photo_head.png");
-//        File imgCirHead = new File(filePath, "image_cir_head.png");
-//        ImageRound imageRound = new ImageRound();
-//        Bitmap bitmap = imageRound.toRoundBitmap(bm);
         try {
             //获取该文件的输出流
             FileOutputStream fos = new FileOutputStream(img);
-//            FileOutputStream fos1 = new FileOutputStream(imgCirHead);
             //Bitmap的CompressFormat函数将图像数据写入输出流中
             bm.compress(Bitmap.CompressFormat.PNG, 85, fos);
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fos1);
             fos.flush();//输出流刷新
             fos.close();
-//            fos1.flush();
-//            fos1.close();
             return Uri.fromFile(img);//产生一个返回File类型的Uri
         } catch (FileNotFoundException e) {
             e.printStackTrace();
