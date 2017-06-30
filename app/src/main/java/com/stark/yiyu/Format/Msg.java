@@ -6,7 +6,7 @@ package com.stark.yiyu.Format;
 public class Msg {
     public String SrcId;
     public String DesId;
-    public String Remarks;
+    public String Remarks;//备注
     public int SendType = 0;
     public int Bubble=0;
     public String Msg;
