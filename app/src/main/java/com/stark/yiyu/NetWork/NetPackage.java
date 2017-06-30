@@ -177,6 +177,11 @@ public class NetPackage {
         }
         return null;
     }
+    public static String CmdModify(String JsonStr,String cmd){
+        Format temp=(Format)JsonConvert.DeserializeObject(JsonStr,new Format());
+        temp.Cmd=cmd;
+        return JsonConvert.SerializeObject(temp);
+    }
     public static Object getBag(String str){
         return getBag(getFormatBag(str));
     }
