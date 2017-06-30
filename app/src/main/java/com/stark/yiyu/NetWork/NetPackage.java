@@ -9,6 +9,7 @@ import com.stark.yiyu.Format.Get;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Format.Refresh;
 import com.stark.yiyu.Format.Registion;
+import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.json.JsonConvert;
 
 import org.json.JSONArray;
@@ -155,6 +156,27 @@ public class NetPackage {
             return JsonConvert.SerializeObject(format);
         }catch(Exception e){
             Log.i("Friend",e.toString());
+        }
+        return null;
+    }
+    public static String SendFile(String src, long size, String name, String hashcode) {
+        TransFile transFile = new TransFile();
+        transFile.Src = src;
+        transFile.Size = size;
+        transFile.Name = name;
+        transFile.HashCode = hashcode;
+        transFile.Mode = "check";
+        String JsonStr;
+        try {
+//            JsonStr = JsonConvert.SerializeObject(transFile);
+//            Format format = new Format();
+//            format.Type = "File";
+//            format.Cmd = "check";
+//            format.JsonMsg = JsonStr;
+//            Log.i("SendFile", JsonStr);
+            return JsonConvert.SerializeObject(transFile);
+        } catch (Exception e) {
+            Log.i("SendFile", e.toString());
         }
         return null;
     }

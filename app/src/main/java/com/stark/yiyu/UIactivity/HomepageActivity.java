@@ -32,16 +32,21 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
+import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
+import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
+import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
+import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
+import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
 
 import java.io.ByteArrayOutputStream;
@@ -250,15 +255,17 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
     }
 
-    private void sendImage(Bitmap bm) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
-        byte[] bytes = stream.toByteArray();
-        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
-        /**
-         * 发送到服务器
-         */
-    }
+//    private void sendImage(Bitmap bm) {
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
+//        byte[] bytes = stream.toByteArray();
+//        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
+//        /**
+//         * 发送到服务器
+//         */
+//        String picPath = getphotoPath();
+//        picPath = picPath + "image_cir_head.png";
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -293,10 +300,12 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
 
             saveCirBitmap(roundBitmap);//保存圆形图片到本地
 
-            sendImage(bm);
             /**
-             * 设置头像
+             * 发送头像
              */
+
+            FileAsyncTask fileAsyncTask = new FileAsyncTask();
+            fileAsyncTask.execute();
 
         } else if (requestCode == GOTO_APPSETTING) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -310,6 +319,30 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                 }
             }
+        }
+    }
+
+    class FileAsyncTask extends AsyncTask<Void, Integer, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        @Override
+        protected Void doInBackground(Void...values) {
+            String path = getphotoPath() + "image_cir_head.png";
+            File file = new File(path);
+            String answer = NetSocket.request(NetPackage.SendFile(path, file.length(), file.getName(), "12"), path);
+            Ack ack = (Ack) NetPackage.getBag(answer);
+            if (ack.Flag) {
+                Log.e("发送图片", "成功");
+            } else {
+                Log.e("发送图片", "失败");
+            }
+            return null;
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
         }
     }
 
