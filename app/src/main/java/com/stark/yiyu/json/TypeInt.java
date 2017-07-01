@@ -14,20 +14,26 @@ public class TypeInt {
     {
         if(type!=null&&(String.class.isAssignableFrom(type)||Character.class.isAssignableFrom(type)||Character.TYPE.isAssignableFrom(type)))
             return 0;
-        if(type!=null&&(Byte.TYPE.isAssignableFrom(type)||Short.TYPE.isAssignableFrom(type)||Integer.TYPE.isAssignableFrom(type)||Long.TYPE.isAssignableFrom(type)||Float.TYPE.isAssignableFrom(type)||Double.TYPE.isAssignableFrom(type)||Number.class.isAssignableFrom(type)))
+        if(type!=null&&(Byte.TYPE.isAssignableFrom(type)||Short.TYPE.isAssignableFrom(type)||Integer.TYPE.isAssignableFrom(type)||Number.class.isAssignableFrom(type)))
             return 1;
-        if(type!=null&&(Boolean.TYPE.isAssignableFrom(type)||Boolean.class.isAssignableFrom(type)))
+        if(type!=null&&Long.TYPE.isAssignableFrom(type))
             return 2;
-        if(type!=null&&type.isArray())
+        if(type!=null&&Float.TYPE.isAssignableFrom(type))
             return 3;
-        if(type!=null&&Connection.class.isAssignableFrom(type))
+        if(type!=null&&Double.TYPE.isAssignableFrom(type))
             return 4;
-        if(type!=null&&Map.class.isAssignableFrom(type))
+        if(type!=null&&(Boolean.TYPE.isAssignableFrom(type)||Boolean.class.isAssignableFrom(type)))
             return 5;
-        if(type!=null&&List.class.isAssignableFrom(type))
+        if(type!=null&&type.isArray())
             return 6;
-        if(type!=null&&JSONArray.class.isAssignableFrom(type))
+        if(type!=null&&Connection.class.isAssignableFrom(type))
             return 7;
-        return 8;
+        if(type!=null&&Map.class.isAssignableFrom(type))
+            return 8;
+        if(type!=null&&List.class.isAssignableFrom(type))
+            return 9;
+        if(type!=null&&JSONArray.class.isAssignableFrom(type))
+            return 10;
+        return 11;
     }
 }
