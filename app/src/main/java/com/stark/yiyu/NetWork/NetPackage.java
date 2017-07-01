@@ -159,7 +159,7 @@ public class NetPackage {
         }
         return null;
     }
-    public static String SendFile(String src, long size, String name, String hashcode) {
+    public static String SendFile(String Srcid,String src, long size, String name, String hashcode) {
         TransFile transFile = new TransFile();
         transFile.Src = src;
         transFile.Size = size;

@@ -8,51 +8,37 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.media.Image;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
-import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
-import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
-import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
-import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -177,54 +163,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         builder.create().show();
     }
 
-    private String getphotoPath() {
-        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
-        return photoPath;
-    }
-
-    private Uri saveBitmap(Bitmap bm) {//将bitmap数据类型保存到sdk卡中
-        //获取保存图像的路径
-        File tmDir = new File(Environment.getExternalStorageDirectory() + "/com.stark.yiyu.UIactivity");//得到保存截图文件的地址
-        if (!tmDir.exists()) {//判断路径是否存在，若没有则创建一个文件夹使该路径可用的
-            tmDir.mkdir();
-        }
-        //设定为了png文件
-        File img = new File(tmDir.getAbsolutePath() + "photo_head.png");
-        try {
-            //获取该文件的输出流
-            FileOutputStream fos = new FileOutputStream(img);
-            //Bitmap的CompressFormat函数将图像数据写入输出流中
-            bm.compress(Bitmap.CompressFormat.PNG, 85, fos);
-            fos.flush();//输出流刷新
-            fos.close();
-            return Uri.fromFile(img);//产生一个返回File类型的Uri
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void saveCirBitmap(Bitmap bitmap) {
-        String cirHeadPath = getphotoPath();
-        File filePath = new File(cirHeadPath);
-        if (!filePath.exists()) {
-            filePath.mkdir();
-        }
-        File imgCirHead = new File(filePath, "image_cir_head.png");
-        try {
-            FileOutputStream fos = new FileOutputStream(imgCirHead);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private String getPhotoPath() {
+//        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
+//        return photoPath;
+//    }
 
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -245,7 +187,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             is = getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(is);
             is.close();
-            return saveBitmap(bitmap);
+            return ImgStorage.saveBitmap(bitmap, "photo_head.png");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -255,17 +197,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
     }
 
-//    private void sendImage(Bitmap bm) {
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
-//        byte[] bytes = stream.toByteArray();
-//        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
-//        /**
-//         * 发送到服务器
-//         */
-//        String picPath = getphotoPath();
-//        picPath = picPath + "image_cir_head.png";
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -276,7 +207,8 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Bundle extras = data.getExtras();//从data中取出数据
                 if (extras != null) {
                     Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
-                    Uri uri = saveBitmap(bm);//将bitmap转化为uri
+
+                    Uri uri = ImgStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
                     startImageZoom(uri);//uri必须是File类型
                 }
             }
@@ -295,16 +227,12 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             Bundle extras = data.getExtras();
             Bitmap bm = extras.getParcelable("data");
 
-            ImageRound imageRound = new ImageRound();
-            Bitmap roundBitmap = imageRound.toRoundBitmap(bm);
+            Bitmap roundBitmap = ImageRound.toRoundBitmap(bm);
 
-            saveCirBitmap(roundBitmap);//保存圆形图片到本地
 
-            /**
-             * 发送头像
-             */
-
+            ImgStorage.saveCirBitmap(ImgStorage.getPhotoPath(this), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
+
             fileAsyncTask.execute();
 
         } else if (requestCode == GOTO_APPSETTING) {
@@ -329,20 +257,31 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
         @Override
         protected Void doInBackground(Void...values) {
-            String path = getphotoPath() + "image_cir_head.png";
+            String path = ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png";
             File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(path, file.length(), file.getName(), "12"), path);
+            String answer = NetSocket.request(NetPackage.SendFile(SrcID,path, file.length(), file.getName(), "12"), path);
             Ack ack = (Ack) NetPackage.getBag(answer);
             if (ack.Flag) {
-                Log.e("发送图片", "成功");
+                publishProgress(1);
             } else {
-                Log.e("发送图片", "失败");
+                publishProgress(0);
             }
             return null;
         }
+
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+            switch (values[0]){
+                case 0:
+                    Toast.makeText(HomepageActivity.this,"发送失败，请稍后重试",Toast.LENGTH_SHORT);
+                    break;
+                case 1:
+                    mArrays.remove(0);
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
+                    adapter.notifyDataSetChanged();
+                    break;
+            }
         }
     }
 
