@@ -20,8 +20,10 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Listview.ElasticListView;
@@ -186,8 +188,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             is = getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(is);
             is.close();
-            ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
-            return imgFileExternalStorage.saveBitmap(bitmap, "photo_head.png");
+            return ImgStorage.saveBitmap(bitmap, "photo_head.png");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -207,8 +208,8 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Bundle extras = data.getExtras();//从data中取出数据
                 if (extras != null) {
                     Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
-                    ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
-                    Uri uri = imgFileExternalStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
+
+                    Uri uri = ImgStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
                     startImageZoom(uri);//uri必须是File类型
                 }
             }
@@ -227,16 +228,13 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             Bundle extras = data.getExtras();
             Bitmap bm = extras.getParcelable("data");
 
-            ImageRound imageRound = new ImageRound();
-            Bitmap roundBitmap = imageRound.toRoundBitmap(bm);
+            Bitmap roundBitmap = ImageRound.toRoundBitmap(bm);
 
-            ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
-            imgFileExternalStorage.saveCirBitmap(getPhotoPath(), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
 
+            ImgStorage.saveCirBitmap(ImgStorage.getPhotoPath(this), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
+
             fileAsyncTask.execute();
-
-
 
         } else if (requestCode == GOTO_APPSETTING) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -260,7 +258,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
         @Override
         protected Void doInBackground(Void...values) {
-            String path = getPhotoPath() + "image_cir_head.png";
+            String path = ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png";
             File file = new File(path);
             String answer = NetSocket.request(NetPackage.SendFile(SrcID,path, file.length(), file.getName(), "12"), path);
             Ack ack = (Ack) NetPackage.getBag(answer);
@@ -271,6 +269,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             }
             return null;
         }
+
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
@@ -280,7 +279,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     break;
                 case 1:
                     mArrays.remove(0);
-                    mArrays.add(0,new ItemHomepageTitle(5, DesId,new BitmapDrawable( BitmapFactory.decodeFile(getPhotoPath()+ "image_cir_head.png")) , Nick, Auto));
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
                     adapter.notifyDataSetChanged();
                     break;
             }
