@@ -37,15 +37,23 @@ public class JsonConvert {
                         break;
                     case 1://整型
                         json.put(field.getName(),(int)(field.get(obj)==null?0:field.get(obj)));
-                        break;
                     case 2:
-                        json.put(field.getName(),(boolean)(field.get(obj)==null?false:field.get(obj)));
+                        json.put(field.getName(),(long)(field.get(obj)==null?0:field.get(obj)));
                         break;
                     case 3:
+                        json.put(field.getName(),(float)(field.get(obj)==null?0:field.get(obj)));
+                        break;
                     case 4:
+                         json.put(field.getName(),(double)(field.get(obj)==null?0:field.get(obj)));
+                        break;
                     case 5:
+                        json.put(field.getName(),(boolean)(field.get(obj)==null?false:field.get(obj)));
+                        break;
                     case 6:
-                    case 7://JsonArray型
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10://JsonArray型
                         json.put(field.getName(),(field.get(obj)==null?null:field.get(obj)));
                         break;
                 }
