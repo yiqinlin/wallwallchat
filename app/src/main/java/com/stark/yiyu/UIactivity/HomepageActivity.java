@@ -173,11 +173,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         });
         builder.create().show();
     }
-
-    private String getPhotoPath() {
-        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
-        return photoPath;
-    }
+    
 
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
