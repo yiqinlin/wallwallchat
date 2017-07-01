@@ -30,6 +30,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.stark.yiyu.File.ImgFileExternalStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Format.TransFile;
@@ -182,50 +184,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         return photoPath;
     }
 
-    private Uri saveBitmap(Bitmap bm) {//将bitmap数据类型保存到sdk卡中
-        //获取保存图像的路径
-        File tmDir = new File(Environment.getExternalStorageDirectory() + "/com.stark.yiyu.UIactivity");//得到保存截图文件的地址
-        if (!tmDir.exists()) {//判断路径是否存在，若没有则创建一个文件夹使该路径可用的
-            tmDir.mkdir();
-        }
-        //设定为了png文件
-        File img = new File(tmDir.getAbsolutePath() + "photo_head.png");
-        try {
-            //获取该文件的输出流
-            FileOutputStream fos = new FileOutputStream(img);
-            //Bitmap的CompressFormat函数将图像数据写入输出流中
-            bm.compress(Bitmap.CompressFormat.PNG, 85, fos);
-            fos.flush();//输出流刷新
-            fos.close();
-            return Uri.fromFile(img);//产生一个返回File类型的Uri
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void saveCirBitmap(Bitmap bitmap) {
-        String cirHeadPath = getphotoPath();
-        File filePath = new File(cirHeadPath);
-        if (!filePath.exists()) {
-            filePath.mkdir();
-        }
-        File imgCirHead = new File(filePath, "image_cir_head.png");
-        try {
-            FileOutputStream fos = new FileOutputStream(imgCirHead);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");//数据和类型
@@ -245,7 +203,8 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             is = getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(is);
             is.close();
-            return saveBitmap(bitmap);
+            ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
+            return imgFileExternalStorage.saveBitmap(bitmap, "photo_head.png");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -255,17 +214,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
     }
 
-//    private void sendImage(Bitmap bm) {
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
-//        byte[] bytes = stream.toByteArray();
-//        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
-//        /**
-//         * 发送到服务器
-//         */
-//        String picPath = getphotoPath();
-//        picPath = picPath + "image_cir_head.png";
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -276,7 +224,8 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Bundle extras = data.getExtras();//从data中取出数据
                 if (extras != null) {
                     Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
-                    Uri uri = saveBitmap(bm);//将bitmap转化为uri
+                    ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
+                    Uri uri = imgFileExternalStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
                     startImageZoom(uri);//uri必须是File类型
                 }
             }
@@ -298,11 +247,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             ImageRound imageRound = new ImageRound();
             Bitmap roundBitmap = imageRound.toRoundBitmap(bm);
 
-            saveCirBitmap(roundBitmap);//保存圆形图片到本地
-
-            /**
-             * 发送头像
-             */
+            ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
+            imgFileExternalStorage.saveCirBitmap(getphotoPath(), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
+//            saveCirBitmap(roundBitmap);//保存圆形图片到本地
 
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
             fileAsyncTask.execute();
