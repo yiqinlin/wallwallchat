@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.stark.yiyu.File.ImgFileExternalStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Listview.ElasticListView;
