@@ -8,53 +8,37 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.media.Image;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.stark.yiyu.File.ImgFileExternalStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
-import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
-import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
-import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
-import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -179,7 +163,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         builder.create().show();
     }
 
-    private String getphotoPath() {
+    private String getPhotoPath() {
         String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
         return photoPath;
     }
@@ -248,11 +232,12 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             Bitmap roundBitmap = imageRound.toRoundBitmap(bm);
 
             ImgFileExternalStorage imgFileExternalStorage = new ImgFileExternalStorage();
-            imgFileExternalStorage.saveCirBitmap(getphotoPath(), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
-//            saveCirBitmap(roundBitmap);//保存圆形图片到本地
+            imgFileExternalStorage.saveCirBitmap(getPhotoPath(), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
 
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
             fileAsyncTask.execute();
+
+
 
         } else if (requestCode == GOTO_APPSETTING) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -276,20 +261,30 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
         @Override
         protected Void doInBackground(Void...values) {
-            String path = getphotoPath() + "image_cir_head.png";
+            String path = getPhotoPath() + "image_cir_head.png";
             File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(path, file.length(), file.getName(), "12"), path);
+            String answer = NetSocket.request(NetPackage.SendFile(SrcID,path, file.length(), file.getName(), "12"), path);
             Ack ack = (Ack) NetPackage.getBag(answer);
             if (ack.Flag) {
-                Log.e("发送图片", "成功");
+                publishProgress(1);
             } else {
-                Log.e("发送图片", "失败");
+                publishProgress(0);
             }
             return null;
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+            switch (values[0]){
+                case 0:
+                    Toast.makeText(HomepageActivity.this,"发送失败，请稍后重试",Toast.LENGTH_SHORT);
+                    break;
+                case 1:
+                    mArrays.remove(0);
+                    mArrays.add(0,new ItemHomepageTitle(5, DesId,new BitmapDrawable( BitmapFactory.decodeFile(getPhotoPath()+ "image_cir_head.png")) , Nick, Auto));
+                    adapter.notifyDataSetChanged();
+                    break;
+            }
         }
     }
 

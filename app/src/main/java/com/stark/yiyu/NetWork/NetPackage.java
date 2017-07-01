@@ -50,7 +50,6 @@ public class NetPackage {
         String JsonStr=null;
         try {
             JsonStr= JsonConvert.SerializeObject(register);/**序列化：封装成json格式*/
-//            Log.e("NetPackage", JsonStr);Shanks
             format.Type = "Registion";
             format.Cmd = "register";
             format.JsonMsg = JsonStr;
@@ -159,8 +158,9 @@ public class NetPackage {
         }
         return null;
     }
-    public static String SendFile(String src, long size, String name, String hashcode) {
+    public static String SendFile(String id,String src, long size, String name, String hashcode) {
         TransFile transFile = new TransFile();
+        transFile.SrcId=id;
         transFile.Src = src;
         transFile.Size = size;
         transFile.Name = name;
