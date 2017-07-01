@@ -50,7 +50,6 @@ public class NetPackage {
         String JsonStr=null;
         try {
             JsonStr= JsonConvert.SerializeObject(register);/**序列化：封装成json格式*/
-//            Log.e("NetPackage", JsonStr);Shanks
             format.Type = "Registion";
             format.Cmd = "register";
             format.JsonMsg = JsonStr;
@@ -160,25 +159,15 @@ public class NetPackage {
         return null;
     }
     public static String SendFile(String Srcid,String src, long size, String name, String hashcode) {
+    public static String SendFile(String id,String src, long size, String name, String hashcode) {
         TransFile transFile = new TransFile();
+        transFile.SrcId=id;
         transFile.Src = src;
         transFile.Size = size;
         transFile.Name = name;
         transFile.HashCode = hashcode;
         transFile.Mode = "check";
-        String JsonStr;
-        try {
-//            JsonStr = JsonConvert.SerializeObject(transFile);
-//            Format format = new Format();
-//            format.Type = "File";
-//            format.Cmd = "check";
-//            format.JsonMsg = JsonStr;
-//            Log.i("SendFile", JsonStr);
-            return JsonConvert.SerializeObject(transFile);
-        } catch (Exception e) {
-            Log.i("SendFile", e.toString());
-        }
-        return null;
+        return JsonConvert.SerializeObject(transFile);
     }
     public static String Get(String SrcId,int Type,JSONArray data){
         Get get=new Get();
@@ -200,8 +189,8 @@ public class NetPackage {
         return null;
     }
     public static String CmdModify(String JsonStr,String cmd){
-        Format temp=(Format)JsonConvert.DeserializeObject(JsonStr,new Format());
-        temp.Cmd=cmd;
+        TransFile temp=(TransFile)JsonConvert.DeserializeObject(JsonStr,new TransFile());
+        temp.Mode=cmd;
         return JsonConvert.SerializeObject(temp);
     }
     public static Object getBag(String str){

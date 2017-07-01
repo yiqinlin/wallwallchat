@@ -13,32 +13,43 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
+import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
+import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
+import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
+import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
+import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -163,10 +174,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         builder.create().show();
     }
 
-//    private String getPhotoPath() {
-//        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
-//        return photoPath;
-//    }
+    private String getPhotoPath() {
+        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
+        return photoPath;
+    }
 
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -197,6 +208,17 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
     }
 
+//    private void sendImage(Bitmap bm) {
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
+//        byte[] bytes = stream.toByteArray();
+//        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
+//        /**
+//         * 发送到服务器
+//         */
+//        String picPath = getphotoPath();
+//        picPath = picPath + "image_cir_head.png";
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
