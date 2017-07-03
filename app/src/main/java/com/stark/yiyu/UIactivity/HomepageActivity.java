@@ -173,7 +173,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         });
         builder.create().show();
     }
-    
+
 
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
