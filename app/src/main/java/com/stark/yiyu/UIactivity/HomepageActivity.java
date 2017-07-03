@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,6 +24,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -94,27 +96,37 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         adapter = new MyAdapter(HomepageActivity.this, mArrays);
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemHomepageTitle(5, DesId, getResources().getDrawable(R.drawable.tianqing), Nick, Auto));
+        mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this, true), Nick, Auto));
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
             send.setOnClickListener(Click);
         } else {
             get.setText("待开发");
-            send.setText("待开发");
-            mReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    /**
-                     *
-                     */
-                }
-            };
-            /**
-             * IntentFilter
-             */
+            send.setText("编辑资料");
         }
-    }
 
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("com.stark.yiyu.changeHead")&&DesId.equals(SrcID)) {
+                    mArrays.remove(0);
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.changeHead");
+        registerReceiver(mReceiver, intentFilter);
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(event.getKeyCode()==KeyEvent.KEYCODE_BACK) {
+            unregisterReceiver(mReceiver);
+            finish();
+        }
+        return false;
+    }
     View.OnClickListener Click = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -309,13 +321,18 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     Toast.makeText(HomepageActivity.this,"发送失败，请稍后重试",Toast.LENGTH_SHORT);
                     break;
                 case 1:
-                    mArrays.remove(0);
-                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
-                    adapter.notifyDataSetChanged();
+                    Intent intent = new Intent();
+                    intent.setAction("com.stark.yiyu.changeHead");
+                    sendBroadcast(intent);
+
+//                    mArrays.remove(0);
+//                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
+//                    adapter.notifyDataSetChanged();
                     break;
             }
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

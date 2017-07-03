@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Fragment.FragAdapter;
 import com.stark.yiyu.Fragment.Fragment1;
 import com.stark.yiyu.Fragment.Fragment2;
@@ -82,7 +84,7 @@ public class TransferActivity extends FragmentActivity{
         title.setText("消 息");
         titleRight.setText("添加");
         titleRight.setOnClickListener(Click);
-        titleLeft.setBackgroundResource(R.drawable.tianqing);
+        titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
         titleLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,15 +98,14 @@ public class TransferActivity extends FragmentActivity{
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                /**
-                 *
-                 */
+                if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
+                    titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
+                }
             }
         };
-        /**
-         * IntentFilter
-         */
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.changeHead");
+        registerReceiver(mReceiver, intentFilter);
 //        DisplayMetrics outMetrics=new DisplayMetrics();
 //        getWindow().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 //        screenWidth=outMetrics.widthPixels;

@@ -40,6 +40,7 @@ public class ImgStorage {
         Intent intent = new Intent(context, MyService.class);
         intent.putExtra("CMD", "Image");
         context.startService(intent);
+
 //        IntentFilter intentFilter = new IntentFilter();
 //        intentFilter.addAction("com.stark.yiyu.File.IMAGE_HEAD");
 ////        context.registerReceiver(intentFilter);
