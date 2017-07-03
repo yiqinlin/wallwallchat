@@ -3,6 +3,8 @@ package com.stark.yiyu.UIactivity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -73,6 +75,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
     private ArrayList<BaseItem> mArrays = null;
     private MyAdapter adapter = null;
     private AlertDialog dialog = null;
+    private BroadcastReceiver mReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,17 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         } else {
             get.setText("待开发");
             send.setText("待开发");
+            mReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    /**
+                     *
+                     */
+                }
+            };
+            /**
+             * IntentFilter
+             */
         }
     }
 

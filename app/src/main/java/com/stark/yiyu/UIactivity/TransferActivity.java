@@ -1,6 +1,7 @@
 package com.stark.yiyu.UIactivity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -46,6 +48,7 @@ public class TransferActivity extends FragmentActivity{
     public static ViewPager vp=null;
     private String Nick=null;
     private String Auto=null;
+    private BroadcastReceiver mReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +74,7 @@ public class TransferActivity extends FragmentActivity{
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
             Nick=cr.getString(0);
+            Log.d("TransferAcivity", "Nick = " + Nick);
             Auto=cr.getString(1);
             cr.close();
         }
@@ -84,11 +88,23 @@ public class TransferActivity extends FragmentActivity{
             public void onClick(View v) {
                 Intent intent =new Intent(TransferActivity.this,HomepageActivity.class);
                 intent.putExtra("id",SrcId);
-                intent.putExtra("Nick",Nick);//昵称
-                intent.putExtra("Auto",Auto);//签名
+                intent.putExtra("nick",Nick);//昵称
+                intent.putExtra("auto",Auto);//签名
                 startActivity(intent);
             }
         });
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                /**
+                 *
+                 */
+            }
+        };
+        /**
+         * IntentFilter
+         */
+
 //        DisplayMetrics outMetrics=new DisplayMetrics();
 //        getWindow().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 //        screenWidth=outMetrics.widthPixels;
@@ -122,6 +138,9 @@ public class TransferActivity extends FragmentActivity{
             }
         });
     }
+
+
+
     public static void setViewPager(int i){//跳页数
         vp.setCurrentItem(i);
     }
