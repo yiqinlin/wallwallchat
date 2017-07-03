@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -303,7 +304,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         protected Void doInBackground(Void...values) {
             String path = ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png";
             File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(SrcID,path, file.length(), file.getName(), "12"), path);
+            String answer = NetSocket.request(NetPackage.SendFile(SrcID, path, file.length(), file.getName(), "12", true), path);
             Ack ack = (Ack) NetPackage.getBag(answer);
             if (ack.Flag) {
                 publishProgress(1);
@@ -388,7 +389,31 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
              * 待开发ing
              */
         } else {
-            showChoosePicDialog();
+            switch (v.getId()) {
+                case R.id.list_homepage_head:
+                    showChoosePicDialog();
+                    break;
+                case R.id.list_homepage_nick:
+                    /**
+                     *
+                     */
+                    break;
+                case R.id.list_homepage_auto:
+                    final EditText edtAuto = new EditText(this);
+                    new AlertDialog.Builder(this)
+                            .setTitle("个性签名")
+                            .setView(edtAuto)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String auto = edtAuto.getText().toString();
+
+                                }
+                            })
+                            .setNegativeButton("取消", null)
+                            .setCancelable(false).show();
+                    break;
+            }
         }
     }
 
@@ -423,5 +448,11 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Toast.makeText(HomepageActivity.this, "留存成功", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 }

@@ -10,4 +10,5 @@ public class TransFile {
     public long Size;
     public String Mode;
     public String HashCode;
+    public boolean IsHead;
 }

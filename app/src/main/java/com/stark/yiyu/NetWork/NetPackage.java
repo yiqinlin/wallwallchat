@@ -158,7 +158,7 @@ public class NetPackage {
         }
         return null;
     }
-    public static String SendFile(String id,String src, long size, String name, String hashcode) {
+    public static String SendFile(String id,String src, long size, String name, String hashcode,boolean ishead) {
         TransFile transFile = new TransFile();
         transFile.SrcId=id;
         transFile.Src = src;
@@ -166,6 +166,7 @@ public class NetPackage {
         transFile.Name = name;
         transFile.HashCode = hashcode;
         transFile.Mode = "check";
+        transFile.IsHead = ishead;
         return JsonConvert.SerializeObject(transFile);
     }
     public static String Get(String SrcId,int Type,JSONArray data){
