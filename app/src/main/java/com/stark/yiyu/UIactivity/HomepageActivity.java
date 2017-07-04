@@ -200,8 +200,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         });
         builder.create().show();
     }
-
-
     private void startImageZoom(Uri uri) {//裁剪
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");//数据和类型
@@ -230,19 +228,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             return null;
         }
     }
-
-//    private void sendImage(Bitmap bm) {
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bm.compress(Bitmap.CompressFormat.PNG, 60, stream);
-//        byte[] bytes = stream.toByteArray();
-//        String img = new String(Base64.encodeToString(bytes, Base64.DEFAULT));
-//        /**
-//         * 发送到服务器
-//         */
-//        String picPath = getphotoPath();
-//        picPath = picPath + "image_cir_head.png";
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST_CODE) {//从摄像头中获取图像
@@ -252,7 +237,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Bundle extras = data.getExtras();//从data中取出数据
                 if (extras != null) {
                     Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
-
                     Uri uri = ImgStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
                     startImageZoom(uri);//uri必须是File类型
                 }
@@ -271,15 +255,11 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             }
             Bundle extras = data.getExtras();
             Bitmap bm = extras.getParcelable("data");
-
             Bitmap roundBitmap = ImageRound.toRoundBitmap(bm);
-
-
             ImgStorage.saveCirBitmap(ImgStorage.getPhotoPath(this), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
+
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
-
             fileAsyncTask.execute();
-
         } else if (requestCode == GOTO_APPSETTING) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 int i = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -325,10 +305,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     Intent intent = new Intent();
                     intent.setAction("com.stark.yiyu.changeHead");
                     sendBroadcast(intent);
-
-//                    mArrays.remove(0);
-//                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
-//                    adapter.notifyDataSetChanged();
                     break;
             }
         }
@@ -448,11 +424,5 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 Toast.makeText(HomepageActivity.this, "留存成功", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mReceiver);
     }
 }
