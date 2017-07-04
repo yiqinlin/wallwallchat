@@ -370,9 +370,22 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     showChoosePicDialog();
                     break;
                 case R.id.list_homepage_nick:
-                    /**
-                     *
-                     */
+                    final EditText edtNick = new EditText(this);
+                    new AlertDialog.Builder(this)
+                            .setTitle("修改昵称")
+                            .setView(edtNick)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String nick = edtNick.getText().toString();
+                                    if (nick != null && !nick.equals("")) {
+
+                                    } else {
+                                        nick = "";
+                                    }
+                                }
+                            })
+                            .setNegativeButton("取消", null).setCancelable(false).show();
                     break;
                 case R.id.list_homepage_auto:
                     final EditText edtAuto = new EditText(this);
@@ -383,7 +396,11 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String auto = edtAuto.getText().toString();
+                                    if (auto != null && !auto.equals("")) {
 
+                                    } else {
+                                        auto = "";
+                                    }
                                 }
                             })
                             .setNegativeButton("取消", null)

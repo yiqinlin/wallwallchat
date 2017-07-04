@@ -15,5 +15,4 @@
     <string name="action_register">Register</string>
     <string name="title_activity_transfer">TransferActivity</string>
     <string name="title_activity_zone">ZoneActivity</string>
-
 </resources>
