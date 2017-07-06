@@ -1,18 +1,22 @@
 package com.stark.yiyu.Fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Get;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
@@ -39,7 +43,8 @@ public class Fragment3 extends Fragment {
     private ArrayList<BaseItem> mArrays=null;
     private MyAdapter adapter=null;
     private String Nick=null;
-    private String Auto=null;
+    private String Auto = null;
+    private BroadcastReceiver mReceiver = null;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState){
         View view=inflater.inflate(R.layout.transfer_right, container, false);
@@ -50,6 +55,25 @@ public class Fragment3 extends Fragment {
         ElasticListView listView = (ElasticListView) view.findViewById(R.id.listView_right);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new MyOnItemClickListener());
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
+                    SQLiteDatabase db = new DatabaseHelper(getActivity()).getWritableDatabase();
+                    SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
+                    db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
+                    Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
+                    if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
+                        mArrays.remove(0);
+                        mArrays.add(0,new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity(), true), cr.getString(0), cr.getString(1)));
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.changeHead");
+        getActivity().registerReceiver(mReceiver, intentFilter);
         return view;
     }
     public void init(SQLiteDatabase db){
@@ -57,7 +81,7 @@ public class Fragment3 extends Fragment {
         db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
-            mArrays.add(new ItemRightHead(3, sp.getString("id", null), getResources().getDrawable(R.drawable.tianqing), cr.getString(0), cr.getString(1)));
+            mArrays.add(new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity(), true), cr.getString(0), cr.getString(1)));
             Nick=cr.getString(0);
             Auto=cr.getString(1);
             cr.close();
@@ -111,5 +135,12 @@ public class Fragment3 extends Fragment {
                     break;
             }
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.e("onDestroyView", "Fragment");
+        getActivity().unregisterReceiver(mReceiver);
+        super.onDestroyView();
     }
 }

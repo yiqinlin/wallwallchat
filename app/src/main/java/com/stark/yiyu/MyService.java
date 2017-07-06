@@ -107,6 +107,11 @@ public class MyService extends Service {
                 if (Connected()) {
                     sendHeart();
                 }
+            } else if (cmd.equals("Image")) {
+                /**
+                 *
+                 *
+                 */
             }
         }else {
             Log.i("MyService","null CMD");

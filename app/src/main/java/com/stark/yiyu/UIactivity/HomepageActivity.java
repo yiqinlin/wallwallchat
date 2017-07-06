@@ -3,8 +3,11 @@ package com.stark.yiyu.UIactivity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,31 +16,43 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
+import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
+import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
+import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
+import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
+import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
-
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +74,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
     private ArrayList<BaseItem> mArrays = null;
     private MyAdapter adapter = null;
     private AlertDialog dialog = null;
+    private BroadcastReceiver mReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +93,37 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         adapter = new MyAdapter(HomepageActivity.this, mArrays);
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemHomepageTitle(5, DesId, getResources().getDrawable(R.drawable.tianqing), Nick, Auto));
+        mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this, true), Nick, Auto));
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
             send.setOnClickListener(Click);
         } else {
             get.setText("待开发");
-            send.setText("待开发");
+            send.setText("编辑资料");
         }
-    }
 
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("com.stark.yiyu.changeHead")&&DesId.equals(SrcID)) {
+                    mArrays.remove(0);
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.changeHead");
+        registerReceiver(mReceiver, intentFilter);
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(event.getKeyCode()==KeyEvent.KEYCODE_BACK) {
+            unregisterReceiver(mReceiver);
+            finish();
+        }
+        return false;
+    }
     View.OnClickListener Click = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -136,7 +173,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 switch (which) {
                     case 0:
                         Log.e("拍照", "选择本地照片");
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -144,7 +181,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                         }
                         break;
                     case 1:
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -223,7 +260,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         protected Void doInBackground(Void...values) {
             String path = ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png";
             File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(SrcID,path, file.length(), file.getName(), "12"), path);
+            String answer = NetSocket.request(NetPackage.SendFile(SrcID, path, file.length(), file.getName(), "12", true), path);
             Ack ack = (Ack) NetPackage.getBag(answer);
             if (ack.Flag) {
                 publishProgress(1);
@@ -241,13 +278,14 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     Toast.makeText(HomepageActivity.this,"发送失败，请稍后重试",Toast.LENGTH_SHORT);
                     break;
                 case 1:
-                    mArrays.remove(0);
-                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
-                    adapter.notifyDataSetChanged();
+                    Intent intent = new Intent();
+                    intent.setAction("com.stark.yiyu.changeHead");
+                    sendBroadcast(intent);
                     break;
             }
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -303,7 +341,48 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
              * 待开发ing
              */
         } else {
-            showChoosePicDialog();
+            switch (v.getId()) {
+                case R.id.list_homepage_head:
+                    showChoosePicDialog();
+                    break;
+                case R.id.list_homepage_nick:
+                    final EditText edtNick = new EditText(this);
+                    new AlertDialog.Builder(this)
+                            .setTitle("修改昵称")
+                            .setView(edtNick)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String nick = edtNick.getText().toString();
+                                    if (nick != null && !nick.equals("")) {
+
+                                    } else {
+                                        nick = "";
+                                    }
+                                }
+                            })
+                            .setNegativeButton("取消", null).setCancelable(false).show();
+                    break;
+                case R.id.list_homepage_auto:
+                    final EditText edtAuto = new EditText(this);
+                    new AlertDialog.Builder(this)
+                            .setTitle("个性签名")
+                            .setView(edtAuto)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String auto = edtAuto.getText().toString();
+                                    if (auto != null && !auto.equals("")) {
+
+                                    } else {
+                                        auto = "";
+                                    }
+                                }
+                            })
+                            .setNegativeButton("取消", null)
+                            .setCancelable(false).show();
+                    break;
+            }
         }
     }
 

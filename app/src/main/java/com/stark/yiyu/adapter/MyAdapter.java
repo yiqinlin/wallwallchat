@@ -237,9 +237,11 @@ public interface Callback{
         viewHolder.id=msg.getId();
         viewHolder.head.setBackgroundDrawable(msg.getHead());
         mCallback = (Callback) mContext;
-        viewHolder.head.setOnClickListener(Click);
         viewHolder.nick.setText(msg.getNick());
         viewHolder.auto.setText(msg.getAuto());
+        viewHolder.head.setOnClickListener(Click);
+        viewHolder.nick.setOnClickListener(Click);
+        viewHolder.auto.setOnClickListener(Click);
         return convertView;
     }
     private View getSimpleListConvertView(int position,View convertView){
@@ -278,6 +280,11 @@ public interface Callback{
                 case R.id.list_homepage_head:
                     mCallback.click(v);
                     break;
+                case R.id.list_homepage_nick:
+                    mCallback.click(v);
+                    break;
+                case R.id.list_homepage_auto:
+                    mCallback.click(v);
             }
         }
     };

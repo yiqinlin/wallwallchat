@@ -1,8 +1,10 @@
 package com.stark.yiyu.UIactivity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -21,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Fragment.FragAdapter;
 import com.stark.yiyu.Fragment.Fragment1;
 import com.stark.yiyu.Fragment.Fragment2;
@@ -46,6 +50,7 @@ public class TransferActivity extends FragmentActivity{
     public static ViewPager vp=null;
     private String Nick=null;
     private String Auto=null;
+    private BroadcastReceiver mReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +76,7 @@ public class TransferActivity extends FragmentActivity{
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
             Nick=cr.getString(0);
+            Log.d("TransferAcivity", "Nick = " + Nick);
             Auto=cr.getString(1);
             cr.close();
         }
@@ -78,17 +84,28 @@ public class TransferActivity extends FragmentActivity{
         title.setText("消 息");
         titleRight.setText("添加");
         titleRight.setOnClickListener(Click);
-        titleLeft.setBackgroundResource(R.drawable.tianqing);
+        titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
         titleLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent =new Intent(TransferActivity.this,HomepageActivity.class);
                 intent.putExtra("id",SrcId);
-                intent.putExtra("Nick",Nick);//昵称
-                intent.putExtra("Auto",Auto);//签名
+                intent.putExtra("nick",Nick);//昵称
+                intent.putExtra("auto",Auto);//签名
                 startActivity(intent);
             }
         });
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
+                    titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.changeHead");
+        registerReceiver(mReceiver, intentFilter);
 //        DisplayMetrics outMetrics=new DisplayMetrics();
 //        getWindow().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 //        screenWidth=outMetrics.widthPixels;
@@ -122,6 +139,9 @@ public class TransferActivity extends FragmentActivity{
             }
         });
     }
+
+
+
     public static void setViewPager(int i){//跳页数
         vp.setCurrentItem(i);
     }
@@ -144,7 +164,7 @@ public class TransferActivity extends FragmentActivity{
                     mid.setBackgroundResource(R.drawable.theme_transfer_tab_message_nor);
                     right.setBackgroundResource(R.drawable.theme_transfer_tab_me_nor);
                     title.setText("世 界");
-                    titleRight.setText("消息");
+                    titleRight.setText("发布");
                     break;
                 case 1:
                     left.setBackgroundResource(R.drawable.theme_transfer_tab_group_nor);
@@ -162,20 +182,20 @@ public class TransferActivity extends FragmentActivity{
                     break;
             }
             if(position==0&&mInputLine.getVisibility()==View.GONE){//第一页世界,输入框为不可见(默认也为不可见)。
-                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);//动画
-                Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
-                mTabLine.setAnimation(mtob);
-                mInputLine.setAnimation(btom);
-                mTabLine.setVisibility(View.GONE);//换页的Tab消失。
-                mInputLine.setVisibility(View.VISIBLE);//让输入框为可见
+//                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);//动画
+//                Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
+//                mTabLine.setAnimation(mtob);
+//                mInputLine.setAnimation(btom);
+//                mTabLine.setVisibility(View.GONE);//换页的Tab消失。
+//                mInputLine.setVisibility(View.VISIBLE);//让输入框为可见
             }
             else if(mInputLine.getVisibility()==View.VISIBLE){//若输入框可见（即已不在‘世界’界面）
-                Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
-                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);
-                mTabLine.setAnimation(btom);
-                mInputLine.setAnimation(mtob);
-                mTabLine.setVisibility(View.VISIBLE);//换页Tab可见
-                mInputLine.setVisibility(View.GONE);//输入框消失
+//                Animation mtob= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_mtob);
+//                Animation btom= AnimationUtils.loadAnimation(TransferActivity.this,R.anim.anim_btom);
+//                mTabLine.setAnimation(btom);
+//                mInputLine.setAnimation(mtob);
+//                mTabLine.setVisibility(View.VISIBLE);//换页Tab可见
+//                mInputLine.setVisibility(View.GONE);//输入框消失
             }
         }
     }
@@ -184,7 +204,11 @@ public class TransferActivity extends FragmentActivity{
         public void onClick(View v) {
             switch (vp.getCurrentItem()){
                 case 0:
-                    setViewPager(1);
+//                    setViewPager(1);
+                    /**
+                     *
+                     */
+
                     break;
                 case 1://若在中间界面
                     Intent intent=new Intent(TransferActivity.this, AddActivity.class);
@@ -200,4 +224,10 @@ public class TransferActivity extends FragmentActivity{
             }
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
+    }
 }
