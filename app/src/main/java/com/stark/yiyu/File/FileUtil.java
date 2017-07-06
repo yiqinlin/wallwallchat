@@ -9,6 +9,10 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.stark.yiyu.Format.FileType;
+
+import java.io.File;
+
 /**
  * Created by Stark on 2017/7/4.
  */
@@ -20,6 +24,26 @@ public class FileUtil {
             }
         }
         return "";
+    }
+    public static String getPath(FileType type){
+        String path=Environment.getExternalStorageDirectory()+"/campus";
+        switch (type){
+            case ImgTemp:
+                path+="/temp";
+                break;
+        }
+        File f=new File(path);
+        if(!f.exists()){
+            f.mkdir();
+        }
+        return path;
+    }
+    public static Uri PathToUri(String path){
+        File file=new File(path);
+        if(!file.exists()){
+            file.delete();
+        }
+        return Uri.fromFile(file);
     }
     public static String getPhotoPathFromContentUri(Context context, Uri uri) {
         String photoPath = "";

@@ -17,9 +17,11 @@ public class Error {
             case 3:
                 return "已在其他设备登录";
             case 5:
-                return "服务器网络异常";
+                return "服务器异常";
             case 6:
                 return "数据异常,请稍后重试";
+            case 8:
+                return "文件在服务器已存在";
             case 101:
                 return "请输入壹语账号";
             case 102:

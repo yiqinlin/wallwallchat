@@ -208,11 +208,6 @@ public class NetPackage {
         }
         return null;
     }
-    public static String CmdModify(String JsonStr,String cmd){
-        TransFile temp=(TransFile)JsonConvert.DeserializeObject(JsonStr,new TransFile());
-        temp.Mode=cmd;
-        return JsonConvert.SerializeObject(temp);
-    }
     public static Object getBag(String str){
         return getBag(getFormatBag(str));
     }

@@ -16,13 +16,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,29 +27,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.stark.yiyu.AsyncTask.FileAsyncTask;
+import com.stark.yiyu.File.FileUtil;
 import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
+import com.stark.yiyu.Format.FileType;
 import com.stark.yiyu.Format.Msg;
-import com.stark.yiyu.Format.TransFile;
 import com.stark.yiyu.Listview.ElasticListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.Util.DateUtil;
-import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
-import com.stark.yiyu.Util.ListUtil;
 import com.stark.yiyu.Util.Status;
+import com.stark.yiyu.Util.Try;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
-import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +68,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
     private MyAdapter adapter = null;
     private AlertDialog dialog = null;
     private BroadcastReceiver mReceiver = null;
+    private Uri outUri;
+    private String outPath;
+    private String creamPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +97,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             get.setText("待开发");
             send.setText("编辑资料");
         }
-
+        outPath=FileUtil.getPath(FileType.ImgTemp) + "/temp.png";
+        creamPath=FileUtil.getPath(FileType.ImgTemp) + "/creamTemp.png";
+        outUri=FileUtil.PathToUri(outPath);
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -177,6 +175,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT,creamPath);
                             startActivityForResult(intent, CAMERA_REQUEST_CODE);
                         }
                         break;
@@ -196,45 +195,23 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         });
         builder.create().show();
     }
-
-    private void startImageZoom(Uri uri) {//裁剪
-        startActivityForResult(ImgStorage.getCropIntent(uri), CROP_REQUEST_CODE);
+    private void CropImg(String in,String out){
+        startActivityForResult(ImgStorage.getCropIntent(in, out), CROP_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST_CODE) {//从摄像头中获取图像
-            if (data == null) {
-                return;
-            } else {//判断出是拍照
-                Bundle extras = data.getExtras();//从data中取出数据
-                if (extras != null) {
-                    Bitmap bm = extras.getParcelable("data");//保存用户拍摄的数据
-
-                    Uri uri = ImgStorage.saveBitmap(bm, "photo_head.png");//将bitmap转化为uri
-                    startImageZoom(uri);//uri必须是File类型
-                }
-            }
+            CropImg(creamPath,outPath);
         } else if (requestCode == GALLERY_REQUEST_CODE) {
-            if (data == null) {
-                return;
-            }
-            startImageZoom(ImgStorage.DataToUri(HomepageActivity.this,data.getData(), "image_head"));
-
-
+            CropImg(FileUtil.getPhotoPathFromContentUri(this, data.getData()),outPath);
         } else if (requestCode == CROP_REQUEST_CODE) {
-            if (data == null) {
-                return;
-            }
-            Bundle extras = data.getExtras();
-            Bitmap bm = extras.getParcelable("data");
 
-            Bitmap roundBitmap = ImageRound.toRoundBitmap(bm);
-
-            ImgStorage.saveCirBitmap(ImgStorage.getPhotoPath(this), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
+            Bitmap rbm = ImageRound.toRoundBitmap(Try.UriToBm(this, outUri));
+            ImgStorage.saveBitmap(rbm, outPath);
 
             FileAsyncTask fileAsyncTask = new FileAsyncTask();
-            fileAsyncTask.execute();
+            fileAsyncTask.execute("up", outPath);
 
         } else if (requestCode == GOTO_APPSETTING) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -251,46 +228,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         }
     }
 
-    class FileAsyncTask extends AsyncTask<Void, Integer, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-        @Override
-        protected Void doInBackground(Void...values) {
-            String path = ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png";
-            File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(SrcID, path, file.length(), file.getName(), "12", true), path);
-            Ack ack = (Ack) NetPackage.getBag(answer);
-            if (ack.Flag) {
-                publishProgress(1);
-            } else {
-                publishProgress(0);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            switch (values[0]){
-                case 0:
-                    Toast.makeText(HomepageActivity.this,"发送失败，请稍后重试",Toast.LENGTH_SHORT);
-                    break;
-                case 1:
-                    Intent intent = new Intent();
-                    intent.setAction("com.stark.yiyu.changeHead");
-                    sendBroadcast(intent);
-                    break;
-            }
-        }
-    }
-
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, java.lang.String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA_GALLERY) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -306,7 +247,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             }
         }
     }
-
     private void showDialogTipUserGoToAppSetting() {
         dialog = new AlertDialog.Builder(this)
                 .setTitle("权限不可用")

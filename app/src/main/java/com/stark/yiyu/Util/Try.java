@@ -1,6 +1,10 @@
 package com.stark.yiyu.Util;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -60,6 +64,14 @@ public class Try {
             Log.i("getBR Exception", e.toString());
             return null;
         }
+    }
+    public static Bitmap UriToBm(Context context,Uri uri){
+        try{
+            return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
+        }catch (Exception e){
+            Log.e("UriToBm",e.toString());
+        }
+        return null;
     }
     public static BufferedReader getBR(InputStream is)
     {
