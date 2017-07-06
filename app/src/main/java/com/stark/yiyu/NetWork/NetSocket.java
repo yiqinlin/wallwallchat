@@ -2,13 +2,22 @@ package com.stark.yiyu.NetWork;
 
 import android.util.Log;
 
+import com.stark.yiyu.File.FileMode;
+import com.stark.yiyu.File.FileUtil;
 import com.stark.yiyu.Format.Ack;
+import com.stark.yiyu.Format.Format;
 import com.stark.yiyu.Util.Try;
+import com.stark.yiyu.json.JsonConvert;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 
 /**
@@ -26,55 +35,69 @@ public class NetSocket {
             socket=Try.getSocket(IP,PORT+1);//第二个服务器
         }
         DataOutputStream bw= Try.getBW(socket);
-        BufferedReader br= Try.getBR(socket);
+        InputStream is=Try.getIS(socket);
+        BufferedReader br= Try.getBR(is);
         send(bw, Package);
         String result=get(br);
         NetDestroy(socket, bw, br);
         return result;
     }
-    public static String request(String Package,String FileSrc) {
+    public static String request(String Package,String FileSrc,int fileMode) {
         Socket socket=Try.getSocket(IP, FILEPORT);
         DataOutputStream bw = Try.getBW(socket);
-        BufferedReader br = Try.getBR(socket);
-        send(bw, Package, null);
+        InputStream is=Try.getIS(socket);
+        BufferedReader br = Try.getBR(is);
+        send(bw, Package);
         String result=get(br);
-        Ack ack=(Ack)NetPackage.getBag(result);
-        if(ack.Flag){
-            send(bw, NetPackage.CmdModify(Package, "up"), FileSrc);
-            result=get(br);
-            Log.e("132132",result);
+        Ack ack=(Ack) NetPackage.getBag(result);
+        switch (fileMode){
+            case FileMode.UPLOAD:
+                if(ack.Flag&&FileSrc!=null){
+                    send(bw,new File(FileSrc));
+                    result=get(br);
+                }
+                break;
+            case FileMode.DOWNLOAD:
+                if(ack.Flag){
+                    BufferedOutputStream bos = null;
+                    FileOutputStream fos = null;
+                    try {
+                        File dir = new File(FileSrc);
+                        if(!dir.exists()&&dir.isDirectory()){//判断文件目录是否存在
+                            dir.mkdirs();
+                        }
+                        String filepath=FileSrc+"/"+ack.SrcId+ FileUtil.getSuffix(ack.MsgCode);
+                        File file = new File(filepath);
+                        fos = new FileOutputStream(file);
+                        fos.write(get(is, Integer.parseInt(ack.BackMsg)));
+                        fos.close();
+                        ack.BackMsg=filepath;
+                        Format format=new Format();
+                        format.Cmd="down";
+                        format.Type="Ack";
+                        format.JsonMsg= JsonConvert.SerializeObject(ack);
+                        result=JsonConvert.SerializeObject(format);
+                    }catch (Exception e){
+                        Log.e("request",e.toString());
+                    }
+                }
+                break;
         }
+        NetDestroy(socket, bw, br);
         return result;
     }
-    public static boolean send(DataOutputStream bw,String Package,String FileSrc){
-        try{
-            int len=0;
-            File file=null;
-            if(FileSrc!=null){
-                file=new File(FileSrc);
-                len=new Long(file.length()).intValue();
-            }
-            byte[] temp=Package.getBytes("UTF-8");
-            byte[] sendMsg=new byte[temp.length+2+len];
-            System.arraycopy(temp, 0, sendMsg,2,temp.length);
-            sendMsg[0]=(byte)((temp.length+2)/255);
-            sendMsg[1]=(byte)((temp.length+2)%255);
-            if(FileSrc!=null){
-                try {
-                    FileInputStream fis = new FileInputStream(file);
-                    fis.read(sendMsg, temp.length+2,len);
-                    fis.close();
-                }catch (Exception e){
-                    Log.e("Send","File:"+e);
-                }
-            }
+    public static boolean send(DataOutputStream bw,File file){
+        try {
+            byte[] sendMsg=new byte[(int)file.length()];
+            FileInputStream fis = new FileInputStream(file);
+            fis.read(sendMsg);
+            fis.close();
             bw.write(sendMsg);
             bw.flush();
-            return true;
         }catch (Exception e){
-            Log.e("Send","File:"+e);
+            Log.e("Send", "File:" + e);
         }
-        return false;
+        return true;
     }
     public static boolean send(DataOutputStream bw,String Package)
     {
@@ -83,7 +106,7 @@ public class NetSocket {
             bw.flush();
             return true;
         }catch (Exception e){
-            Log.i("NetSocket","W"+e.toString());
+            Log.i("NetSocket", "W" + e.toString());
         }
         return false;
     }
@@ -93,6 +116,20 @@ public class NetSocket {
         }catch (Exception e){
             return null;
         }
+    }
+    public static byte[] get(InputStream is,int count){
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        byte[] buf=new byte[512];
+        int a;
+        try {
+            while(count>0&&(a= is.read(buf))!=-1) {
+                bout.write(buf, 0, a);
+                count-=a;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bout.toByteArray();
     }
     public static void NetDestroy(Socket socket,DataOutputStream bw,BufferedReader br){
         Try.CloseSocket(socket);

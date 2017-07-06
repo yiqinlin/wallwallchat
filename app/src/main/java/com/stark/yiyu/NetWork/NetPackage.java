@@ -158,15 +158,36 @@ public class NetPackage {
         }
         return null;
     }
-    public static String SendFile(String id,String src, long size, String name, String hashcode) {
+    public static String SendFile(String hashcode,String name,long size,boolean longtime ) {
         TransFile transFile = new TransFile();
-        transFile.SrcId=id;
-        transFile.Src = src;
         transFile.Size = size;
-        transFile.Name = name;
         transFile.HashCode = hashcode;
-        transFile.Mode = "check";
-        return JsonConvert.SerializeObject(transFile);
+        transFile.Name=name;
+        transFile.IsLong=longtime;
+        try{
+            Format format=new Format();
+            format.Type="File";
+            format.Cmd="up";
+            format.JsonMsg=JsonConvert.SerializeObject(transFile);
+            return JsonConvert.SerializeObject(format);
+        }catch (Exception e) {
+            Log.e("SendFile", "" + e);
+            return null;
+        }
+    }
+    public static String getFile(String hashcode){
+        TransFile transFile = new TransFile();
+        transFile.HashCode = hashcode;
+        try{
+            Format format=new Format();
+            format.Type="File";
+            format.Cmd="down";
+            format.JsonMsg=JsonConvert.SerializeObject(transFile);
+            return JsonConvert.SerializeObject(format);
+        }catch (Exception e) {
+            Log.e("SendFile", "" + e);
+            return null;
+        }
     }
     public static String Get(String SrcId,int Type,JSONArray data){
         Get get=new Get();
@@ -186,11 +207,6 @@ public class NetPackage {
             Log.i("Get",e.toString());
         }
         return null;
-    }
-    public static String CmdModify(String JsonStr,String cmd){
-        TransFile temp=(TransFile)JsonConvert.DeserializeObject(JsonStr,new TransFile());
-        temp.Mode=cmd;
-        return JsonConvert.SerializeObject(temp);
     }
     public static Object getBag(String str){
         return getBag(getFormatBag(str));

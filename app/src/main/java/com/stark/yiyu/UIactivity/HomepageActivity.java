@@ -38,9 +38,6 @@ import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.json.JsonConvert;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -139,7 +136,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 switch (which) {
                     case 0:
                         Log.e("拍照", "选择本地照片");
-                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -147,7 +144,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                         }
                         break;
                     case 1:
-                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M&&ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(HomepageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -163,40 +160,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         builder.create().show();
     }
 
-    private String getPhotoPath() {
-        String photoPath = String.format("data/data/%1$s/imgbases/", getApplicationContext().getPackageName());
-        return photoPath;
-    }
-
     private void startImageZoom(Uri uri) {//裁剪
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(uri, "image/*");//数据和类型
-        intent.putExtra("crop", "true");//开启的Intent 显示View是可裁减的
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);//裁剪的图片的宽高。最终得到的输出图片的宽高252
-        intent.putExtra("circleCrop", true);
-        intent.putExtra("return-data", true);//裁剪后的数据通过intent返回回来
-        startActivityForResult(intent, CROP_REQUEST_CODE);
+        startActivityForResult(ImgStorage.getCropIntent(uri), CROP_REQUEST_CODE);
     }
-
-    private Uri converUri(Uri uri) {
-        InputStream is = null;
-        try {
-            is = getContentResolver().openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-            return ImgStorage.saveBitmap(bitmap, "photo_head.png");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -216,10 +182,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             if (data == null) {
                 return;
             }
-            Uri uri;
-            uri = data.getData();
-            Uri fileUri = converUri(uri);//转化为File类型的uri
-            startImageZoom(fileUri);
+            startImageZoom(ImgStorage.DataToUri(HomepageActivity.this,data.getData(), "image_head"));
+
+
         } else if (requestCode == CROP_REQUEST_CODE) {
             if (data == null) {
                 return;
@@ -229,10 +194,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
 
             Bitmap roundBitmap = ImageRound.toRoundBitmap(bm);
 
-
             ImgStorage.saveCirBitmap(ImgStorage.getPhotoPath(this), "image_cir_head.png", roundBitmap);//保存圆形图片到本地
-            FileAsyncTask fileAsyncTask = new FileAsyncTask();
 
+            FileAsyncTask fileAsyncTask = new FileAsyncTask();
             fileAsyncTask.execute();
 
         } else if (requestCode == GOTO_APPSETTING) {

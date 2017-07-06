@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -52,10 +53,18 @@ public class Try {
             return null;
         }
     }
-    public static BufferedReader getBR(Socket socket)
+    public static InputStream getIS(Socket socket){
+        try{
+            return socket.getInputStream();
+        }catch (Exception e){
+            Log.i("getBR Exception", e.toString());
+            return null;
+        }
+    }
+    public static BufferedReader getBR(InputStream is)
     {
         try {
-            return new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+            return new BufferedReader(new InputStreamReader(is,"UTF-8"));
         }catch (Exception e)
         {
             Log.i("getBR Exception", e.toString());
