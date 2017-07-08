@@ -90,9 +90,11 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
         mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this, true), Nick, Auto));
+
+        send.setOnClickListener(Click);
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
-            send.setOnClickListener(Click);
+//            send.setOnClickListener(Click);
         } else {
             get.setText("待开发");
             send.setText("编辑资料");
@@ -132,29 +134,34 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     myAsyncTask.execute();
                     break;
                 case R.id.button_homepage_right:
-                    Date date = new Date();
-                    DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
-                    DateFormat Time = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
-                    Msg msg = new Msg();
-                    msg.SrcId = DesId;
-                    msg.Remarks = Nick;
-                    msg.Msg = Auto;
-                    msg.Date = format.format(date);
-                    msg.Time = Time.format(date);
-                    Intent broad = new Intent();
-                    broad.setAction("com.stark.yiyu.msg");
-                    broad.putExtra("Msg", JsonConvert.SerializeObject(msg));
-                    broad.putExtra("BagType", "Message");
-                    sendBroadcast(broad);
-                    if (AddActivity.mThis != null) {
-                        AddActivity.mThis.finish();
+                    if (!DesId.equals(SrcID)) {
+                        Date date = new Date();
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+                        DateFormat Time = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
+                        Msg msg = new Msg();
+                        msg.SrcId = DesId;
+                        msg.Remarks = Nick;
+                        msg.Msg = Auto;
+                        msg.Date = format.format(date);
+                        msg.Time = Time.format(date);
+                        Intent broad = new Intent();
+                        broad.setAction("com.stark.yiyu.msg");
+                        broad.putExtra("Msg", JsonConvert.SerializeObject(msg));
+                        broad.putExtra("BagType", "Message");
+                        sendBroadcast(broad);
+                        if (AddActivity.mThis != null) {
+                            AddActivity.mThis.finish();
+                        }
+                        Intent intent = new Intent(HomepageActivity.this, ChatActivity.class);
+                        intent.putExtra("nick", Nick);
+                        intent.putExtra("id", DesId);
+                        startActivityForResult(intent, 0);
+                        ChatActivity.This.finish();
+                        finish();
+                    } else {
+                        Intent intent = new Intent(HomepageActivity.this, EditInfoActivity.class);
+                        startActivity(intent);
                     }
-                    Intent intent = new Intent(HomepageActivity.this, ChatActivity.class);
-                    intent.putExtra("nick", Nick);
-                    intent.putExtra("id", DesId);
-                    startActivityForResult(intent, 0);
-                    ChatActivity.This.finish();
-                    finish();
                     break;
             }
         }

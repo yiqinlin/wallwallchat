@@ -16,15 +16,19 @@ import com.stark.yiyu.R;
 import com.stark.yiyu.UIactivity.AddActivity;
 import com.stark.yiyu.UIactivity.DetailActivity;
 import com.stark.yiyu.adapter.holder.ItemType;
+import com.stark.yiyu.adapter.holder.ViewHolderEditInfo;
 import com.stark.yiyu.adapter.holder.ViewHolderHomepageTitle;
 import com.stark.yiyu.adapter.holder.ViewHolderKnow;
+import com.stark.yiyu.adapter.holder.ViewHolderMargin;
 import com.stark.yiyu.adapter.holder.ViewHolderMid;
 import com.stark.yiyu.adapter.holder.ViewHolderRightHead;
 import com.stark.yiyu.adapter.holder.ViewHolderSChat;
 import com.stark.yiyu.adapter.holder.ViewHolderSimpleList;
 import com.stark.yiyu.bean.BaseItem;
+import com.stark.yiyu.bean.ItemEditInfo;
 import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.bean.ItemKnow;
+import com.stark.yiyu.bean.ItemMargin;
 import com.stark.yiyu.bean.ItemMid;
 import com.stark.yiyu.bean.ItemRightHead;
 import com.stark.yiyu.bean.ItemSMsg;
@@ -110,6 +114,12 @@ public interface Callback{
                 break;
             case 6:
                 convertView=getSimpleListConvertView(position,convertView);
+                break;
+            case 7://俩个TextView
+                convertView = getEditInfoConvertView(position, convertView);
+                break;
+            case 8://空白间隔:
+                convertView = getMarginConvertView(position, convertView);
                 break;
         }
         return convertView;
@@ -260,6 +270,38 @@ public interface Callback{
         viewHolder.Image.setImageDrawable(msg.getImage());
         return convertView;
     }
+
+    private View getEditInfoConvertView(int postion, View convertView) {
+        ViewHolderEditInfo viewHolder;
+        ItemEditInfo msg = (ItemEditInfo) mData.get(postion);
+        if (convertView == null) {
+            viewHolder = new ViewHolderEditInfo();
+            convertView = mInflater.inflate(R.layout.list_editinfo, null);
+            viewHolder.txvLeft = (TextView) convertView.findViewById(R.id.list_txv_left);
+            viewHolder.txvRight = (TextView) convertView.findViewById(R.id.list_txv_right);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolderEditInfo) convertView.getTag();
+        }
+        viewHolder.txvLeft.setText(msg.getStrLeft());
+        viewHolder.txvRight.setText(msg.getStrRight());
+
+        return convertView;
+    }
+
+    private View getMarginConvertView(int postion, View convertView) {
+        ViewHolderMargin viewHolder;
+        ItemMargin msg = (ItemMargin) mData.get(postion);
+        if (convertView == null) {
+            viewHolder = new ViewHolderMargin();
+            convertView = mInflater.inflate(R.layout.list_margin, null);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolderMargin) convertView.getTag();
+        }
+        return convertView;
+    }
+
     View.OnClickListener Click=new View.OnClickListener(){
         @Override
         public void onClick(View v) {
