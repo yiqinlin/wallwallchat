@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -27,17 +25,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.stark.yiyu.AsyncTask.FileAsyncTask;
+import com.stark.yiyu.File.FileMode;
 import com.stark.yiyu.File.FileUtil;
 import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.FileType;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Listview.ElasticListView;
+import com.stark.yiyu.NetWork.MD5;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
 import com.stark.yiyu.Util.DateUtil;
+import com.stark.yiyu.Util.Error;
 import com.stark.yiyu.Util.ImageRound;
 import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.Util.Try;
@@ -46,6 +46,7 @@ import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.json.JsonConvert;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,11 +67,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
     private String Auto = null;
     private ArrayList<BaseItem> mArrays = null;
     private MyAdapter adapter = null;
-    private AlertDialog dialog = null;
     private BroadcastReceiver mReceiver = null;
-    private Uri outUri;
     private String outPath;
     private String creamPath;
+    private String cirPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,15 +97,16 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             get.setText("待开发");
             send.setText("编辑资料");
         }
-        outPath=FileUtil.getPath(FileType.ImgTemp) + "/temp.png";
-        creamPath=FileUtil.getPath(FileType.ImgTemp) + "/creamTemp.png";
-        outUri=FileUtil.PathToUri(outPath);
+        outPath=FileUtil.getPath(FileType.ImgTemp) + "/poly.png";
+        creamPath=FileUtil.getPath(FileType.ImgTemp) + "/crm.png";
+        cirPath=FileUtil.getPath(FileType.ImgTemp) + "/cir.png";
+
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.yiyu.changeHead")&&DesId.equals(SrcID)) {
                     mArrays.remove(0);
-                    mArrays.add(0, new ItemHomepageTitle(5, DesId, new BitmapDrawable(BitmapFactory.decodeFile(ImgStorage.getPhotoPath(HomepageActivity.this) + "image_cir_head.png")), Nick, Auto));
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId,ImgStorage.getHead(HomepageActivity.this,true), Nick, Auto));
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -175,7 +176,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                             ActivityCompat.requestPermissions(HomepageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_CAMERA_GALLERY);
                         } else {
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            intent.putExtra(MediaStore.EXTRA_OUTPUT,creamPath);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT,FileUtil.PathToUri(creamPath));
                             startActivityForResult(intent, CAMERA_REQUEST_CODE);
                         }
                         break;
@@ -195,39 +196,57 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         });
         builder.create().show();
     }
-    private void CropImg(String in,String out){
-        startActivityForResult(ImgStorage.getCropIntent(in, out), CROP_REQUEST_CODE);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST_CODE) {//从摄像头中获取图像
-            CropImg(creamPath,outPath);
-        } else if (requestCode == GALLERY_REQUEST_CODE) {
-            CropImg(FileUtil.getPhotoPathFromContentUri(this, data.getData()),outPath);
-        } else if (requestCode == CROP_REQUEST_CODE) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST_CODE) {
+                Uri in = Uri.fromFile(new File(creamPath));
+                Uri out = Uri.fromFile(new File(outPath));
+                startActivityForResult(ImgStorage.getCropIntent(in, out), CROP_REQUEST_CODE);
+            } else if (requestCode == GALLERY_REQUEST_CODE) {
+                startActivityForResult(ImgStorage.getCropIntent(Uri.fromFile(new File(FileUtil.getPhotoPathFromContentUri(this, data.getData()))),Uri.fromFile(new File(outPath))), CROP_REQUEST_CODE);
+            } else if (requestCode == CROP_REQUEST_CODE) {
 
-            Bitmap rbm = ImageRound.toRoundBitmap(Try.UriToBm(this, outUri));
-            ImgStorage.saveBitmap(rbm, outPath);
+                Bitmap rbm = ImageRound.toRoundBitmap(Try.UriToBm(this, Uri.fromFile(new File(outPath))));
+                ImgStorage.saveBitmap(rbm, cirPath);
 
-            FileAsyncTask fileAsyncTask = new FileAsyncTask();
-            fileAsyncTask.execute("up", outPath);
+                FileAsyncTask fileAsyncTask = new FileAsyncTask();
+                fileAsyncTask.execute(cirPath);
 
-        } else if (requestCode == GOTO_APPSETTING) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                int i = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                if (i != PackageManager.PERMISSION_GRANTED) {
-                    showDialogTipUserGoToAppSetting();
-                } else {
-                    if (dialog != null && dialog.isShowing()) {
-                        dialog.dismiss();
+            } else if (requestCode == GOTO_APPSETTING) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    int i = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    if (i != PackageManager.PERMISSION_GRANTED) {
+                        PermissionRequest();
+                    } else {
+                        Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
-
+    private void PermissionRequest() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("权限不可用")
+                .setMessage("请在-应用设置-权限中，获取权限。")
+                .setPositiveButton("接受", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, GOTO_APPSETTING);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                }).setCancelable(false).show();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, java.lang.String[] permissions, int[] grantResults) {
@@ -237,7 +256,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     boolean b = shouldShowRequestPermissionRationale(permissions[0]);
                     if (!b) {
-                        showDialogTipUserGoToAppSetting();
+                        PermissionRequest();
                     } else {
                         finish();
                     }
@@ -247,32 +266,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             }
         }
     }
-    private void showDialogTipUserGoToAppSetting() {
-        dialog = new AlertDialog.Builder(this)
-                .setTitle("权限不可用")
-                .setMessage("请在-应用设置-权限中，获取权限。")
-                .setPositiveButton("接受", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        gotoAppSetting();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }).setCancelable(false).show();
-    }
-
-    private void gotoAppSetting() {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getPackageName(), null);
-        intent.setData(uri);
-        startActivityForResult(intent, GOTO_APPSETTING);
-    }
-
     //头像的点击事件
     @Override
     public void click(View v) {
@@ -325,7 +318,50 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             }
         }
     }
-
+    class FileAsyncTask extends AsyncTask<String, Integer, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        @Override
+        protected java.lang.Void doInBackground(String... values) {
+            String path = values[0];
+            Log.e("path",path);
+            File file = new File(path);
+            String answer = NetSocket.request(NetPackage.SendFile(MD5.get(file), file.getName(), file.length(), true), path, FileMode.UPLOAD);
+            Ack ack = (Ack) NetPackage.getBag(answer);
+            Log.e("backmsg",answer);
+            if (ack.Flag) {
+                if(FileUtil.Move(path,FileUtil.getPath(FileType.mHead),true)&&FileUtil.Move(outPath, FileUtil.getPath(FileType.mHead), true)) {
+                    Intent intent = new Intent();
+                    intent.setAction("com.stark.yiyu.changeHead");
+                    intent.putExtra("hashcode", ack.BackMsg);
+                    sendBroadcast(intent);
+                    publishProgress(100);
+                }else{
+                    publishProgress(110);
+                }
+            } else {
+                if(ack.Error==8){
+                    answer = NetSocket.request(NetPackage.getFile(ack.BackMsg), FileUtil.getPath(FileType.mHead)+"/cir.png", FileMode.DOWNLOAD);
+                    ack = (Ack) NetPackage.getBag(answer);
+                    if (ack.Flag) {
+                        publishProgress(100);
+                    } else {
+                        publishProgress(ack.Error);
+                    }
+                }else {
+                    publishProgress(ack.Error);
+                }
+            }
+            return null;
+        }
+        @Override
+        protected void onProgressUpdate(java.lang.Integer... values) {
+            super.onProgressUpdate(values);
+            Toast.makeText(HomepageActivity.this, Error.error(values[0]),Toast.LENGTH_SHORT).show();
+        }
+    }
     class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
         Ack ack = new Ack();
         String msgcode = null;

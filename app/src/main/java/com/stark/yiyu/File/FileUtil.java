@@ -8,10 +8,17 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.stark.yiyu.Format.FileType;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by Stark on 2017/7/4.
@@ -25,25 +32,194 @@ public class FileUtil {
         }
         return "";
     }
+    public static String getName(String name) {
+        for(int i=name.length()-1;i>0;i--){
+            if(name.substring(i,i+1).equals(".")){
+                return name.substring(0,i);
+            }
+        }
+        return "";
+    }
+    public static String getUsefulPath(String oldPath,String hashCode,String oldName){
+        File dir = new File(oldPath);
+        if(dir.isDirectory()){
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            oldPath += "/" + hashCode + FileUtil.getSuffix(oldName);
+        }else{
+            if(dir.exists()) {
+                int i = 1;
+                while (( new File(dir.getParentFile().getPath()  + "/" + FileUtil.getName(oldName) + "(" + i + ")" + FileUtil.getSuffix(oldName))).exists()) {
+                    i++;
+                }
+                oldPath = dir.getParentFile().getPath()  + "/" + FileUtil.getName(oldName) + "(" + i + ")" + FileUtil.getSuffix(oldName);
+            }
+        }
+        return oldPath;
+    }
     public static String getPath(FileType type){
         String path=Environment.getExternalStorageDirectory()+"/campus";
         switch (type){
             case ImgTemp:
                 path+="/temp";
                 break;
+            case Head:
+                path+="/head";
+                break;
+            case mHead:
+                path+="/head/mhead";
+                break;
+            case oHead:
+                path+="/head/ohead";
+                break;
         }
         File f=new File(path);
         if(!f.exists()){
-            f.mkdir();
+            f.mkdirs();
         }
         return path;
     }
-    public static Uri PathToUri(String path){
-        File file=new File(path);
-        if(!file.exists()){
-            file.delete();
+    public static boolean Copy(String srcFileName, String destFileName, boolean overlay) {
+        File srcFile = new File(srcFileName);
+        if (!srcFile.exists()) {
+            return false;
+        } else if (!srcFile.isFile()) {
+            return false;
         }
-        return Uri.fromFile(file);
+        File destFile = new File(destFileName);
+        if (destFile.exists()) {
+            if (overlay) {
+                new File(destFileName).delete();
+            }
+        } else {
+            if (!destFile.getParentFile().exists()) {
+                if (!destFile.getParentFile().mkdirs()) {
+                    return false;
+                }
+            }
+        }
+        int n;
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(srcFile);
+            out = new FileOutputStream(destFile);
+            byte[] buffer = new byte[1024];
+
+            while ((n = in.read(buffer)) != -1) {
+                out.write(buffer, 0, n);
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            try {
+                if (out != null)
+                    out.close();
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static boolean CopyDirectory(String srcDirName, String destDirName, boolean overlay) {
+        File srcDir = new File(srcDirName);
+        if (!srcDir.exists()) {
+            return false;
+        } else if (!srcDir.isDirectory()) {
+            return false;
+        }
+        if (!destDirName.endsWith(File.separator)) {
+            destDirName = destDirName + File.separator;
+        }
+        File destDir = new File(destDirName);
+        if (destDir.exists()) {
+            if (overlay) {
+                DeleteFile(destDir);
+            } else {
+                return false;
+            }
+        } else {
+            if (!destDir.mkdirs()) {
+                return false;
+            }
+        }
+        boolean flag = true;
+        File[] files = srcDir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            // 复制文件
+            if (files[i].isFile()) {
+                flag = Copy(files[i].getAbsolutePath(),
+                        destDirName + files[i].getName(), overlay);
+                if (!flag)
+                    break;
+            } else if (files[i].isDirectory()) {
+                flag =Copy(files[i].getAbsolutePath(),
+                        destDirName + files[i].getName(), overlay);
+                if (!flag)
+                    break;
+            }
+        }
+        if (!flag) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public static boolean Move(String path,String desdir,boolean overlay){
+        try {
+            File file = new File(path);
+            File dfile=new File(desdir + "/" + file.getName());
+            if(dfile.exists()){
+                if(overlay) {
+                    DeleteFile(dfile);
+                }else{
+                    return false;
+                }
+            }
+            if (file.renameTo(dfile)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static Uri PathToUri(String path){
+        DeleteFileOrDir(new File(path));
+        return Uri.fromFile(new File(path));
+    }
+    public static void DeleteFileOrDir(File file) {
+        if (file.isFile()) {
+            Log.e("delete",""+ DeleteFile(file));
+            return;
+        }
+        if (file.isDirectory()) {
+            File[] childFiles = file.listFiles();
+            if (childFiles == null || childFiles.length == 0) {
+                DeleteFile(file);
+                return;
+            }
+            for (int i = 0; i < childFiles.length; i++) {
+                DeleteFileOrDir(childFiles[i]);
+            }
+            DeleteFile(file);
+        }
+    }
+    public static boolean DeleteFile(File file) {
+        if (file != null) {
+            String tmpPath = file.getParent() + File.separator + System.currentTimeMillis();
+            File tmp = new File(tmpPath);
+            file.renameTo(tmp);
+            return tmp.delete();
+        }
+        return false;
     }
     public static String getPhotoPathFromContentUri(Context context, Uri uri) {
         String photoPath = "";

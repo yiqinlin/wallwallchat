@@ -22,6 +22,8 @@ public class Error {
                 return "数据异常,请稍后重试";
             case 8:
                 return "文件在服务器已存在";
+            case 100:
+                return "操作成功";
             case 101:
                 return "请输入壹语账号";
             case 102:
@@ -40,6 +42,8 @@ public class Error {
                 return "两次输入的密码不一致，请注意格式重新输入";
             case 109:
                 return "请勿重复添加";
+            case 110:
+                return "文件操作错误";
             default:
                 return "未知错误！";
         }

@@ -15,8 +15,6 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -204,11 +202,8 @@ public class TransferActivity extends FragmentActivity{
         public void onClick(View v) {
             switch (vp.getCurrentItem()){
                 case 0:
-//                    setViewPager(1);
-                    /**
-                     *
-                     */
-
+                    Intent intent0=new Intent(TransferActivity.this,PublishActivity.class);
+                    startActivity(intent0);
                     break;
                 case 1://若在中间界面
                     Intent intent=new Intent(TransferActivity.this, AddActivity.class);

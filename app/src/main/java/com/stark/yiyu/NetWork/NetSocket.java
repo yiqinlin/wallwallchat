@@ -9,7 +9,6 @@ import com.stark.yiyu.Format.Format;
 import com.stark.yiyu.Util.Try;
 import com.stark.yiyu.json.JsonConvert;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -52,26 +51,20 @@ public class NetSocket {
         Ack ack=(Ack) NetPackage.getBag(result);
         switch (fileMode){
             case FileMode.UPLOAD:
-                if(ack.Flag&&FileSrc!=null){
+                if(ack.Flag){
                     send(bw,new File(FileSrc));
                     result=get(br);
                 }
                 break;
             case FileMode.DOWNLOAD:
                 if(ack.Flag){
-                    BufferedOutputStream bos = null;
-                    FileOutputStream fos = null;
+                    FileOutputStream fos;
                     try {
-                        File dir = new File(FileSrc);
-                        if(!dir.exists()&&dir.isDirectory()){//判断文件目录是否存在
-                            dir.mkdirs();
-                        }
-                        String filepath=FileSrc+"/"+ack.SrcId+ FileUtil.getSuffix(ack.MsgCode);
-                        File file = new File(filepath);
+                        File file=new File(FileUtil.getUsefulPath(FileSrc,ack.BackMsg,ack.MsgCode));
                         fos = new FileOutputStream(file);
                         fos.write(get(is, Integer.parseInt(ack.BackMsg)));
                         fos.close();
-                        ack.BackMsg=filepath;
+                        ack.BackMsg=FileSrc;
                         Format format=new Format();
                         format.Cmd="down";
                         format.Type="Ack";

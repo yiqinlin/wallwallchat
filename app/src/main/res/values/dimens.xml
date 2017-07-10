@@ -11,6 +11,7 @@
     <dimen name="standard_margin">16dp</dimen>
 
     <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_xsmall">13sp</dimen>
     <dimen name="text_size_mid">14sp</dimen>
     <dimen name="text_size_xmid">15sp</dimen>
     <dimen name="text_size">16sp</dimen>

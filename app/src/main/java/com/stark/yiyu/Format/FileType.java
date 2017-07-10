@@ -5,4 +5,7 @@ package com.stark.yiyu.Format;
  */
 public enum FileType {
     ImgTemp,
+    Head,
+    mHead,
+    oHead,
 }

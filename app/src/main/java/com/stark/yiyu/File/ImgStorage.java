@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.stark.yiyu.Format.FileType;
 import com.stark.yiyu.MyService;
 import com.stark.yiyu.R;
 
@@ -24,11 +25,10 @@ import java.io.IOException;
 public class ImgStorage {
 
     public static Drawable getHead(Context context, Boolean sex) {
-        String photoPath = getPhotoPath(context);
-        photoPath = photoPath + "image_cir_head.png";
+        String photoPath = FileUtil.getPath(FileType.mHead);
+        photoPath = photoPath + "/cir.png";
         File imgPath = new File(photoPath);
         if (imgPath.exists()) {
-            Log.e("圆形图片路径", "存在");
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
             Drawable drawable = new BitmapDrawable(bitmap);
             return drawable;
@@ -50,34 +50,30 @@ public class ImgStorage {
         return photoPath;
     }
 
-    public static Uri saveBitmap(Bitmap bm, String path) {
+    public static void saveBitmap(Bitmap bm, String path) {
         File file = new File(path);
         try {
             FileOutputStream fos = new FileOutputStream(file);
             bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
             fos.flush();
             fos.close();
-            return Uri.fromFile(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return null;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
     }
 
-    public static Intent getCropIntent(String in,String out){
-        Uri temp=Uri.fromFile(new File(in));
+    public static Intent getCropIntent(Uri in,Uri out){
         Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(temp, "image/*");//数据和类型
+        intent.setDataAndType(in, "image/*");//数据和类型
         intent.putExtra("crop", "true");//开启的Intent 显示View是可裁减的
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);//裁剪的图片的宽高。最终得到的输出图片的宽高252
         intent.putExtra("circleCrop", true);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(new File(out)));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,out);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.PNG.toString());
         intent.putExtra("return-data", false);//裁剪后的数据通过intent返回回来
         return intent;
@@ -87,7 +83,7 @@ public class ImgStorage {
     public static void saveCirBitmap(String cirHeadPath, String imgName, Bitmap bm) {
         File filePath = new File(cirHeadPath);
         if (!filePath.exists()) {
-            filePath.mkdir();
+            filePath.mkdirs();
         }
         File imgPath = new File(filePath, imgName);
         try {

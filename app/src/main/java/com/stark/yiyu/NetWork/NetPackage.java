@@ -154,7 +154,7 @@ public class NetPackage {
             Log.i("Friend",JsonStr);
             return JsonConvert.SerializeObject(format);
         }catch(Exception e){
-            Log.i("Friend",e.toString());
+            Log.i("Friend", e.toString());
         }
         return null;
     }
@@ -169,6 +169,7 @@ public class NetPackage {
             format.Type="File";
             format.Cmd="up";
             format.JsonMsg=JsonConvert.SerializeObject(transFile);
+            Log.e("SendFile", format.JsonMsg);
             return JsonConvert.SerializeObject(format);
         }catch (Exception e) {
             Log.e("SendFile", "" + e);

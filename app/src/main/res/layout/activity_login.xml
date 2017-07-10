@@ -21,6 +21,7 @@
             android:background="@drawable/tianqing"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="70dp"
+            android:id="@+id/Login_head"
             android:layout_marginBottom="28dp"/>
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,6 +34,7 @@
                 android:gravity="center"
                 android:text="账号:"
                 android:background="@drawable/input_bkg"
+                android:textSize="@dimen/text_size_xmid"
                 android:textColor="@android:color/darker_gray"
                 android:layout_weight="5"/>
             <RelativeLayout
@@ -45,6 +47,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/input_bkg"
                 android:textCursorDrawable="@drawable/cursor_bkg"
+                android:textSize="@dimen/text_size"
                 android:inputType="number"
                 android:maxLines="1"
                 android:maxLength="11"
@@ -74,6 +77,7 @@
                 android:text="密码:"
                 android:background="@drawable/input_bkg"
                 android:textColor="@android:color/darker_gray"
+                android:textSize="@dimen/text_size_xmid"
                 android:layout_weight="5"/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -86,6 +90,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/input_bkg"
                     android:textCursorDrawable="@drawable/cursor_bkg"
+                    android:textSize="@dimen/text_size"
                     android:maxLength="16"
                     android:digits="1234567890.,.?!:/@;'~()&lt;&gt;&quot;&amp;*[]\\`#$%^_+-={}|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     android:inputType="textPassword"
@@ -126,6 +131,7 @@
                 android:id="@+id/button_to_forget"
                 android:background="#00000000"
                 android:gravity="left|center_vertical"
+                android:textSize="@dimen/text_size_mid"
                 android:textColor="@android:color/holo_blue_light"
                 android:text="忘记密码?" />
             <Button
@@ -135,6 +141,7 @@
                 android:id="@+id/button_to_register"
                 android:background="#00000000"
                 android:gravity="right|center_vertical"
+                android:textSize="@dimen/text_size_mid"
                 android:textColor="@android:color/holo_blue_light"
                 android:text="新用户注册"/>
         </LinearLayout>

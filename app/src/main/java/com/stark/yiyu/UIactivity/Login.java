@@ -14,8 +14,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.MyService;
 import com.stark.yiyu.NetWork.MD5;
 import com.stark.yiyu.R;
@@ -49,6 +51,7 @@ public class Login extends Activity {
         Button register=(Button)findViewById(R.id.button_to_register);
         Button forget=(Button)findViewById(R.id.button_to_forget);
         sp= this.getSharedPreferences("action", MODE_PRIVATE);
+        ((ImageView)findViewById(R.id.Login_head)).setImageDrawable(ImgStorage.getHead(Login.this,sp.getBoolean("sex",true)));
         ID=sp.getString("id", null);//用户帐号
         PassWord=sp.getString("password",null);
         if(ID!=null) {
