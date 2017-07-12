@@ -1,7 +1,10 @@
 package com.stark.yiyu.UIactivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -22,6 +25,8 @@ import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemEditInfo;
+import com.stark.yiyu.bean.ItemEditInfo2;
+import com.stark.yiyu.bean.ItemEditMail;
 import com.stark.yiyu.bean.ItemMargin;
 import com.stark.yiyu.bean.ItemSimpleList;
 
@@ -37,6 +42,18 @@ public class EditInfoActivity extends Activity {
     ArrayList<BaseItem> mArrays;
     MyAdapter adapter;
 
+    private Drawable imgHead = null;
+    private String nick = null;
+    private String auto = null;
+    private String sex = null;
+    private String birthday = null;
+    private String school = null;
+    private String address = null;
+    private String hometown = null;
+    private String mail = null;
+    private String selfInfo = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +61,7 @@ public class EditInfoActivity extends Activity {
         Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
         ImageButton left = (ImageButton) findViewById(R.id.button_transfer_title_left);
         TextView title = (TextView) findViewById(R.id.text_transfer_title);
-        Button right = (Button) findViewById(R.id.button_transfer_title_right);
+//        Button right = (Button) findViewById(R.id.button_transfer_title_right);
         left.setBackgroundResource(R.drawable.title_back);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,20 +76,18 @@ public class EditInfoActivity extends Activity {
         adapter = new MyAdapter(EditInfoActivity.this, mArrays);
         listView.setAdapter(adapter);
 
-        mArrays.add(new ItemSimpleList(6, "头像", getResources().getDrawable(R.drawable.tianqing)));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "昵称", "哈库纳玛塔塔"));
-        mArrays.add(new ItemEditInfo(7, "签名", "踏破虚空无一事,涅槃生死绝安排"));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "性别", "男"));
-        mArrays.add(new ItemEditInfo(7, "生日", "1997-2-22"));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "学校", "成都东软"));
-        mArrays.add(new ItemEditInfo(7, "所在地", "中国"));
-        mArrays.add(new ItemEditInfo(7, "家乡", ""));
-        mArrays.add(new ItemEditInfo(7, "邮箱", ""));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "个人说明", "人必自侮，而后人侮之。"));
+        imgHead = getResources().getDrawable(R.drawable.tianqing);
+        nick = "哈库纳玛塔塔";
+        auto = "踏破虚空无一事，涅槃生死绝安排";
+        sex = "男";
+        birthday = "1997-2-22";
+        school = "成都东软学院";
+        address = "中国";
+        hometown = "成都";
+        mail = "919664295@qq.com";
+        selfInfo = "人必自侮,而后人侮之。";
+
+        refreshAdapter();
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
 
@@ -85,7 +100,21 @@ public class EditInfoActivity extends Activity {
                 case 0:
                     Toast.makeText(EditInfoActivity.this, "" + position, Toast.LENGTH_SHORT).show();
                     break;
-                case 1:
+                case 2:
+                    break;
+                case 5:
+                    new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{"男", "女"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == 0) {
+                                sex = "男";
+                            } else {
+                                sex = "女";
+                            }
+                            refreshAdapter();
+                            dialog.dismiss();
+                        }
+                    }).show();
                     break;
                 case 6:
                     Calendar now = Calendar.getInstance();
@@ -93,32 +122,13 @@ public class EditInfoActivity extends Activity {
                     int monthOfYear = now.get(Calendar.MONTH);
                     int dayOfMonth = now.get(Calendar.DAY_OF_MONTH);
 
-                    Log.d("Shanks", "1");
                     MyDateDialog myDateDialog = new MyDateDialog(EditInfoActivity.this, android.R.style.Theme_Holo_Dialog_NoActionBar
                             , new MyDateDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
                             int month = monthOfYear + 1;
-                            Toast.makeText(EditInfoActivity.this, "Shanks", Toast.LENGTH_SHORT).show();
-
-                            Log.d("生日:", year + "-" + month + "-" + dayOfMonth);
-                            mArrays.clear();
-                            mArrays.add(new ItemSimpleList(6, "头像", getResources().getDrawable(R.drawable.tianqing)));
-                            mArrays.add(new ItemMargin(8));//设置间隔空格.
-                            mArrays.add(new ItemEditInfo(7, "昵称", "哈库纳玛塔塔"));
-                            mArrays.add(new ItemEditInfo(7, "签名", "踏破虚空无一事,涅槃生死绝安排"));
-                            mArrays.add(new ItemMargin(8));//设置间隔空格.
-                            mArrays.add(new ItemEditInfo(7, "性别", "男"));
-                            mArrays.add(new ItemEditInfo(7, "生日", year + "-" + month + "-" + dayOfMonth));
-                            mArrays.add(new ItemMargin(8));//设置间隔空格.
-                            mArrays.add(new ItemEditInfo(7, "学校", "成都东软"));
-                            mArrays.add(new ItemEditInfo(7, "所在地", "中国"));
-                            mArrays.add(new ItemEditInfo(7, "家乡", ""));
-                            mArrays.add(new ItemEditInfo(7, "邮箱", ""));
-                            mArrays.add(new ItemMargin(8));//设置间隔空格.
-                            mArrays.add(new ItemEditInfo(7, "个人说明", "人必自侮，而后人侮之。"));
-                            adapter.notifyDataSetChanged();
+                            birthday = year + "-" + month + "-" + dayOfMonth;
+                            refreshAdapter();
                         }
                     }, year, monthOfYear, dayOfMonth);
                     myDateDialog.myShow();
@@ -129,8 +139,42 @@ public class EditInfoActivity extends Activity {
                     lp.width = (int) (display.getWidth() * 0.8);
                     myDateDialog.getWindow().setAttributes(lp);
                     break;
+                case 8:
+                    Intent it = new Intent(EditInfoActivity.this, SortSchool.class);
+                    startActivityForResult(it,123);
+                    break;
             }
         }
     }
 
+    private void refreshAdapter() {
+        mArrays.clear();
+        mArrays.add(new ItemSimpleList(6, "头像", imgHead));
+        mArrays.add(new ItemMargin(8));//设置间隔空格.
+        mArrays.add(new ItemEditInfo2(9, "昵称", nick));
+        mArrays.add(new ItemEditInfo(7, "签名", auto));
+        mArrays.add(new ItemMargin(8));//设置间隔空格.
+        mArrays.add(new ItemEditInfo(7, "性别", sex));
+        mArrays.add(new ItemEditInfo(7, "生日", birthday));
+        mArrays.add(new ItemMargin(8));//设置间隔空格.
+        mArrays.add(new ItemEditInfo(7, "学校", school));
+        mArrays.add(new ItemEditInfo(7, "所在地", address));
+        mArrays.add(new ItemEditInfo(7, "家乡", hometown));
+        mArrays.add(new ItemEditMail(10, "邮箱", mail));
+        mArrays.add(new ItemMargin(8));//设置间隔空格.
+        mArrays.add(new ItemEditInfo(7, "个人说明", selfInfo));
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 123) {
+            if (resultCode == 666) {
+                school = data.getStringExtra("school");
+                Log.i("School", "School = " + school);
+                refreshAdapter();
+            }
+        }
+    }
 }

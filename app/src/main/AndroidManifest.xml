@@ -91,6 +91,9 @@
         <activity
             android:name=".UIactivity.EditInfoActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".UIactivity.SortSchool"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+        </activity>
     </application>
 
 </manifest>

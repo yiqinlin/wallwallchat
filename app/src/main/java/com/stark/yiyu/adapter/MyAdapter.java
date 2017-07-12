@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +18,8 @@ import com.stark.yiyu.UIactivity.AddActivity;
 import com.stark.yiyu.UIactivity.DetailActivity;
 import com.stark.yiyu.adapter.holder.ItemType;
 import com.stark.yiyu.adapter.holder.ViewHolderEditInfo;
+import com.stark.yiyu.adapter.holder.ViewHolderEditInfo2;
+import com.stark.yiyu.adapter.holder.ViewHolderEditMail;
 import com.stark.yiyu.adapter.holder.ViewHolderHomepageTitle;
 import com.stark.yiyu.adapter.holder.ViewHolderKnow;
 import com.stark.yiyu.adapter.holder.ViewHolderMargin;
@@ -26,6 +29,8 @@ import com.stark.yiyu.adapter.holder.ViewHolderSChat;
 import com.stark.yiyu.adapter.holder.ViewHolderSimpleList;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemEditInfo;
+import com.stark.yiyu.bean.ItemEditInfo2;
+import com.stark.yiyu.bean.ItemEditMail;
 import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.bean.ItemKnow;
 import com.stark.yiyu.bean.ItemMargin;
@@ -120,6 +125,12 @@ public interface Callback{
                 break;
             case 8://空白间隔:
                 convertView = getMarginConvertView(position, convertView);
+                break;
+            case 9://一个TextView，一个EditText
+                convertView = getEditInfo2ConvertView(position, convertView);
+                break;
+            case 10://一个TextView，一个邮箱格式的EditText:
+                convertView = getEditMailConvertView(position, convertView);
                 break;
         }
         return convertView;
@@ -271,9 +282,9 @@ public interface Callback{
         return convertView;
     }
 
-    private View getEditInfoConvertView(int postion, View convertView) {
+    private View getEditInfoConvertView(int position, View convertView) {
         ViewHolderEditInfo viewHolder;
-        ItemEditInfo msg = (ItemEditInfo) mData.get(postion);
+        ItemEditInfo msg = (ItemEditInfo) mData.get(position);
         if (convertView == null) {
             viewHolder = new ViewHolderEditInfo();
             convertView = mInflater.inflate(R.layout.list_editinfo, null);
@@ -285,13 +296,12 @@ public interface Callback{
         }
         viewHolder.txvLeft.setText(msg.getStrLeft());
         viewHolder.txvRight.setText(msg.getStrRight());
-
         return convertView;
     }
 
-    private View getMarginConvertView(int postion, View convertView) {
+    private View getMarginConvertView(int position, View convertView) {
         ViewHolderMargin viewHolder;
-        ItemMargin msg = (ItemMargin) mData.get(postion);
+        ItemMargin msg = (ItemMargin) mData.get(position);
         if (convertView == null) {
             viewHolder = new ViewHolderMargin();
             convertView = mInflater.inflate(R.layout.list_margin, null);
@@ -300,6 +310,40 @@ public interface Callback{
             viewHolder = (ViewHolderMargin) convertView.getTag();
         }
         return convertView;
+    }
+
+    private View getEditInfo2ConvertView(int position, View convertView) {
+        ViewHolderEditInfo2 viewHolder;
+        ItemEditInfo2 msg = (ItemEditInfo2) mData.get(position);
+        if (convertView == null) {
+            viewHolder = new ViewHolderEditInfo2();
+            convertView = mInflater.inflate(R.layout.list_editinfo2, null);
+            viewHolder.txvLeft = (TextView) convertView.findViewById(R.id.list_txv_left);
+            viewHolder.edtRight = (EditText) convertView.findViewById(R.id.list_edt_right);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolderEditInfo2) convertView.getTag();
+        }
+        viewHolder.txvLeft.setText(msg.getStrLeft());
+        viewHolder.edtRight.setText(msg.getStrRight());
+        return convertView;
+    }
+
+    private View getEditMailConvertView(int position, View converView) {
+        ViewHolderEditMail viewHolder;
+        ItemEditMail msg = (ItemEditMail) mData.get(position);
+        if (converView == null) {
+            viewHolder = new ViewHolderEditMail();
+            converView = mInflater.inflate(R.layout.list_editmail, null);
+            viewHolder.txvLeft = (TextView) converView.findViewById(R.id.list_txv_left);
+            viewHolder.edtRight = (EditText) converView.findViewById(R.id.list_edt_right);
+            converView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolderEditMail) converView.getTag();
+        }
+        viewHolder.txvLeft.setText(msg.getStrLeft());
+        viewHolder.edtRight.setText(msg.getStrRight());
+        return converView;
     }
 
     View.OnClickListener Click=new View.OnClickListener(){

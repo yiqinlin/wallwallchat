@@ -15,4 +15,24 @@
     <string name="action_register">Register</string>
     <string name="title_activity_transfer">TransferActivity</string>
     <string name="title_activity_zone">ZoneActivity</string>
+
+    <string-array name="data">
+        <item>的吗</item>
+        <item>西亚</item>
+        <item>的吗</item>
+        <item>12亚</item>
+        <item>ewq</item>
+        <item>任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务</item>
+        <item>撒旦</item>
+        <item>自行车</item>
+        <item>vb</item>
+        <item>古风</item>
+        <item>毒药</item>
+        <item>iuy</item>
+        <item>好贵</item>
+        <item>你们</item>
+        <item>比你们</item>
+        <item>个</item>
+    </string-array>
+
 </resources>
