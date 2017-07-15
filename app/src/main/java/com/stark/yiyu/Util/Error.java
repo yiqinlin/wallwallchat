@@ -44,6 +44,8 @@ public class Error {
                 return "请勿重复添加";
             case 110:
                 return "文件操作错误";
+            case 111:
+                return "请选择学校";
             default:
                 return "未知错误！";
         }

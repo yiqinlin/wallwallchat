@@ -30,7 +30,10 @@ public class Register extends Activity {
     private String RPassWord="";
     private ToastDialog mToastDialog=null;
     private SharedPreferences sp=null;
-    private SharedPreferences.Editor editor=null;
+    private SharedPreferences.Editor editor = null;
+
+    private TextView txvCollege = null;
+
     private static int i=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,18 @@ public class Register extends Activity {
             Edit[1] = (EditText) findViewById(R.id.edit_regi_pass);
             Edit[2] = (EditText) findViewById(R.id.edit_right_pass);
             final Button register = (Button) findViewById(R.id.button_register);
+
+            txvCollege = (TextView) findViewById(R.id.txvCollege);
+            final Button btnCollege = (Button) findViewById(R.id.btnCollege);
+
+            btnCollege.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(Register.this, SortSchool.class);
+                    startActivityForResult(it,321);
+                }
+            });
+
             register.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -78,6 +93,8 @@ public class Register extends Activity {
                         Error = com.stark.yiyu.Util.Error.error(108);
                         Edit[1].setText(null);
                         Edit[2].setText(null);
+                    } else if (txvCollege.equals("") && txvCollege == null) {
+                        Error = com.stark.yiyu.Util.Error.error(111);
                     } else {
                         PassWord = MD5.get(PassWord);
                         MyAsyncTask asyncTask = new MyAsyncTask();/**异步线程*/
@@ -130,6 +147,21 @@ public class Register extends Activity {
                         }
                     }
                 });
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 321) {
+            if (resultCode == 666) {
+
+                String college = data.getStringExtra("college");
+
+                sp.edit().putString("Edu", data.getStringExtra("Edu")).apply();
+                
+                txvCollege.setText(college);
             }
         }
     }

@@ -45,4 +45,5 @@
         <item name="android:activityCloseEnterAnimation">@anim/anim_ltom</item>
         <item name="android:activityCloseExitAnimation">@anim/anim_mtor</item>
     </style>
+
 </resources>
