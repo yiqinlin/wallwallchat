@@ -40,6 +40,8 @@ public class Error {
                 return "两次输入的密码不一致，请注意格式重新输入";
             case 109:
                 return "请勿重复添加";
+            case 111:
+                return "请选择学校";
             default:
                 return "未知错误！";
         }

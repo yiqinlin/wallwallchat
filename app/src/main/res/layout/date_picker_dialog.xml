@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <DatePicker
+        android:headerBackground="#808080"
         android:id="@+id/datePicker"
         android:layout_gravity="center_horizontal"
         android:calendarViewShown="false"

@@ -61,7 +61,6 @@ public class EditInfoActivity extends Activity {
         Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
         ImageButton left = (ImageButton) findViewById(R.id.button_transfer_title_left);
         TextView title = (TextView) findViewById(R.id.text_transfer_title);
-//        Button right = (Button) findViewById(R.id.button_transfer_title_right);
         left.setBackgroundResource(R.drawable.title_back);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,8 +170,8 @@ public class EditInfoActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 123) {
             if (resultCode == 666) {
-                school = data.getStringExtra("school");
-                Log.i("School", "School = " + school);
+                school = data.getStringExtra("college");
+                Log.i("college", "college = " + school);
                 refreshAdapter();
             }
         }

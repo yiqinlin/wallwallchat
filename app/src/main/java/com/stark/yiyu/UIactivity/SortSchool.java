@@ -1,6 +1,8 @@
 package com.stark.yiyu.UIactivity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,7 +16,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.stark.yiyu.Database.DatabaseSchoolHelper;
 import com.stark.yiyu.R;
+import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.SortListView.CharacterParser;
 import com.stark.yiyu.SortListView.PinyinComparator;
 import com.stark.yiyu.SortListView.SideBar;
@@ -39,10 +43,23 @@ public class SortSchool extends AppCompatActivity {
 
     private PinyinComparator pinyinComparator;
 
+    boolean isProvince;//true 省份界面 false学校界面
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sort_school);
+        Log.i("SortSchool", "start");
+        isProvince = true;//省份界面
+        SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();
+        Cursor cr = db.rawQuery("select * from data", null);
+
+        if (!cr.moveToNext()) {
+            DatabaseSchoolHelper.InitDatabase(SortSchool.this);
+        }
+
+        cr.close();
+        db.close();
         initViews();
     }
 
@@ -68,15 +85,52 @@ public class SortSchool extends AppCompatActivity {
         sortListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(SortSchool.this, ((SortModel) adapter.getItem(position)).getName(), Toast.LENGTH_SHORT).show();
-                Intent it = new Intent();
-                it.putExtra("school", ((SortModel) adapter.getItem(position)).getName());
-                setResult(666, it);
-                finish();
+                if (isProvince) {//省份界面进入学校界面
+                    SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();
+                    Cursor cr = db.query("data", null, "province=?", new String[]{((SortModel) adapter.getItem(position)).getName()}, null, null, null);
+                    if (cr != null && cr.getCount() > 0) {
+                        isProvince = false;//学校界面，选择学校
+                        SourceDateList.clear();
+                        while (cr.moveToNext()) {
+                            String name = cr.getString(cr.getColumnIndex("name"));
+                            SortModel sortModel = new SortModel();
+                            sortModel.setName(name);
+                            String pinyin = characterParser.getSelling(name);
+                            String sortString = pinyin.substring(0, 1).toUpperCase();
+                            if (sortString.matches("[A-Z]")) {
+                                sortModel.setSortLetters(sortString.toUpperCase());
+                            } else {
+                                sortModel.setSortLetters("#");
+                            }
+                            SourceDateList.add(sortModel);
+                        }
+                        Collections.sort(SourceDateList, pinyinComparator);
+                        adapter.notifyDataSetChanged();
+                    }
+                    cr.close();
+                    db.close();
+                } else {//学校界面，选择学校
+                    SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();
+                    Cursor cr = db.query("data", null, "name=?", new String[]{((SortModel) adapter.getItem(position)).getName()}, null, null, null);
+                    String code = null;
+                    if (cr != null && cr.getCount() > 0) {
+                        cr.moveToNext();
+                        code = cr.getString(cr.getColumnIndex("code"));
+
+//                        Toast.makeText(SortSchool.this, code, Toast.LENGTH_SHORT).show();
+                    }
+                    cr.close();
+                    db.close();
+                    isProvince = true;
+                    Intent it = new Intent();
+                    it.putExtra("college", ((SortModel) adapter.getItem(position)).getName());
+                    it.putExtra("Edu", code);
+                    setResult(666, it);
+                    finish();
+                }
             }
         });
-
-        SourceDateList = filledData(getResources().getStringArray(R.array.data));
+        SourceDateList = filledData();//省份界面
 
         //根据a-z进行排序源数据
         Collections.sort(SourceDateList, pinyinComparator);
@@ -103,13 +157,18 @@ public class SortSchool extends AppCompatActivity {
         });
     }
 
-    private List<SortModel> filledData(String[] date) {
+    private List<SortModel> filledData() {//省份界面
         List<SortModel> mSortList = new ArrayList<SortModel>();
-
-        for(int i = 0;i<date.length;i++) {
+        SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();
+        Cursor cr = db.rawQuery("select distinct province from data", null);
+        if (!cr.moveToNext()) {
+            DatabaseSchoolHelper.InitDatabase(SortSchool.this);
+        }
+        cr.moveToFirst();
+        do {
             SortModel sortModel = new SortModel();
-            sortModel.setName(date[i]);
-            String pinyin = characterParser.getSelling(date[i]);
+            sortModel.setName(cr.getString(cr.getColumnIndex("province")));
+            String pinyin = characterParser.getSelling(cr.getString(cr.getColumnIndex("province")));
             String sortString = pinyin.substring(0, 1).toUpperCase();
             if (sortString.matches("[A-Z]")) {
                 sortModel.setSortLetters(sortString.toUpperCase());
@@ -117,7 +176,9 @@ public class SortSchool extends AppCompatActivity {
                 sortModel.setSortLetters("#");
             }
             mSortList.add(sortModel);
-        }
+        } while (cr.moveToNext());
+        cr.close();
+        db.close();
         return mSortList;
     }
 
@@ -140,5 +201,35 @@ public class SortSchool extends AppCompatActivity {
         //根据a-z进行排序
         Collections.sort(filterDateList, pinyinComparator);
         adapter.updateListView(filterDateList);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isProvince) {//显示省份, 按返回即返回
+            super.onBackPressed();
+        } else {//进入学校界面后 ， 按返回为省份界面
+            isProvince = true;
+            SourceDateList.clear();
+            SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();
+            Cursor cr = db.rawQuery("select distinct province from data", null);
+            if (!cr.moveToNext()) {
+                DatabaseSchoolHelper.InitDatabase(SortSchool.this);
+            }
+            cr.moveToFirst();
+            do {
+                SortModel sortModel = new SortModel();
+                sortModel.setName(cr.getString(cr.getColumnIndex("province")));
+                String pinyin = characterParser.getSelling(cr.getString(cr.getColumnIndex("province")));
+                String sortString = pinyin.substring(0, 1).toUpperCase();
+                if (sortString.matches("[A-Z]")) {
+                    sortModel.setSortLetters(sortString.toUpperCase());
+                } else {
+                    sortModel.setSortLetters("#");
+                }
+                SourceDateList.add(sortModel);
+            } while (cr.moveToNext());
+            Collections.sort(SourceDateList, pinyinComparator);
+            adapter.notifyDataSetChanged();
+        }
     }
 }

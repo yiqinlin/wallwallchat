@@ -82,6 +82,7 @@
         android:layout_marginBottom="@dimen/magic_margin"
         android:text="6-16位的英文字符、数字或字母"
         android:textColor="@android:color/secondary_text_dark" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,6 +112,8 @@
             android:maxLines="1"
             android:singleLine="true" />
     </LinearLayout>
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -121,6 +124,44 @@
         android:text="再次输入密码，以确保密码正确"
         android:textColor="@android:color/secondary_text_dark" />
     <!--  < = &lt;   > = &gt;   " = &quot;   & = &amp;  \ = \\ -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/standard_margin"
+        android:paddingRight="@dimen/standard_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:paddingLeft="@dimen/standard_margin"
+            android:paddingRight="@dimen/standard_margin"
+            android:id="@+id/txvCollege"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="请选择学校"
+            android:gravity="center_vertical"
+            android:textColorHint="@android:color/darker_gray"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="@dimen/text_size"
+            android:background="@drawable/input_bkg"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginRight="7dp"
+            android:layout_weight="8"/>
+
+        <Button
+            android:id="@+id/btnCollege"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size"
+            android:text="选择"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:background="@drawable/big_button"/>
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/button_register"
         android:layout_width="match_parent"
