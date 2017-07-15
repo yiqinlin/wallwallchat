@@ -104,6 +104,7 @@ public class EditInfoActivity extends Activity {
                     break;
                 case 3:
                     it = new Intent(EditInfoActivity.this, AutoActivity.class);
+                    it.putExtra("auto", auto);
                     startActivityForResult(it,RES_AUTO_CODE);
                     break;
                 case 5:
@@ -178,8 +179,11 @@ public class EditInfoActivity extends Activity {
                 school = data.getStringExtra("college");
                 Log.i("college", "college = " + school);
                 refreshAdapter();
-            } else if (resultCode == RES_AUTO_CODE) {
+            }
+        } else if (requestCode == RES_AUTO_CODE) {
+            if (resultCode == 4) {
                 auto = data.getStringExtra("auto");
+                Log.e("EditInfoActivity", auto);
                 refreshAdapter();
             }
         }

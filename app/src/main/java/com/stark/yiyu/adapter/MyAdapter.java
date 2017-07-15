@@ -145,18 +145,6 @@ public interface Callback{
                 break;
             case 13:
                 convertView=getTextSeparateConVertView(position,convertView);
-            case 7://俩个TextView
-                convertView = getEditInfoConvertView(position, convertView);
-                break;
-            case 8://空白间隔:
-                convertView = getMarginConvertView(position, convertView);
-                break;
-            case 9://一个TextView，一个EditText
-                convertView = getEditInfo2ConvertView(position, convertView);
-                break;
-            case 10://一个TextView，一个邮箱格式的EditText:
-                convertView = getEditMailConvertView(position, convertView);
-                break;
         }
         return convertView;
     }

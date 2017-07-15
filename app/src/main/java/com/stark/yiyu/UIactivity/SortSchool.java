@@ -1,5 +1,6 @@
 package com.stark.yiyu.UIactivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SortSchool extends AppCompatActivity {
+public class SortSchool extends Activity {
 
     private ListView sortListView;
     private SideBar sideBar;

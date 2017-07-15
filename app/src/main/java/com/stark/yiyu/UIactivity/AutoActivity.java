@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import com.stark.yiyu.R;
 import com.stark.yiyu.Util.Status;
 
 public class AutoActivity extends Activity {
+    private EditText edtAuto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +28,18 @@ public class AutoActivity extends Activity {
         Button right = (Button) findViewById(R.id.button_transfer_title_right);
         ImageButton left = (ImageButton) findViewById(R.id.button_transfer_title_left);
         TextView title = (TextView) findViewById(R.id.text_transfer_title);
-        final EditText edtAuto = (EditText) findViewById(R.id.edtAuto);
+        edtAuto = (EditText) findViewById(R.id.edtAuto);
 
         left.setBackgroundResource(R.drawable.title_back);
         right.setText("保存");
+
+        Intent it = getIntent();
+        String auto = it.getStringExtra("auto");
+        if (auto.equals("") || auto == null) {
+            auto = "  ";
+        }
+        edtAuto.setText(auto);
+        edtAuto.setSelection(auto.length());
 
         left.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,10 +52,12 @@ public class AutoActivity extends Activity {
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("AutoActivity", edtAuto.getText().toString());
+                Log.e("AutoActivity", edtAuto.getText().toString());
                 String auto = edtAuto.getText().toString();
                 Intent it = new Intent();
                 it.putExtra("auto", auto);
-                setResult(123, it);
+                setResult(4, it);
                 finish();
             }
         });
