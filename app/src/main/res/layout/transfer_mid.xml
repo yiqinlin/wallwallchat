@@ -14,5 +14,4 @@
         android:overScrollMode="never"
         android:transcriptMode="normal"
         android:layout_gravity="top"/>
-    <!--android:divider="@null"-->
 </LinearLayout>

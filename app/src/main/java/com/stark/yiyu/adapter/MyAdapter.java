@@ -10,11 +10,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.stark.yiyu.MyService;
 import com.stark.yiyu.R;
 import com.stark.yiyu.UIactivity.AddActivity;
 import com.stark.yiyu.UIactivity.DetailActivity;
+import com.stark.yiyu.UIactivity.WallMsgActivity;
 import com.stark.yiyu.adapter.holder.ItemType;
 import com.stark.yiyu.adapter.holder.ViewHolderHomepageTitle;
 import com.stark.yiyu.adapter.holder.ViewHolderKnow;
@@ -22,6 +25,8 @@ import com.stark.yiyu.adapter.holder.ViewHolderMid;
 import com.stark.yiyu.adapter.holder.ViewHolderRightHead;
 import com.stark.yiyu.adapter.holder.ViewHolderSChat;
 import com.stark.yiyu.adapter.holder.ViewHolderSimpleList;
+import com.stark.yiyu.adapter.holder.ViewHolderTextSeparate;
+import com.stark.yiyu.adapter.holder.ViewHolderWallInfo;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemHomepageTitle;
 import com.stark.yiyu.bean.ItemKnow;
@@ -29,6 +34,8 @@ import com.stark.yiyu.bean.ItemMid;
 import com.stark.yiyu.bean.ItemRightHead;
 import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.bean.ItemSimpleList;
+import com.stark.yiyu.bean.ItemTextSeparate;
+import com.stark.yiyu.bean.ItemWallInfo;
 import com.stark.yiyu.toast.ListAnimImageView;
 
 import java.util.ArrayList;
@@ -97,21 +104,41 @@ public interface Callback{
                 convertView=getSChatConvertView(itemType, position, convertView);
                 break;
             case 2:
-                convertView=getMidConvertView(position,convertView);
+                convertView=getMidConvertView(position, convertView);
                 break;
             case 3:
-                convertView=getRightHeadConvertView(position,convertView);
+                convertView=getRightHeadConvertView(position, convertView);
                 break;
             case 4:
-                convertView=getKnowConvertView(position,convertView);
+                convertView=getKnowConvertView(position, convertView);
                 break;
             case 5:
-                convertView=getHomepageTitleConvertView(position,convertView);
+                convertView=getHomepageTitleConvertView(position, convertView);
                 break;
             case 6:
-                convertView=getSimpleListConvertView(position,convertView);
+                convertView=getSimpleListConvertView(position, convertView);
                 break;
+            case 11:
+            case 12:
+                convertView= getWallInfoConvertView(itemType,position, convertView);
+                break;
+            case 13:
+                convertView=getTextSeparateConVertView(position,convertView);
         }
+        return convertView;
+    }
+    private View getTextSeparateConVertView(int position,View convertView){
+        ViewHolderTextSeparate viewHolder;
+        ItemTextSeparate msg=(ItemTextSeparate)mData.get(position);
+        if(convertView==null){
+            viewHolder=new ViewHolderTextSeparate();
+            convertView = mInflater.inflate(R.layout.list_comment_title, null);
+            viewHolder.Text=(TextView)convertView.findViewById(R.id.list_comment_title);
+            convertView.setTag(viewHolder);
+        }else{
+            viewHolder=(ViewHolderTextSeparate)convertView.getTag();
+        }
+        viewHolder.Text.setText(msg.getText());
         return convertView;
     }
     private View getMidConvertView(int position,View convertView){
@@ -145,19 +172,19 @@ public interface Callback{
             viewHolder=new ViewHolderSChat();
             if(type==0) {
                 convertView = mInflater.inflate(R.layout.list_item_chat_su, null);
-                viewHolder.head = (ImageView) convertView.findViewById(R.id.list_chat_su_head);
-                viewHolder.message = (Button) convertView.findViewById(R.id.list_chat_su_msg);
+                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_chat_su_head);
+                viewHolder.message = (TextView) convertView.findViewById(R.id.list_chat_su_msg);
                 viewHolder.state=(ListAnimImageView)convertView.findViewById(R.id.list_chat_su_ListAnim);
             }else if(type==1){
                 convertView = mInflater.inflate(R.layout.list_item_chat_sf, null);
-                viewHolder.head = (ImageView) convertView.findViewById(R.id.list_chat_sf_head);
-                viewHolder.message = (Button) convertView.findViewById(R.id.list_chat_sf_msg);
+                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_chat_sf_head);
+                viewHolder.message = (TextView) convertView.findViewById(R.id.list_chat_sf_msg);
             }
             convertView.setTag(viewHolder);
         }else{
-            viewHolder=(ViewHolderSChat)convertView.getTag();
+            viewHolder=(ViewHolderSChat) convertView.getTag();
         }
-        viewHolder.head.setImageDrawable(msg.getHead());
+        viewHolder.head.setBackgroundDrawable(msg.getHead());
         viewHolder.message.setText(msg.getMsg());
         viewHolder.message.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,7 +240,7 @@ public interface Callback{
             viewHolder.Tome=(Button)convertView.findViewById(R.id.list_button_know_me);
             convertView.setTag(viewHolder);
         }else{
-            viewHolder=(ViewHolderKnow)convertView.getTag();
+            viewHolder= (ViewHolderKnow)convertView.getTag();
         }
         viewHolder.I.setText(msg.geti());
         viewHolder.Me.setText(msg.getme());
@@ -242,6 +269,81 @@ public interface Callback{
         viewHolder.head.setOnClickListener(Click);
         viewHolder.nick.setOnClickListener(Click);
         viewHolder.auto.setOnClickListener(Click);
+        return convertView;
+    }
+    private View getWallInfoConvertView(int type,int position, View convertView){
+        ViewHolderWallInfo viewHolder;
+        final ItemWallInfo msg=(ItemWallInfo)mData.get(position);
+        if(convertView==null){
+            viewHolder=new ViewHolderWallInfo();
+            viewHolder.id=msg.getId();
+            if(type==11) {
+                convertView=mInflater.inflate(R.layout.list_info_ordinary, null);
+                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_head);
+                viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_ordinary_nick);
+                viewHolder.linear = (LinearLayout) convertView.findViewById(R.id.list_info_ordinary_linear);
+                viewHolder.time = (TextView) convertView.findViewById(R.id.list_info_ordinary_time);
+                viewHolder.more = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_more);
+                viewHolder.content = (TextView) convertView.findViewById(R.id.list_info_ordinary_content);
+            }else if(type==12){
+                convertView=mInflater.inflate(R.layout.list_info_anonymous, null);
+                viewHolder.linear=(LinearLayout)convertView.findViewById(R.id.list_info_anonymous_linear);
+                viewHolder.time=(TextView)convertView.findViewById(R.id.list_info_anonymous_time);
+                viewHolder.more=(ImageButton)convertView.findViewById(R.id.list_info_anonymous_more);
+                viewHolder.content=(TextView)convertView.findViewById(R.id.list_info_anonymous_content);
+            }
+            viewHolder.comment=(ImageButton)convertView.findViewById(R.id.list_info_comment);
+            viewHolder.cnum=(TextView)convertView.findViewById(R.id.list_info_cnum);
+            viewHolder.agree =(ImageButton)convertView.findViewById(R.id.list_info_agree);
+            viewHolder.anum =(TextView)convertView.findViewById(R.id.list_info_anum);
+            convertView.setTag(viewHolder);
+        }else{
+            viewHolder=(ViewHolderWallInfo)convertView.getTag();
+        }
+        if(type==11) {
+            viewHolder.head.setBackgroundDrawable(msg.getHead());
+            viewHolder.nick.setText(msg.getNick());
+        }
+        viewHolder.linear.setBackgroundDrawable(mContext.getResources().getDrawable(msg.getType()));
+        viewHolder.time.setText(msg.getTime());
+        viewHolder.more.setOnClickListener(Click);
+        viewHolder.content.setText(msg.getContent());
+        viewHolder.comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mContext, WallMsgActivity.class);
+                intent.putExtra("type",msg.getType());
+                intent.putExtra("id",msg.getId());
+                intent.putExtra("msgcode",msg.getMsgcode());
+                intent.putExtra("nick",msg.getNick());
+                intent.putExtra("time",msg.getTime());
+                intent.putExtra("content",msg.getContent());
+                intent.putExtra("anum",msg.getAnum());
+                intent.putExtra("cnum",msg.getCnum());
+                mContext.startActivity(intent);
+//                Intent intent=new Intent(mContext, MyService.class);
+//                intent.putExtra("CMD","Comment");
+//                intent.putExtra("msgcode",msg.getMsgcode());
+//                intent.putExtra("receiver",msg.getId());
+//                intent.putExtra("mode",0);
+//                intent.putExtra("type",0);
+//                mContext.startService(intent);
+            }
+        });
+        viewHolder.cnum.setText(msg.getCnum());
+        viewHolder.agree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mContext, MyService.class);
+                intent.putExtra("CMD","Agree");
+                intent.putExtra("msgcode",msg.getMsgcode());
+                intent.putExtra("receiver",msg.getId());
+                intent.putExtra("mode",1);
+                intent.putExtra("type",0);
+                mContext.startService(intent);
+            }
+        });
+        viewHolder.anum.setText(msg.getAnum());
         return convertView;
     }
     private View getSimpleListConvertView(int position,View convertView){
@@ -285,6 +387,7 @@ public interface Callback{
                     break;
                 case R.id.list_homepage_auto:
                     mCallback.click(v);
+                    break;
             }
         }
     };

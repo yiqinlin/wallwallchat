@@ -23,17 +23,14 @@ import com.stark.yiyu.R;
 import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.UIactivity.ChatActivity;
+import com.stark.yiyu.Util.DateUtil;
 import com.stark.yiyu.Util.Try;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.adapter.holder.ViewHolderMid;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemMid;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by Stark on 2017/2/14.
@@ -77,10 +74,10 @@ public class Fragment2 extends Fragment {
                 Msg msg= (Msg)NetPackage.getBag(intent.getStringExtra("Msg"),intent.getStringExtra("BagType"));
                 Cursor cursor = db.query("mid",null, "id=?", new String[]{msg.SrcId}, null, null, null);
                 if(cursor!=null&&cursor.getCount()>0&&cursor.moveToNext()) {
-                    db.update("mid", Data.getMidContentValues(null, null, msg.Remarks, msg.Msg + "", msg.Date + " " + msg.Time, "" + (Integer.parseInt(cursor.getString(5)) < 100 ? Integer.parseInt(cursor.getString(5)) + 1 : 100)), "id=?", new String[]{msg.SrcId});
+                    db.update("mid", Data.getMidContentValues(null, null, msg.Remarks, msg.Msg + "", msg.MsgCode, "" + (Integer.parseInt(cursor.getString(5)) < 100 ? Integer.parseInt(cursor.getString(5)) + 1 : 100)), "id=?", new String[]{msg.SrcId});
                     cursor.close();
                 }else {
-                    db.insert("mid", null, Data.getMidContentValues(msg.SrcId, null, msg.Remarks, msg.Msg + "", msg.Date + " " + msg.Time, "1"));
+                    db.insert("mid", null, Data.getMidContentValues(msg.SrcId, null, msg.Remarks, msg.Msg + "", msg.MsgCode, "1"));
                 }
                 db.close();
                 msgRefresh(adapter, mArrays);
@@ -104,13 +101,11 @@ public class Fragment2 extends Fragment {
 
     private void msgRefresh(MyAdapter adapter,ArrayList<BaseItem> mArrays){
         SQLiteDatabase db=new DatabaseHelper(getActivity()).getWritableDatabase();
-        Cursor cr=db.query("mid",null,null,null,null,null,"date desc");
+        Cursor cr=db.query("mid",null,null,null,null,null,"msgcode desc");
         if(cr!=null&&cr.getCount()>0){
             mArrays.clear();
-            Date date=new Date();
-            DateFormat format=new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
             while(cr.moveToNext()){
-                mArrays.add(new ItemMid(2, cr.getString(0), getResources().getDrawable(R.drawable.tianqing), cr.getString(2), cr.getString(3), format.format(date).equals(cr.getString(4).substring(0, 10))?cr.getString(4).substring(11, 16):cr.getString(4).substring(5,10), cr.getString(5)));
+                mArrays.add(new ItemMid(2, cr.getString(0), getResources().getDrawable(R.drawable.tianqing), cr.getString(2), cr.getString(3), DateUtil.MtoST(cr.getString(4)), cr.getString(5)));
             }
             cr.close();
             adapter.notifyDataSetChanged();

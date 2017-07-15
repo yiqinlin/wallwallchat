@@ -24,6 +24,7 @@ import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.SQLite.DatabaseHelper;
+import com.stark.yiyu.Util.DateUtil;
 import com.stark.yiyu.Util.Try;
 
 import java.io.BufferedReader;
@@ -87,7 +88,7 @@ public class MyService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mReceiver, intentFilter);
-        Log.i("MyService","in onCreate");
+        Log.i("MyService", "in onCreate");
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -110,8 +111,13 @@ public class MyService extends Service {
             } else if (cmd.equals("Image")) {
                 /**
                  *
-                 *
                  */
+            }else if(cmd.equals("WallMsg")){
+                WallMsgSend(intent);
+            }else if(cmd.equals("Agree")){
+                Agree(intent);
+            }else if(cmd.equals("Comment")){
+                Comment(intent);
             }
         }else {
             Log.i("MyService","null CMD");
@@ -130,6 +136,39 @@ public class MyService extends Service {
         }else{
             return MsgSocket.isConnected();
         }
+    }
+    public boolean Comment(Intent intent) {
+        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
+        ID=sp.getString("id",null);
+        String Edu=sp.getString("edu",null);
+        if(ID!=null&&Edu!=null) {
+            JsonMsg = NetPackage.Comment(ID, Try.getStringExtra(intent, "receiver"), DateUtil.getMsgCode(MyService.this), Try.getStringExtra(intent, "msgcode"),"test",Edu, intent.getIntExtra("mode", 0), intent.getIntExtra("type", 0))+"\n";
+            new Thread(send).start();
+            return true;
+        }else
+            return false;
+    }
+    public boolean Agree(Intent intent){
+        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
+        ID=sp.getString("id",null);
+        String Edu=sp.getString("edu",null);
+        if(ID!=null&&Edu!=null) {
+            JsonMsg = NetPackage.Agree(ID,Try.getStringExtra(intent,"receiver"),Try.getStringExtra(intent,"msgcode"),Edu,intent.getIntExtra("mode",0),intent.getIntExtra("type",0))+"\n";
+            new Thread(send).start();
+            return true;
+        }else
+            return false;
+    }
+    public boolean WallMsgSend(Intent intent){
+        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
+        ID=sp.getString("id",null);
+        String Edu=sp.getString("edu",null);
+        if(ID!=null&&Edu!=null) {
+            JsonMsg = NetPackage.SendWMsg(ID, Edu, Try.getStringExtra(intent, "msg"), "0", intent.getIntExtra("mode", 0), sp.getInt("sex", 0))+"\n";
+            new Thread(send).start();
+            return true;
+        }else
+            return false;
     }
     public boolean AutoLogin()
     {

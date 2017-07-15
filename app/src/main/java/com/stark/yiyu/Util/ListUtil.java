@@ -15,7 +15,7 @@ public class ListUtil {
             if(temp.getMsgCode()!=null&&temp.getMsgCode().equals(msgCode)){
                 temp.State = 1;
                 temp.MsgCode=newCode;
-                temp.Date=DateUtil.Mtod(newCode);
+                temp.Date=DateUtil.Mtoy(newCode);
                 temp.Time=DateUtil.Mtot(newCode);
                 mArrays.set(i,temp);
             }

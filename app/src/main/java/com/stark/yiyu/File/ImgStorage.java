@@ -2,6 +2,7 @@ package com.stark.yiyu.File;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,7 +25,7 @@ import java.io.IOException;
  */
 public class ImgStorage {
 
-    public static Drawable getHead(Context context, Boolean sex) {
+    public static Drawable getHead(Context context) {
         String photoPath = FileUtil.getPath(FileType.mHead);
         photoPath = photoPath + "/cir.png";
         File imgPath = new File(photoPath);
@@ -36,8 +37,8 @@ public class ImgStorage {
         Intent intent = new Intent(context, MyService.class);
         intent.putExtra("CMD", "Image");
         context.startService(intent);
-
-        if (sex) {
+        SharedPreferences sp =context.getSharedPreferences("action", Context.MODE_PRIVATE);
+        if (sp.getBoolean("sex",true)) {
             Log.e("圆形图片路径", "不存在,男");
             return context.getResources().getDrawable(R.drawable.tianqing);
         }

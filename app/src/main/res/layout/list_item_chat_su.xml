@@ -25,7 +25,7 @@
                 android:src="@drawable/loading_progress_grey_rotate"
                 android:visibility="gone"/>
         </LinearLayout>
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="0dp"
@@ -34,8 +34,8 @@
             android:textSize="@dimen/text_size_xmid"
             android:background="@drawable/aio_user_bg_nor"
             android:textColor="#ffffff"
-            android:id="@+id/list_chat_su_msg"
-            style="?android:attr/borderlessButtonStyle"/>
+            android:clickable="true"
+            android:id="@+id/list_chat_su_msg"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="42dp"
@@ -43,10 +43,10 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="7dp"
         android:layout_marginLeft="7dp">
-        <ImageView
+        <ImageButton
             android:id="@+id/list_chat_su_head"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="42dp"
+            android:layout_height="42dp" />
     </LinearLayout>
 
 </LinearLayout>

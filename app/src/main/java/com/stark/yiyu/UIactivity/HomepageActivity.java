@@ -89,7 +89,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         adapter = new MyAdapter(HomepageActivity.this, mArrays);
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this, true), Nick, Auto));
+        mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this), Nick, Auto));
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
             send.setOnClickListener(Click);
@@ -106,7 +106,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.yiyu.changeHead")&&DesId.equals(SrcID)) {
                     mArrays.remove(0);
-                    mArrays.add(0, new ItemHomepageTitle(5, DesId,ImgStorage.getHead(HomepageActivity.this,true), Nick, Auto));
+                    mArrays.add(0, new ItemHomepageTitle(5, DesId,ImgStorage.getHead(HomepageActivity.this), Nick, Auto));
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -331,6 +331,12 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
             String answer = NetSocket.request(NetPackage.SendFile(MD5.get(file), file.getName(), file.length(), true), path, FileMode.UPLOAD);
             Ack ack = (Ack) NetPackage.getBag(answer);
             Log.e("backmsg",answer);
+            if(ack.Error==8) {
+                answer = NetSocket.request(NetPackage.getFile(ack.BackMsg), FileUtil.getPath(FileType.mHead) + "/cir.png", FileMode.DOWNLOAD);
+                ack = (Ack) NetPackage.getBag(answer);
+            }else {
+                publishProgress(ack.Error);
+            }
             if (ack.Flag) {
                 if(FileUtil.Move(path,FileUtil.getPath(FileType.mHead),true)&&FileUtil.Move(outPath, FileUtil.getPath(FileType.mHead), true)) {
                     Intent intent = new Intent();
@@ -341,18 +347,8 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 }else{
                     publishProgress(110);
                 }
-            } else {
-                if(ack.Error==8){
-                    answer = NetSocket.request(NetPackage.getFile(ack.BackMsg), FileUtil.getPath(FileType.mHead)+"/cir.png", FileMode.DOWNLOAD);
-                    ack = (Ack) NetPackage.getBag(answer);
-                    if (ack.Flag) {
-                        publishProgress(100);
-                    } else {
-                        publishProgress(ack.Error);
-                    }
-                }else {
-                    publishProgress(ack.Error);
-                }
+            }else {
+                publishProgress(ack.Error);
             }
             return null;
         }
@@ -375,7 +371,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         @Override
         protected Void doInBackground(Void... values) {
             ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
+
             //db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 2), "msgcode=?", new String[]{ack.MsgCode});
+
             if (!ack.Flag) {
                 publishProgress(-1);
             } else {

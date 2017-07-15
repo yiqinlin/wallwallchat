@@ -8,8 +8,9 @@ import org.json.JSONArray;
 public class Refresh {
     public String SrcId;
     public String DesId;
+    public String Msg;
     public int Start;
     public int Mode;
-    public JSONArray MsgCode;
-    public JSONArray Data;
+    public JSONArray WallData;
+    public JSONArray ChatData;
 }

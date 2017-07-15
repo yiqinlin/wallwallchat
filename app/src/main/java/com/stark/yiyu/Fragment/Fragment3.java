@@ -65,7 +65,7 @@ public class Fragment3 extends Fragment {
                     Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
                     if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
                         mArrays.remove(0);
-                        mArrays.add(0,new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity(), true), cr.getString(0), cr.getString(1)));
+                        mArrays.add(0,new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity()), cr.getString(0), cr.getString(1)));
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -81,7 +81,7 @@ public class Fragment3 extends Fragment {
         db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
-            mArrays.add(new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity(), true), cr.getString(0), cr.getString(1)));
+            mArrays.add(new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity()), cr.getString(0), cr.getString(1)));
             Nick=cr.getString(0);
             Auto=cr.getString(1);
             cr.close();

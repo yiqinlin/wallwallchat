@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Format.Refresh;
@@ -34,8 +35,6 @@ import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemSMsg;
 import com.stark.yiyu.json.JsonConvert;
-
-import org.json.JSONArray;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -89,7 +88,6 @@ public class ChatActivity extends Activity {
             public void onRefresh() {
                 new AsyncTask<Void, Void, Void>() {
                     int SelectionTemp = 0;
-
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
@@ -97,16 +95,20 @@ public class ChatActivity extends Activity {
                                 return null;
                             }
                             if (DesId != null && SrcId != null) {
-                                JSONArray jsonArray = new JSONArray();
-                                Cursor cr = db.query("u" + DesId, new String[]{"msgcode"}, null, null, null, null, "msgcode desc", start + ",15");
-                                if (cr != null && cr.getCount() > 0) {
-                                    while (cr.moveToNext()) {
-                                        jsonArray.put(cr.getString(0));
-                                    }
-                                    cr.close();
-                                }
-                                JsonConvert.UpdateDB(db, DesId, (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcId, DesId, start, 1, jsonArray) + '\n')));
-                                SelectionTemp = AddList();
+//                                JSONArray jsonArray = new JSONArray();
+//                                Cursor cr = db.query("u" + DesId, new String[]{"msgcode"}, null, null, null, null, "msgcode desc", start + ",15");
+//                                if (cr != null && cr.getCount() > 0) {
+//                                    while (cr.moveToNext()) {
+//                                        jsonArray.put(cr.getString(0));
+//                                    }
+//                                    cr.close();
+//                                }
+                                //有网
+                                Refresh refresh=(Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcId, DesId, start, 1, 0, "") + '\n'));
+                                JsonConvert.UpdateData(ChatActivity.this, db, DesId, refresh, mArrays);
+                                SelectionTemp = refresh.ChatData.length();
+                                //没网或超时
+                                //SelectionTemp=AddList();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -153,6 +155,7 @@ public class ChatActivity extends Activity {
                 String cmdStr=intent.getStringExtra("BagType");
                 Msg msg= (Msg)NetPackage.getBag(msgStr,cmdStr);
                 if(msg.SrcId.equals(DesId)) {
+                    start++;
                     mArrays.add(new ItemSMsg(1, msg.SrcId, ChatActivity.this.getResources().getDrawable(R.drawable.tianqing), msg.SendType, msg.Bubble, msg.Msg, msg.MsgCode, msg.Date, msg.Time, 1));
                     adapter.notifyDataSetChanged();
                 }else{
@@ -200,7 +203,7 @@ public class ChatActivity extends Activity {
                         item_type = 1;
                     }
                     count++;
-                    mArrays.add(0,new ItemSMsg(item_type, cr.getString(0), ChatActivity.this.getResources().getDrawable(R.drawable.tianqing), cr.getInt(1), cr.getInt(2), cr.getString(3), cr.getString(4), cr.getString(5), cr.getString(6), cr.getInt(7)));
+                    mArrays.add(0,new ItemSMsg(item_type, cr.getString(0), ImgStorage.getHead(ChatActivity.this), cr.getInt(1), cr.getInt(2), cr.getString(3), cr.getString(4), cr.getString(5), cr.getString(6), cr.getInt(7)));
                 }
             }
             cr.close();
@@ -234,7 +237,7 @@ public class ChatActivity extends Activity {
         protected Void doInBackground(Void...values) {
             if(MsgTemp!=null) {
                 ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.SendMsg(sp.getString("id", null), DesId, MsgTemp, msgCode) + '\n'));
-                db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 0), "msgcode=?", new String[]{ack.MsgCode});
+                db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtoy(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 0), "msgcode=?", new String[]{ack.MsgCode});
                 if(!ack.Flag){
                     publishProgress(-1);
                 }else{
@@ -253,6 +256,7 @@ public class ChatActivity extends Activity {
                     Toast.makeText(ChatActivity.this, Error.error(ack.Error),Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
+                    start++;
                     mArrays=ListUtil.UpadteState(mArrays,ack.MsgCode,ack.BackMsg);
                     adapter.notifyDataSetChanged();
                     break;

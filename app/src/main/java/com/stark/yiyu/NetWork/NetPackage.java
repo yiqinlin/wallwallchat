@@ -6,10 +6,12 @@ import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.CmdType;
 import com.stark.yiyu.Format.Format;
 import com.stark.yiyu.Format.Get;
+import com.stark.yiyu.Format.Interact;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Format.Refresh;
 import com.stark.yiyu.Format.Registion;
 import com.stark.yiyu.Format.TransFile;
+import com.stark.yiyu.Format.WallMsgSend;
 import com.stark.yiyu.json.JsonConvert;
 
 import org.json.JSONArray;
@@ -83,6 +85,77 @@ public class NetPackage {
         Log.i("Send",JsonStr);
         return JsonStr;
     }
+    public static String Comment(String sponsor,String receiver,String msgcode,String msgcode2,String msg,String edu,int mode,int type){
+        Interact interact=new Interact();
+        Format format=new Format();
+        interact.Sponsor=sponsor;
+        interact.Receiver=receiver;
+        interact.MsgCode=msgcode;
+        interact.MsgCode2=msgcode2;
+        interact.Msg=msg;
+        interact.Edu=edu;
+        interact.Mode=mode;
+        interact.Type=type;
+        String JsonStr=null;
+        try {
+            JsonStr= JsonConvert.SerializeObject(interact);
+            format.Type = "Interact";
+            format.Cmd = "comment";
+            format.JsonMsg = JsonStr;
+            JsonStr = JsonConvert.SerializeObject(format);
+        }catch (Exception e)
+        {
+            Log.i("Interact",e.toString());
+        }
+        Log.i("Interact",JsonStr);
+        return JsonStr;
+    }
+    public static String Agree(String sponsor,String receiver,String msgcode,String edu,int mode,int type) {
+        Interact interact=new Interact();
+        Format format=new Format();
+        interact.Sponsor=sponsor;
+        interact.Receiver=receiver;
+        interact.MsgCode=msgcode;
+        interact.Edu=edu;
+        interact.Mode=mode;
+        interact.Type=type;
+        String JsonStr=null;
+        try {
+            JsonStr= JsonConvert.SerializeObject(interact);
+            format.Type = "Interact";
+            format.Cmd = "agree";
+            format.JsonMsg = JsonStr;
+            JsonStr = JsonConvert.SerializeObject(format);
+        }catch (Exception e)
+        {
+            Log.i("Interact",e.toString());
+        }
+        Log.i("Interact",JsonStr);
+        return JsonStr;
+    }
+    public static String SendWMsg(String SrcId,String Edu,String msg,String msgCode,int mode,int type){
+        WallMsgSend wallmsg=new WallMsgSend();
+        Format format=new Format();
+        wallmsg.Sponsor=SrcId;
+        wallmsg.Edu=Edu;
+        wallmsg.Msg=msg;
+        wallmsg.MsgCode=msgCode;
+        wallmsg.Mode=mode;
+        wallmsg.Type=type;
+        String JsonStr=null;
+        try {
+            JsonStr= JsonConvert.SerializeObject(wallmsg);
+            format.Type = "WallMsg";
+            format.Cmd = "wsend";
+            format.JsonMsg = JsonStr;
+            JsonStr = JsonConvert.SerializeObject(format);
+        }catch (Exception e)
+        {
+            Log.i("WSend",e.toString());
+        }
+        Log.i("WSend",JsonStr);
+        return JsonStr;
+    }
     public static String SendGMsg(String SrcId,String DesId,String msg,String msgCode){
         Msg message=new Msg();
         Format format=new Format();
@@ -117,19 +190,19 @@ public class NetPackage {
         }
         return null;
     }
-    public static String Refresh(String SrcId,String DesId,int start,int type,JSONArray data){
+    public static String Refresh(String SrcId,String DesId,int start,int type,int cmd,String msg){
         Refresh refresh=new Refresh();
         refresh.SrcId=SrcId;
         refresh.DesId=DesId;
         refresh.Mode=type;
         refresh.Start=start;
-        refresh.MsgCode=data;
+        refresh.Msg=msg;
         String JsonStr;
         try {
             JsonStr=JsonConvert.SerializeObject(refresh);
             Format format = new Format();
             format.Type = "Refresh";
-            format.Cmd = "sRefresh";
+            format.Cmd = (cmd==0?"sRefresh":"wRefresh");
             format.JsonMsg = JsonStr;
             Log.i("Refresh",JsonStr);
             return JsonConvert.SerializeObject(format);

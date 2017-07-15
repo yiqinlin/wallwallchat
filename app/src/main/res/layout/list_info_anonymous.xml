@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:padding="@dimen/magic_margin"
-    android:layout_width="match_parent"
     android:descendantFocusability="blocksDescendants"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/list_info_ordinary_linear">
-        <include layout="@layout/list_info_head_ordinary"/>
+        android:id="@+id/list_info_anonymous_linear"
+        android:orientation="vertical">
+        <include layout="@layout/list_info_head_anonymous"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,11 +18,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/list_info_anonymous_content"
                 android:ellipsize="end"
                 android:textSize="@dimen/text_size_xmid"
                 android:maxLines="8"
-                android:textColor="@android:color/black"
-                android:id="@+id/list_info_ordinary_content"/>
+                android:textColor="@android:color/black"/>
         </LinearLayout>
         <include layout="@layout/list_info_bottom"/>
     </LinearLayout>

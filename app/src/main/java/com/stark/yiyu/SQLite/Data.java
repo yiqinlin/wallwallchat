@@ -27,7 +27,7 @@ public class Data {
         }
         return cv;
     }
-    public static ContentValues getMidContentValues(String id,String head,String remarks,String message,String date,String count){
+    public static ContentValues getMidContentValues(String id,String head,String remarks,String message,String msgcode,String count){
         ContentValues cv=new ContentValues();
         if(id!=null){
             cv.put("id", id);
@@ -37,8 +37,8 @@ public class Data {
             cv.put("remarks", remarks);
         }if(message!=null) {
             cv.put("message", message);
-        }if(date!=null) {
-            cv.put("date", date);
+        }if(msgcode!=null) {
+            cv.put("msgcode", msgcode);
         }if(count!=null) {
             cv.put("count", count);
         }

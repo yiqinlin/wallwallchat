@@ -5,14 +5,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Get;
 import com.stark.yiyu.Format.Refresh;
 import com.stark.yiyu.Format.SimpleMsg;
 import com.stark.yiyu.Format.UserInfo;
+import com.stark.yiyu.Format.WallMsgGet;
 import com.stark.yiyu.R;
 import com.stark.yiyu.SQLite.Data;
+import com.stark.yiyu.Util.DateUtil;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemSMsg;
+import com.stark.yiyu.bean.ItemWallInfo;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -37,6 +41,7 @@ public class JsonConvert {
                         break;
                     case 1://整型
                         json.put(field.getName(),(int)(field.get(obj)==null?0:field.get(obj)));
+                        break;
                     case 2:
                         json.put(field.getName(),(long)(field.get(obj)==null?0:field.get(obj)));
                         break;
@@ -75,15 +80,55 @@ public class JsonConvert {
         }
         return getObject(obj, jsonobj);
     }
-    public static void UpdateDB(SQLiteDatabase db,String DesId,Refresh refresh){
-        int length=refresh.Data.length();
+    public static void UpdateData(Context context, SQLiteDatabase db, String DesId, Refresh refresh, ArrayList<BaseItem> mArray){
+        int length=refresh.ChatData.length();
         SimpleMsg Msg;
+        Cursor cursor;
+        int item_type;
         for (int i=0;i<length;i++) {
             try {
-                Msg = (SimpleMsg) getObject(new SimpleMsg(), refresh.Data.getJSONObject(i));
-                db.insert("u" + DesId, null, Data.getSChatContentValues(Msg.Guestid, Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1));
+                Msg = (SimpleMsg) getObject(new SimpleMsg(), refresh.ChatData.getJSONObject(i));
+                if (Msg.Guestid.equals(DesId)) {
+                    item_type = 1;
+                } else if (Msg.Guestid.equals("10000")) {
+                    item_type = 2;
+                } else {
+                    item_type = 0;
+                }
+                mArray.add(0,new ItemSMsg(item_type,Msg.Guestid,ImgStorage.getHead(context), Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1));
+                cursor= db.query("u" + DesId,null, "msgcode=?", new String[]{Msg.MsgCode}, null, null, null);
+                if(cursor!=null&&cursor.getCount()>0&&cursor.moveToNext()){
+                    db.update("u" + DesId,Data.getSChatContentValues(Msg.Guestid, Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1),"msgcode=?", new String[]{Msg.MsgCode});
+                    cursor.close();
+                }else{
+                    db.insert("u" + DesId, null, Data.getSChatContentValues(Msg.Guestid, Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1));
+                }
             } catch (Exception e) {
                 Log.i("UpdateDB", e.toString());
+            }
+        }
+    }
+    public static void UpdateWall(Context context, Refresh refresh, ArrayList<BaseItem> mArrays){
+        int length=refresh.WallData.length();
+        WallMsgGet Msg;
+        int item_type;
+        for (int i=0;i<length;i++) {
+            try {
+                Msg = (WallMsgGet) getObject(new WallMsgGet(), refresh.WallData.getJSONObject(i));
+                switch (Msg.Mode){
+                    case 0:
+                        item_type = 11;
+                        break;
+                    case 1:
+                        item_type = 12;
+                        break;
+                    default:
+                        item_type=11;
+                        break;
+                }
+                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
+            } catch (Exception e) {
+                Log.i("UpdateWall", e.toString());
             }
         }
     }
@@ -113,19 +158,19 @@ public class JsonConvert {
 
         }
     }
-    public static ArrayList<BaseItem> AddList(Context context,String id,ArrayList<BaseItem> mArrays,Refresh refresh){
-        int length=refresh.Data.length();
+    public static ArrayList<BaseItem> AddList(Context context,String SrcID,ArrayList<BaseItem> mArrays,Refresh refresh){
+        int length=refresh.ChatData.length();
         for (int i=0;i<length;i++) {
             JSONObject jsonobj;
             SimpleMsg Msg=new SimpleMsg();
             try {
-                jsonobj = refresh.Data.getJSONObject(i);
+                jsonobj = refresh.ChatData.getJSONObject(i);
                 Msg=(SimpleMsg)getObject(new SimpleMsg(),jsonobj);
             }catch (Exception e){
                 Log.i("Array",e.toString());
             }
             int typeTemp;
-            if(Msg.Guestid.equals(id)){
+            if(Msg.Guestid.equals(SrcID)){
                 typeTemp=0;
             }else if(Msg.Guestid.equals("10000")){
                 typeTemp=2;

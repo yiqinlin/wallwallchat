@@ -19,6 +19,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:background="@drawable/tianqing"
+                android:id="@+id/list_info_comment"
                 android:gravity="center"/>
         </LinearLayout>
         <LinearLayout
@@ -32,6 +33,7 @@
             android:textSize="@dimen/text_size_xsmall"
             android:gravity="center_vertical|start"
             android:layout_gravity="center_vertical"
+            android:id="@+id/list_info_cnum"
             android:text="评论"/>
         </LinearLayout>
 
@@ -52,6 +54,7 @@
                 android:textSize="@dimen/text_size_xsmall"
                 android:gravity="center_vertical|end"
                 android:layout_gravity="center_vertical"
+                android:id="@+id/list_info_anum"
                 android:text="点赞"/>
         </LinearLayout>
         <LinearLayout
@@ -64,7 +67,8 @@
             <ImageButton
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:background="@drawable/tianqing"/>
+                android:background="@drawable/tianqing"
+                android:id="@+id/list_info_agree"/>
         </LinearLayout>
     </LinearLayout>
 

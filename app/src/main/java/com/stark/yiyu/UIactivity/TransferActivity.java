@@ -82,7 +82,7 @@ public class TransferActivity extends FragmentActivity{
         title.setText("消 息");
         titleRight.setText("添加");
         titleRight.setOnClickListener(Click);
-        titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
+        titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this));
         titleLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +97,7 @@ public class TransferActivity extends FragmentActivity{
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
-                    titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this, true));
+                    titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this));
                 }
             }
         };
@@ -161,7 +161,7 @@ public class TransferActivity extends FragmentActivity{
                     left.setBackgroundResource(R.drawable.theme_transfer_tab_group_focused);
                     mid.setBackgroundResource(R.drawable.theme_transfer_tab_message_nor);
                     right.setBackgroundResource(R.drawable.theme_transfer_tab_me_nor);
-                    title.setText("世 界");
+                    title.setText("校 园");
                     titleRight.setText("发布");
                     break;
                 case 1:

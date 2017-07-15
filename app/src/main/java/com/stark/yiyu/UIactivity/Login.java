@@ -51,7 +51,7 @@ public class Login extends Activity {
         Button register=(Button)findViewById(R.id.button_to_register);
         Button forget=(Button)findViewById(R.id.button_to_forget);
         sp= this.getSharedPreferences("action", MODE_PRIVATE);
-        ((ImageView)findViewById(R.id.Login_head)).setImageDrawable(ImgStorage.getHead(Login.this,sp.getBoolean("sex",true)));
+        ((ImageView)findViewById(R.id.Login_head)).setImageDrawable(ImgStorage.getHead(Login.this));
         ID=sp.getString("id", null);//用户帐号
         PassWord=sp.getString("password",null);
         if(ID!=null) {

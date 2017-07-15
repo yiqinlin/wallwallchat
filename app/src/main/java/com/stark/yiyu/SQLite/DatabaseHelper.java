@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS mid(id varchar(20),head varchar(20),remarks varchar(20),message varchar(100),date varchar(20),count varchar(3))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS mid(id varchar(20),head varchar(20),remarks varchar(20),message varchar(100),msgcode varchar(20),count varchar(3))");
         db.execSQL("CREATE TABLE IF NOT EXISTS config(key varchar(20),value integer)");
     }
 
