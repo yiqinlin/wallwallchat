@@ -90,9 +90,9 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
         mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this), Nick, Auto));
+        send.setOnClickListener(Click);
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
-            send.setOnClickListener(Click);
         } else {
             get.setText("待开发");
             send.setText("编辑资料");
