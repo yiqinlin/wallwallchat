@@ -25,7 +25,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.stark.yiyu.AsyncTask.FileAsyncTask;
 import com.stark.yiyu.File.FileMode;
 import com.stark.yiyu.File.FileUtil;
 import com.stark.yiyu.File.ImgStorage;
@@ -228,6 +227,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     } else {
                         Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                     }
+                    Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -253,6 +253,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     }
                 }).setCancelable(false).show();
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, java.lang.String[] permissions, int[] grantResults) {
