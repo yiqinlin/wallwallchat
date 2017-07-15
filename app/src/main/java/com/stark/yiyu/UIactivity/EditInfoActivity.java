@@ -42,6 +42,8 @@ public class EditInfoActivity extends Activity {
     ArrayList<BaseItem> mArrays;
     MyAdapter adapter;
 
+    private static int RES_AUTO_CODE = 0;
+
     private Drawable imgHead = null;
     private String nick = null;
     private String auto = null;
@@ -93,13 +95,16 @@ public class EditInfoActivity extends Activity {
     }
 
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+        Intent it = null;
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
                 case 0:
                     Toast.makeText(EditInfoActivity.this, "" + position, Toast.LENGTH_SHORT).show();
                     break;
-                case 2:
+                case 3:
+                    it = new Intent(EditInfoActivity.this, AutoActivity.class);
+                    startActivityForResult(it,RES_AUTO_CODE);
                     break;
                 case 5:
                     new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{"男", "女"}, new DialogInterface.OnClickListener() {
@@ -139,8 +144,8 @@ public class EditInfoActivity extends Activity {
                     myDateDialog.getWindow().setAttributes(lp);
                     break;
                 case 8:
-                    Intent it = new Intent(EditInfoActivity.this, SortSchool.class);
-                    startActivityForResult(it,123);
+                    it = new Intent(EditInfoActivity.this, SortSchool.class);
+                    startActivityForResult(it, 123);
                     break;
             }
         }
@@ -172,6 +177,9 @@ public class EditInfoActivity extends Activity {
             if (resultCode == 666) {
                 school = data.getStringExtra("college");
                 Log.i("college", "college = " + school);
+                refreshAdapter();
+            } else if (resultCode == RES_AUTO_CODE) {
+                auto = data.getStringExtra("auto");
                 refreshAdapter();
             }
         }

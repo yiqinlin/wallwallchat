@@ -91,13 +91,14 @@
         <activity
             android:name=".UIactivity.PublishActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity android:name=".UIactivity.WallMsgActivity"></activity>
+        <activity android:name=".UIactivity.WallMsgActivity" />
         <activity
             android:name=".UIactivity.EditInfoActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".UIactivity.SortSchool"
-            android:windowSoftInputMode="adjustResize|stateHidden">
-        </activity>
+        <activity
+            android:name=".UIactivity.SortSchool"
+            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
+        <activity android:name=".UIactivity.AutoActivity"></activity>
     </application>
 
 </manifest>
