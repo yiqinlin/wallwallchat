@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import com.stark.yiyu.R;
 import com.stark.yiyu.SortListView.CharacterParser;
 import com.stark.yiyu.SortListView.PinyinComparator;
 import com.stark.yiyu.SortListView.SideBar;
+import com.stark.yiyu.Util.Status;
 import com.stark.yiyu.adapter.SortAdapter;
 import com.stark.yiyu.bean.SortModel;
 
@@ -48,6 +50,7 @@ public class SortSchool extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sort_school);
+        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
         ImageButton left=(ImageButton)findViewById(R.id.button_transfer_title_left);
         TextView mid=(TextView)findViewById(R.id.text_transfer_title);
         mid.setText("选 择");
