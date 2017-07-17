@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -59,10 +60,9 @@ public class SideBar extends View {
 
         for (int i = 0; i < b.length; i++) {
             paint.setColor(getResources().getColor(android.R.color.darker_gray));
-            // paint.setColor(Color.WHITE);
             paint.setTypeface(Typeface.DEFAULT);
             paint.setAntiAlias(true);
-            paint.setTextSize(35);
+            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13, getResources().getDisplayMetrics()));
             // 选中的状态
             if (i == choose) {
                 paint.setColor(Color.rgb(33, 65, 98));
