@@ -9,21 +9,25 @@ import com.stark.yiyu.R;
  */
 public class ItemWallInfo extends BaseItem{
     private String id;
+    private String id2;
     private String msgCode;
     private Drawable head;
     private int type;
     private String nick;
+    private String nick2;
     private String time;
     private String content;
     private String cnum;
     private String anum;
-    public ItemWallInfo(int itemType, int type, String id,String msgCode, Drawable head, String nick, String time, String content, String cnum, String anum){
+    public ItemWallInfo(int itemType, int type, String id,String id2,String msgCode, Drawable head, String nick, String nick2,String time, String content, String cnum, String anum){
         super(itemType);
         this.type=type;
         this.id=id;
+        this.id2=id2;
         this.msgCode=msgCode;
         this.head=head;
         this.nick=nick;
+        this.nick2=nick2;
         this.time=time;
         this.content=content;
         this.cnum=cnum;
@@ -31,6 +35,9 @@ public class ItemWallInfo extends BaseItem{
     }
     public String getId(){
         return this.id+"";
+    }
+    public String getId2(){
+        return this.id2;
     }
     public String getMsgcode(){return this.msgCode+"";}
     public Drawable getHead(){
@@ -50,6 +57,7 @@ public class ItemWallInfo extends BaseItem{
     public String getNick(){
         return this.nick+"";
     }
+    public String getNick2(){return this.nick2;}
     public String getTime(){
         return this.time+"";
     }

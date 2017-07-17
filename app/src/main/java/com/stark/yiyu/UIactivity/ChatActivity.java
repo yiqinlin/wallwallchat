@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -65,9 +67,9 @@ public class ChatActivity extends Activity {
         ImageButton left=(ImageButton)findViewById(R.id.button_transfer_title_left);
         TextView mid=(TextView)findViewById(R.id.text_transfer_title);
         Button right=(Button)findViewById(R.id.button_transfer_title_right);
-        Button send=(Button)findViewById(R.id.button_chat_send);
+        final Button send=(Button)findViewById(R.id.button_send);
         msgNumber=(TextView)findViewById(R.id.text_transfer_title_left);
-        input=(EditText)findViewById(R.id.edit_chat_input);
+        input=(EditText)findViewById(R.id.edit_send);
         listView=(MyListView)findViewById(R.id.list_chat);
         sp = ChatActivity.this.getSharedPreferences("action", MODE_PRIVATE);
         SrcId = sp.getString("id", null);
@@ -104,7 +106,7 @@ public class ChatActivity extends Activity {
 //                                    cr.close();
 //                                }
                                 //有网
-                                Refresh refresh=(Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcId, DesId, start, 1, 0, "") + '\n'));
+                                Refresh refresh=(Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcId, DesId, start, 1, 0, "",1) + '\n'));
                                 JsonConvert.UpdateData(ChatActivity.this, db, DesId, refresh, mArrays);
                                 SelectionTemp = refresh.ChatData.length();
                                 //没网或超时
@@ -135,9 +137,9 @@ public class ChatActivity extends Activity {
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1=new Intent(ChatActivity.this,HomepageActivity.class);
-                intent1.putExtra("nick",intent.getStringExtra("nick"));
-                intent1.putExtra("id",DesId);
+                Intent intent1 = new Intent(ChatActivity.this, HomepageActivity.class);
+                intent1.putExtra("nick", intent.getStringExtra("nick"));
+                intent1.putExtra("id", DesId);
                 startActivity(intent1);
             }
         });
@@ -170,10 +172,34 @@ public class ChatActivity extends Activity {
             @Override
             public void onClick(View v) {
                 unregisterReceiver(mReceiver);
-                Intent intent=new Intent();
-                intent.putExtra("id",DesId);
+                Intent intent = new Intent();
+                intent.putExtra("id", DesId);
                 setResult(2, intent);
                 finish();
+            }
+        });
+        send.setClickable(false);
+        send.setBackgroundResource(R.drawable.gray_button);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence text, int start, int before, int count) {
+                //text  输入框中改变后的字符串信息 start 输入框中改变后的字符串的起始位置 before 输入框中改变前的字符串的位置 默认为0 count 输入框中改变后的一共输入字符串的数量
+                if(count==0){
+                    send.setClickable(false);
+                    send.setBackgroundResource(R.drawable.gray_button);
+                }else{
+                    send.setClickable(true);
+                    send.setBackgroundResource(R.drawable.big_button);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence text, int start, int count, int after) {
+                //text  输入框中改变前的字符串信息 start 输入框中改变前的字符串的起始位置 count 输入框中改变前后的字符串改变数量一般为0 after 输入框中改变后的字符串与起始位置的偏移量
+            }
+
+            @Override
+            public void afterTextChanged(Editable edit) {
+                //edit  输入结束呈现在输入框中的信息
             }
         });
     }

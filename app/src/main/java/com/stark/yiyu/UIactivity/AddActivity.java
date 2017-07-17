@@ -48,8 +48,8 @@ public class AddActivity extends Activity {
         ImageButton left=(ImageButton)findViewById(R.id.button_transfer_title_left);
         TextView title=(TextView)findViewById(R.id.text_transfer_title);
         refreshView = (LinearLayout)findViewById(R.id.layout_refresh);
-        final Button search=(Button)findViewById(R.id.button_chat_send);
-        final EditText input=(EditText)findViewById(R.id.edit_chat_input);
+        final Button search=(Button)findViewById(R.id.button_send);
+        final EditText input=(EditText)findViewById(R.id.edit_send);
         title.setText(getIntent().getStringExtra("title"));
         Mode=getIntent().getIntExtra("Mode",1);
         search.setText("搜索");

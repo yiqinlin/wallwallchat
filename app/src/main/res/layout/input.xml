@@ -15,7 +15,7 @@
         android:textSize="@dimen/text_size"
         android:layout_weight="1"
         android:maxLines="5"
-        android:id="@+id/edit_chat_input"/>
+        android:id="@+id/edit_send"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,6 +30,6 @@
             android:background="@drawable/send_bkg"
             android:text="发送"
             style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/button_chat_send"/>
+            android:id="@+id/button_send"/>
     </LinearLayout>
 </LinearLayout>

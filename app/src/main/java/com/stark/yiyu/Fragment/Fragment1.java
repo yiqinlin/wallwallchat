@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +50,7 @@ public class Fragment1 extends Fragment{
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        Refresh refresh = (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, "nsu", 0, 2, 1, "")));
+                        Refresh refresh = (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, "nsu", 0, 2, 1, "",0)));
                         mArrays.clear();
                         JsonConvert.UpdateWall(getActivity(), refresh, mArrays);
                         return null;
@@ -69,17 +68,10 @@ public class Fragment1 extends Fragment{
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.e("here","here");
             ItemWallInfo msg=(ItemWallInfo)mArrays.get(position-1);
             Intent intent = new Intent(getActivity(), WallMsgActivity.class);
-            intent.putExtra("type",msg.getType());
-            intent.putExtra("id",msg.getId());
+            intent.putExtra("sponsor",msg.getId());
             intent.putExtra("msgcode",msg.getMsgcode());
-            intent.putExtra("nick",msg.getNick());
-            intent.putExtra("time",msg.getTime());
-            intent.putExtra("content",msg.getContent());
-            intent.putExtra("anum",msg.getAnum());
-            intent.putExtra("cnum",msg.getCnum());
             startActivity(intent);
         }
     }
