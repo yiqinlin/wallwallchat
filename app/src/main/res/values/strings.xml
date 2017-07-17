@@ -34,5 +34,6 @@
         <item>比你们</item>
         <item>个</item>
     </string-array>
+    <string name="title_activity_personal_note">PersonalNoteActivity</string>
 
 </resources>

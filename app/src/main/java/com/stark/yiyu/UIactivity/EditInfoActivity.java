@@ -43,6 +43,7 @@ public class EditInfoActivity extends Activity {
     MyAdapter adapter;
 
     private static int RES_AUTO_CODE = 0;
+    private static int RES_NOTE_CODE = 1;
 
     private Drawable imgHead = null;
     private String nick = null;
@@ -121,7 +122,7 @@ public class EditInfoActivity extends Activity {
                         }
                     }).show();
                     break;
-                case 6:
+                case 6://birthday = "1997-2-22";
                     Calendar now = Calendar.getInstance();
                     int year = now.get(Calendar.YEAR);
                     int monthOfYear = now.get(Calendar.MONTH);
@@ -147,6 +148,11 @@ public class EditInfoActivity extends Activity {
                 case 8:
                     it = new Intent(EditInfoActivity.this, SortSchool.class);
                     startActivityForResult(it, 123);
+                    break;
+                case 13:
+                    it = new Intent(EditInfoActivity.this, SelfInfoActivity.class);
+                    it.putExtra("selfInfo", selfInfo);
+                    startActivityForResult(it, RES_NOTE_CODE);
                     break;
             }
         }
@@ -184,6 +190,11 @@ public class EditInfoActivity extends Activity {
             if (resultCode == 4) {
                 auto = data.getStringExtra("auto");
                 Log.e("EditInfoActivity", auto);
+                refreshAdapter();
+            }
+        } else if (requestCode == RES_NOTE_CODE) {
+            if (resultCode == 5) {
+                selfInfo = data.getStringExtra("selfInfo");
                 refreshAdapter();
             }
         }
