@@ -84,7 +84,7 @@ public class EditInfoActivity extends Activity {
         sex = "男";
         birthday = "1997-2-22";
         school = "成都东软学院";
-        address = "中国";
+        address = "四川";
         hometown = "成都";
         mail = "919664295@qq.com";
         selfInfo = "人必自侮,而后人侮之。";
@@ -198,5 +198,16 @@ public class EditInfoActivity extends Activity {
                 refreshAdapter();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        /**
+         * 保存个人信息
+         */
+
+
+
+        super.onBackPressed();
     }
 }

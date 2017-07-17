@@ -94,7 +94,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         send.setOnClickListener(Click);
         if (!DesId.equals(SrcID)) {
             get.setOnClickListener(Click);
-
         } else {
             get.setText("待开发");
             send.setText("编辑资料");
@@ -294,10 +293,13 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String nick = edtNick.getText().toString();
-                                    if (nick != null && !nick.equals("")) {
+                                    if (!nick.equals("") && nick.length() != 0) {
+                                        /**
+                                         *
+                                         */
 
                                     } else {
-                                        nick = "";
+                                        Toast.makeText(HomepageActivity.this, "请填写昵称", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             })
@@ -312,8 +314,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String auto = edtAuto.getText().toString();
-                                    if (auto != null && !auto.equals("")) {
-
+                                    if (!auto.equals("") && auto.length() != 0) {
+                                        /**
+                                         *
+                                         */
                                     } else {
                                         auto = "";
                                     }

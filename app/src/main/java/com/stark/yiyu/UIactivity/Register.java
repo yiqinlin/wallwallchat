@@ -93,7 +93,7 @@ public class Register extends Activity {
                         Error = com.stark.yiyu.Util.Error.error(108);
                         Edit[1].setText(null);
                         Edit[2].setText(null);
-                    } else if (txvCollege.equals("") && txvCollege == null) {
+                    } else if (txvCollege.getText().toString().equals("") || txvCollege.getText().toString().length() == 0) {
                         Error = com.stark.yiyu.Util.Error.error(111);
                     } else {
                         PassWord = MD5.get(PassWord);
