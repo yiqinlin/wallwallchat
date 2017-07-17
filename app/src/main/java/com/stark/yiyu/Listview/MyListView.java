@@ -39,6 +39,7 @@ public class MyListView extends ListView implements OnScrollListener {
 
     private LayoutInflater mInflater;
     private LinearLayout mHeadView;
+    private LinearLayout mTailView;
     private ImageView mArrowImageView;
     private TextView headHint;
     private ListAnimImageView mProgressBar;
@@ -71,15 +72,19 @@ public class MyListView extends ListView implements OnScrollListener {
     private void init() {
         mInflater = LayoutInflater.from(context);
         mHeadView = (LinearLayout) mInflater.inflate(R.layout.list_head, null);
+        mTailView=(LinearLayout)mInflater.inflate(R.layout.list_refresh,null);
         mArrowImageView = (ImageView) mHeadView.findViewById(R.id.head_arrowImageView);
         mProgressBar = (ListAnimImageView) mHeadView.findViewById(R.id.head_progressBar);
         headHint=(TextView)mHeadView.findViewById(R.id.refresh_head_text);
 
         measureView(mHeadView);
+        measureView(mTailView);
         mHeadContentHeight = mHeadView.getMeasuredHeight();
         mHeadView.setPadding(0, -mHeadContentHeight, 0, 0);
         mHeadView.invalidate();
         addHeaderView(mHeadView, null, false);
+        addFooterView(mTailView, null, false);
+        mTailView.setVisibility(GONE);
         setOnScrollListener(this);
 
         mAnimation = new RotateAnimation(0, -180, RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
@@ -94,6 +99,7 @@ public class MyListView extends ListView implements OnScrollListener {
 
         mState = DONE;
         mISRefreshable = false;
+
     }
 
     private void measureView(View child) {
@@ -312,6 +318,10 @@ public class MyListView extends ListView implements OnScrollListener {
     }
     @Override
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        if(deltaY>0){
+            mTailView.setVisibility(VISIBLE);
+            mTailView.setPadding(0,0,0,-mTailView.getHeight());
+        }
         if(deltaY<0&&!isTouchEvent) {
             this.Reset();
             if(-deltaY>mHeadContentHeight){

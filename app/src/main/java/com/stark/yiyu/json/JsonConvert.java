@@ -1,6 +1,7 @@
 package com.stark.yiyu.json;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -126,9 +127,33 @@ public class JsonConvert {
                         item_type=11;
                         break;
                 }
-                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
+                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
             } catch (Exception e) {
                 Log.i("UpdateWall", e.toString());
+            }
+        }
+    }
+    public static void UpdateComment(Context context, Refresh refresh, ArrayList<BaseItem> mArrays){
+        int length=refresh.WallData.length();
+        WallMsgGet Msg;
+        int item_type;
+        for (int i=0;i<length;i++) {
+            try {
+                Msg = (WallMsgGet) getObject(new WallMsgGet(), refresh.WallData.getJSONObject(i));
+                switch (Msg.Mode){
+                    case 0:
+                        item_type = 13;
+                        break;
+                    case 1:
+                        item_type = 14;
+                        break;
+                    default:
+                        item_type=13;
+                        break;
+                }
+                mArrays.add(new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
+            } catch (Exception e) {
+                Log.i("UpdateComment", e.toString());
             }
         }
     }
@@ -140,13 +165,14 @@ public class JsonConvert {
             return null;
         }
     }
-    public static void UpdateDB(SQLiteDatabase db,Get get){
+    public static void UpdateDB(SQLiteDatabase db,SharedPreferences sp,Get get){
         int length=get.Data.length();
         UserInfo User;
         for (int i=0;i<length;i++) {
             try {
                 User = (UserInfo) getObject(new UserInfo(),get.Data.getJSONObject(i));
                 Cursor cr=db.query("userdata",new String[]{"id"},"id=?",new String[]{User.Id},null,null,null);
+                sp.edit().putString("nick",User.Nick);
                 if(cr!=null&&cr.getCount()>0&&cr.moveToNext()) {
                     db.update("userdata", Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth, User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme), "id=?", new String[]{User.Id});
                 }else{

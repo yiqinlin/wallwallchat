@@ -65,7 +65,7 @@ public class TransferActivity extends FragmentActivity{
         right=(Button)findViewById(R.id.button_tab_right);
         mInputLine=(LinearLayout)findViewById(R.id.layout_tab_input);
         mTabLine=(LinearLayout)findViewById(R.id.layout_tab);
-        input=(EditText)findViewById(R.id.edit_chat_input);
+        input=(EditText)findViewById(R.id.edit_send);
 
         SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
         SharedPreferences sp=TransferActivity.this.getSharedPreferences("action", Context.MODE_PRIVATE);

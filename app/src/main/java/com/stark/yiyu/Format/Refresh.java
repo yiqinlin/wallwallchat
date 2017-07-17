@@ -11,6 +11,7 @@ public class Refresh {
     public String Msg;
     public int Start;
     public int Mode;
+    public String Sort;
     public JSONArray WallData;
     public JSONArray ChatData;
 }

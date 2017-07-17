@@ -1,6 +1,7 @@
 package com.stark.yiyu.UIactivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -136,7 +137,7 @@ public class SortSchool extends Activity {
                     isProvince = true;
                     Intent it = new Intent();
                     it.putExtra("college", ((SortModel) adapter.getItem(position)).getName());
-                    it.putExtra("Edu", code);
+                    getSharedPreferences("action", Context.MODE_PRIVATE).edit().putString("edu",code).apply();
                     setResult(666, it);
                     finish();
                 }

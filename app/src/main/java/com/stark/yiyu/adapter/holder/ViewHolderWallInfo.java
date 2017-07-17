@@ -11,6 +11,7 @@ public class ViewHolderWallInfo {
     public String id;
     public ImageButton head;
     public LinearLayout linear;
+    public TextView reply;
     public TextView nick;
     public TextView time;
     public ImageButton more;

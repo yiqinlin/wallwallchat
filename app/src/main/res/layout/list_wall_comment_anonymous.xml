@@ -5,11 +5,10 @@
     android:layout_width="match_parent"
     android:descendantFocusability="blocksDescendants"
     android:layout_height="match_parent">
-    <include layout="@layout/list_wall_comment_head"/>
+    <include layout="@layout/list_wall_comment_anonymous_head"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginLeft="49dp">
         <TextView
             android:layout_width="wrap_content"
@@ -19,16 +18,15 @@
             android:textColor="@android:color/darker_gray"
             android:text="回复:xxx"
             android:visibility="gone"/>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
-            android:clickable="true"
             android:textSize="@dimen/text_size_xmid"
-            android:gravity="center_vertical|left"
+            android:clickable="true"
             android:textColor="@android:color/black"
-            android:id="@+id/list_info_content"
+            android:gravity="center_vertical|left"
+            android:layout_marginTop="7dp"
+            android:id="@+id/list_info_anonymous_comment_content"
             android:text="文字测试"/>
     </LinearLayout>
 </LinearLayout>

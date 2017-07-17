@@ -158,9 +158,6 @@ public class Register extends Activity {
             if (resultCode == 666) {
 
                 String college = data.getStringExtra("college");
-
-                sp.edit().putString("Edu", data.getStringExtra("Edu")).apply();
-                
                 txvCollege.setText(college);
             }
         }

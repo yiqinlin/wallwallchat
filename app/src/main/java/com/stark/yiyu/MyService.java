@@ -44,8 +44,6 @@ public class MyService extends Service {
     private String UUID=null;
     private String IP="60.205.191.131";
     private int PORT=12345;
-    private String UIP="";
-    private int UPORT=3000;
     private boolean outRec=true;
     private int NetState=1;
     private int LogState=0;
@@ -92,8 +90,8 @@ public class MyService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("MyService", "in onStartCommand");
         String cmd= Try.getStringExtra(intent, "CMD");
+        Log.i("MyService", "in onStartCommand:"+cmd);
         if(cmd!=null&&!cmd.equals("")) {
             if (cmd.equals("Welcome")) {
                 if(NetState!=0&&!Connected()) {
@@ -142,7 +140,7 @@ public class MyService extends Service {
         ID=sp.getString("id",null);
         String Edu=sp.getString("edu",null);
         if(ID!=null&&Edu!=null) {
-            JsonMsg = NetPackage.Comment(ID, Try.getStringExtra(intent, "receiver"), DateUtil.getMsgCode(MyService.this), Try.getStringExtra(intent, "msgcode"),"test",Edu, intent.getIntExtra("mode", 0), intent.getIntExtra("type", 0))+"\n";
+            JsonMsg = NetPackage.Comment(ID, Try.getStringExtra(intent, "receiver"), DateUtil.getMsgCode(MyService.this), Try.getStringExtra(intent, "msgcode"),Try.getStringExtra(intent, "msg"),Edu, intent.getIntExtra("mode", 0), intent.getIntExtra("type", 0))+"\n";
             new Thread(send).start();
             return true;
         }else

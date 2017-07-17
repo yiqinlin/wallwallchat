@@ -5,9 +5,11 @@ package com.stark.yiyu.Format;
  */
 public class WallMsgGet {
     public String Sponsor;
+    public String Receiver;
     public String Edu;
     public String Head;
     public String Nick;
+    public String Nick2;
     public int Type;
     public int Mode;
     public String Msg;

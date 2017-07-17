@@ -190,11 +190,31 @@ public class NetPackage {
         }
         return null;
     }
-    public static String Refresh(String SrcId,String DesId,int start,int type,int cmd,String msg){
+    public static String Refresh(String SrcId,String DesId,int start,int refreshMode,int cmd,String msg,int sortMode){
         Refresh refresh=new Refresh();
         refresh.SrcId=SrcId;
         refresh.DesId=DesId;
-        refresh.Mode=type;
+        refresh.Mode=refreshMode;
+        switch (sortMode){
+            case 0:
+                refresh.Sort="msgcode ASC";
+            break;
+            case 1:
+                refresh.Sort="msgcode DESC";
+                break;
+            case 2:
+                refresh.Sort="anum ASC";
+                break;
+            case 3:
+                refresh.Sort="anum DESC";
+                break;
+            case 4:
+                refresh.Sort="cnum ASC";
+                break;
+            case 5:
+                refresh.Sort="cnum DESC";
+                break;
+        }
         refresh.Start=start;
         refresh.Msg=msg;
         String JsonStr;

@@ -141,9 +141,11 @@ public interface Callback{
                 break;
             case 11:
             case 12:
+            case 13:
+            case 14:
                 convertView= getWallInfoConvertView(itemType,position, convertView);
                 break;
-            case 13:
+            case 15:
                 convertView=getTextSeparateConVertView(position,convertView);
                 break;
         }
@@ -299,21 +301,32 @@ public interface Callback{
         if(convertView==null){
             viewHolder=new ViewHolderWallInfo();
             viewHolder.id=msg.getId();
-            if(type==11) {
-                convertView=mInflater.inflate(R.layout.list_info_ordinary, null);
-                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_head);
-                viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_ordinary_nick);
-                viewHolder.linear = (LinearLayout) convertView.findViewById(R.id.list_info_ordinary_linear);
-                viewHolder.time = (TextView) convertView.findViewById(R.id.list_info_ordinary_time);
-                viewHolder.more = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_more);
-                viewHolder.content = (TextView) convertView.findViewById(R.id.list_info_ordinary_content);
-            }else if(type==12){
-                convertView=mInflater.inflate(R.layout.list_info_anonymous, null);
-                viewHolder.linear=(LinearLayout)convertView.findViewById(R.id.list_info_anonymous_linear);
-                viewHolder.time=(TextView)convertView.findViewById(R.id.list_info_anonymous_time);
-                viewHolder.more=(ImageButton)convertView.findViewById(R.id.list_info_anonymous_more);
-                viewHolder.content=(TextView)convertView.findViewById(R.id.list_info_anonymous_content);
+            switch (type){
+                case 11:
+                    convertView=mInflater.inflate(R.layout.list_info_ordinary, null);
+                    viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_head);
+                    viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_ordinary_nick);
+                    viewHolder.linear = (LinearLayout) convertView.findViewById(R.id.list_info_ordinary_linear);
+                    viewHolder.more = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_more);
+                    break;
+                case 12:
+                    convertView=mInflater.inflate(R.layout.list_info_anonymous, null);
+                    viewHolder.linear=(LinearLayout)convertView.findViewById(R.id.list_info_anonymous_linear);
+                    viewHolder.more=(ImageButton)convertView.findViewById(R.id.list_info_anonymous_more);
+                    break;
+                case 13:
+                    convertView=mInflater.inflate(R.layout.list_wall_comment, null);
+                    viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_comment_head);
+                    viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_comment_nick);
+                    viewHolder.reply=(TextView)convertView.findViewById(R.id.list_comment_reply);
+                    break;
+                case 14:
+                    convertView=mInflater.inflate(R.layout.list_wall_comment_anonymous, null);
+                    viewHolder.reply=(TextView)convertView.findViewById(R.id.list_comment_reply);
+                    break;
             }
+            viewHolder.content = (TextView) convertView.findViewById(R.id.list_info_content);
+            viewHolder.time = (TextView) convertView.findViewById(R.id.list_info_time);
             viewHolder.comment=(ImageButton)convertView.findViewById(R.id.list_info_comment);
             viewHolder.cnum=(TextView)convertView.findViewById(R.id.list_info_cnum);
             viewHolder.agree =(ImageButton)convertView.findViewById(R.id.list_info_agree);
@@ -322,37 +335,39 @@ public interface Callback{
         }else{
             viewHolder=(ViewHolderWallInfo)convertView.getTag();
         }
-        if(type==11) {
+        if(type==11||type==13){
             viewHolder.head.setBackgroundDrawable(msg.getHead());
             viewHolder.nick.setText(msg.getNick());
         }
-        viewHolder.linear.setBackgroundDrawable(mContext.getResources().getDrawable(msg.getType()));
-        viewHolder.time.setText(msg.getTime());
-        viewHolder.more.setOnClickListener(Click);
-        viewHolder.content.setText(msg.getContent());
+       switch (type) {
+           case 11:
+           case 12:
+               viewHolder.linear.setBackgroundDrawable(mContext.getResources().getDrawable(msg.getType()));
+               viewHolder.more.setOnClickListener(Click);
+               break;
+           case 13:
+           case 14:
+               if(msg.getNick2()!=null) {
+                   viewHolder.reply.setVisibility(View.VISIBLE);
+                   viewHolder.reply.setText("回复: "+msg.getNick2());
+               }else{
+                   viewHolder.reply.setVisibility(View.GONE);
+               }
+               break;
+        }
         viewHolder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(mContext, WallMsgActivity.class);
-                intent.putExtra("type",msg.getType());
-                intent.putExtra("id",msg.getId());
-                intent.putExtra("msgcode",msg.getMsgcode());
-                intent.putExtra("nick",msg.getNick());
-                intent.putExtra("time",msg.getTime());
-                intent.putExtra("content",msg.getContent());
-                intent.putExtra("anum",msg.getAnum());
-                intent.putExtra("cnum",msg.getCnum());
+                Intent intent = new Intent(mContext, WallMsgActivity.class);
+                intent.putExtra("sponsor",msg.getId());
+                intent.putExtra("msgcode", msg.getMsgcode());
                 mContext.startActivity(intent);
-//                Intent intent=new Intent(mContext, MyService.class);
-//                intent.putExtra("CMD","Comment");
-//                intent.putExtra("msgcode",msg.getMsgcode());
-//                intent.putExtra("receiver",msg.getId());
-//                intent.putExtra("mode",0);
-//                intent.putExtra("type",0);
-//                mContext.startService(intent);
             }
         });
+        viewHolder.time.setText(msg.getTime());
+        viewHolder.content.setText(msg.getContent());
         viewHolder.cnum.setText(msg.getCnum());
+        viewHolder.anum.setText(msg.getAnum());
         viewHolder.agree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -360,12 +375,11 @@ public interface Callback{
                 intent.putExtra("CMD","Agree");
                 intent.putExtra("msgcode",msg.getMsgcode());
                 intent.putExtra("receiver",msg.getId());
-                intent.putExtra("mode",1);
+                intent.putExtra("mode",0);
                 intent.putExtra("type",0);
                 mContext.startService(intent);
             }
         });
-        viewHolder.anum.setText(msg.getAnum());
         return convertView;
     }
     private View getSimpleListConvertView(int position,View convertView){

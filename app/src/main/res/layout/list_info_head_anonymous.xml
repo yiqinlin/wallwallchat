@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="20:30"
-            android:id="@+id/list_info_anonymous_time"
+            android:id="@+id/list_info_time"
             android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/text_size_xsmall"/>
     </LinearLayout>
