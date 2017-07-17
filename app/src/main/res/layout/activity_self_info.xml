@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:background="@color/LayoutBackground"
+    android:orientation="vertical"
+    tools:context="com.stark.yiyu.UIactivity.SelfInfoActivity">
+
+    <include layout="@layout/transfer_title" />
+
+    <EditText
+        android:id="@+id/edtInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="8"
+        android:maxLines="8"
+        android:gravity="top"
+        android:scrollbars="vertical"
+        android:inputType="textMultiLine"
+        android:enabled="true"
+        />
+
+</LinearLayout>

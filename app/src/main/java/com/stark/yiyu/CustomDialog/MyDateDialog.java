@@ -41,7 +41,7 @@ public class MyDateDialog extends AlertDialog implements DatePicker.OnDateChange
         Context themeContext = getContext();
         LayoutInflater inflater = LayoutInflater.from(themeContext);
         view = inflater.inflate(R.layout.date_picker_dialog, null);
-        view.setBackgroundColor(Color.WHITE);
+//        view.setBackgroundColor(Color.WHITE);
 
         mDatePicker = (DatePicker) view.findViewById(R.id.datePicker);
 

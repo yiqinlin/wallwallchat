@@ -41,6 +41,9 @@ public class EditInfoActivity extends Activity {
     ArrayList<BaseItem> mArrays;
     MyAdapter adapter;
 
+    private static int RES_AUTO_CODE = 0;
+    private static int RES_NOTE_CODE = 1;
+
     private Drawable imgHead = null;
     private String nick = null;
     private String auto = null;
@@ -80,7 +83,7 @@ public class EditInfoActivity extends Activity {
         sex = "男";
         birthday = "1997-2-22";
         school = "成都东软学院";
-        address = "中国";
+        address = "四川";
         hometown = "成都";
         mail = "919664295@qq.com";
         selfInfo = "人必自侮,而后人侮之。";
@@ -92,13 +95,17 @@ public class EditInfoActivity extends Activity {
     }
 
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+        Intent it = null;
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
                 case 0:
                     Toast.makeText(EditInfoActivity.this, "" + position, Toast.LENGTH_SHORT).show();
                     break;
-                case 2:
+                case 3:
+                    it = new Intent(EditInfoActivity.this, AutoActivity.class);
+                    it.putExtra("auto", auto);
+                    startActivityForResult(it,RES_AUTO_CODE);
                     break;
                 case 5:
                     new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{"男", "女"}, new DialogInterface.OnClickListener() {
@@ -114,7 +121,7 @@ public class EditInfoActivity extends Activity {
                         }
                     }).show();
                     break;
-                case 6:
+                case 6://birthday = "1997-2-22";
                     Calendar now = Calendar.getInstance();
                     int year = now.get(Calendar.YEAR);
                     int monthOfYear = now.get(Calendar.MONTH);
@@ -138,8 +145,13 @@ public class EditInfoActivity extends Activity {
                     myDateDialog.getWindow().setAttributes(lp);
                     break;
                 case 8:
-                    Intent it = new Intent(EditInfoActivity.this, SortSchool.class);
-                    startActivityForResult(it,123);
+                    it = new Intent(EditInfoActivity.this, SortSchool.class);
+                    startActivityForResult(it, 123);
+                    break;
+                case 13:
+                    it = new Intent(EditInfoActivity.this, SelfInfoActivity.class);
+                    it.putExtra("selfInfo", selfInfo);
+                    startActivityForResult(it, RES_NOTE_CODE);
                     break;
             }
         }
@@ -173,6 +185,28 @@ public class EditInfoActivity extends Activity {
                 Log.i("college", "college = " + school);
                 refreshAdapter();
             }
+        } else if (requestCode == RES_AUTO_CODE) {
+            if (resultCode == 4) {
+                auto = data.getStringExtra("auto");
+                Log.e("EditInfoActivity", auto);
+                refreshAdapter();
+            }
+        } else if (requestCode == RES_NOTE_CODE) {
+            if (resultCode == 5) {
+                selfInfo = data.getStringExtra("selfInfo");
+                refreshAdapter();
+            }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        /**
+         * 保存个人信息
+         */
+
+
+
+        super.onBackPressed();
     }
 }

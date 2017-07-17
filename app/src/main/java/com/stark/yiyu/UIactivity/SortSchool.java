@@ -129,8 +129,6 @@ public class SortSchool extends Activity {
                     if (cr != null && cr.getCount() > 0) {
                         cr.moveToNext();
                         code = cr.getString(cr.getColumnIndex("code"));
-
-//                        Toast.makeText(SortSchool.this, code, Toast.LENGTH_SHORT).show();
                     }
                     cr.close();
                     db.close();

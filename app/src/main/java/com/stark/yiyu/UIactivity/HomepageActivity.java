@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 import com.stark.yiyu.File.FileMode;
 import com.stark.yiyu.File.FileUtil;
 import com.stark.yiyu.File.ImgStorage;
@@ -227,7 +228,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     } else {
                         Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(this, "权限获取成功", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -253,7 +253,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     }
                 }).setCancelable(false).show();
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, java.lang.String[] permissions, int[] grantResults) {
@@ -294,10 +293,13 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String nick = edtNick.getText().toString();
-                                    if (nick != null && !nick.equals("")) {
+                                    if (!nick.equals("") && nick.length() != 0) {
+                                        /**
+                                         *
+                                         */
 
                                     } else {
-                                        nick = "";
+                                        Toast.makeText(HomepageActivity.this, "请填写昵称", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             })
@@ -312,8 +314,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String auto = edtAuto.getText().toString();
-                                    if (auto != null && !auto.equals("")) {
-
+                                    if (!auto.equals("") && auto.length() != 0) {
+                                        /**
+                                         *
+                                         */
                                     } else {
                                         auto = "";
                                     }
