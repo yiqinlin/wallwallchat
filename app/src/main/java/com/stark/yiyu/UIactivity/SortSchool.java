@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -13,13 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.stark.yiyu.Database.DatabaseSchoolHelper;
 import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.SortListView.CharacterParser;
 import com.stark.yiyu.SortListView.PinyinComparator;
 import com.stark.yiyu.SortListView.SideBar;
@@ -50,6 +48,16 @@ public class SortSchool extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sort_school);
+        ImageButton left=(ImageButton)findViewById(R.id.button_transfer_title_left);
+        TextView mid=(TextView)findViewById(R.id.text_transfer_title);
+        mid.setText("选 择");
+        left.setBackgroundResource(R.drawable.title_back);
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         Log.i("SortSchool", "start");
         isProvince = true;//省份界面
         SQLiteDatabase db = new DatabaseSchoolHelper(SortSchool.this).getWritableDatabase();

@@ -145,6 +145,7 @@ public interface Callback{
                 break;
             case 13:
                 convertView=getTextSeparateConVertView(position,convertView);
+                break;
         }
         return convertView;
     }
