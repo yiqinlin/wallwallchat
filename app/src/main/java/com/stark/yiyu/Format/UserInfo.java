@@ -1,14 +1,19 @@
 package com.stark.yiyu.Format;
 
+import java.io.Serializable;
+
 /**
  * Created by Stark on 2017/4/9.
  */
-public class UserInfo {
+public class UserInfo implements Serializable {
     public String Id;
     public String Nick;
     public String Auto;
     public int Sex=-1;
     public String Birth;
+    public String College;
+    public String Edu;
+    public String Mail;
     public String Pnumber;
     public String Startdate;
     public int Catdate=-1;

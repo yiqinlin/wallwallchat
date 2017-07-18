@@ -2,7 +2,6 @@ package com.stark.yiyu.UIactivity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +30,7 @@ public class AutoActivity extends Activity {
         edtAuto = (EditText) findViewById(R.id.edtAuto);
 
         left.setBackgroundResource(R.drawable.title_back);
-        right.setText("保存");
+        right.setText("确定");
 
         Intent it = getIntent();
         String auto = it.getStringExtra("auto");
@@ -47,16 +46,14 @@ public class AutoActivity extends Activity {
                 finish();
             }
         });
-        title.setText("个性签名");
+        title.setText("编 辑");
 
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("AutoActivity", edtAuto.getText().toString());
-                Log.e("AutoActivity", edtAuto.getText().toString());
-                String auto = edtAuto.getText().toString();
                 Intent it = new Intent();
-                it.putExtra("auto", auto);
+                it.putExtra("auto", edtAuto.getText().toString());
                 setResult(4, it);
                 finish();
             }

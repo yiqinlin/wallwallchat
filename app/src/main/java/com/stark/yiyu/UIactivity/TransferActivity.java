@@ -8,11 +8,11 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -23,13 +23,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.stark.yiyu.File.ImgStorage;
+import com.stark.yiyu.Format.Get;
 import com.stark.yiyu.Fragment.FragAdapter;
 import com.stark.yiyu.Fragment.Fragment1;
 import com.stark.yiyu.Fragment.Fragment2;
 import com.stark.yiyu.Fragment.Fragment3;
+import com.stark.yiyu.NetWork.NetPackage;
+import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
 import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.Util.Status;
+import com.stark.yiyu.json.JsonConvert;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,11 +76,10 @@ public class TransferActivity extends FragmentActivity{
         SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
         SharedPreferences sp=TransferActivity.this.getSharedPreferences("action", Context.MODE_PRIVATE);
         final String SrcId=sp.getString("id", null);//用户帐号
-        db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),college varchar(30),edu char(10),mail char(30),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
             Nick=cr.getString(0);
-            Log.d("TransferAcivity", "Nick = " + Nick);
             Auto=cr.getString(1);
             cr.close();
         }
@@ -98,15 +103,20 @@ public class TransferActivity extends FragmentActivity{
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
                     titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this));
+                }else if(intent.getAction().equals("com.stark.yiyu.UpdateUserInfo")){
+                    new MyAsyncTask().execute();
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.yiyu.changeHead");
+        intentFilter.addAction("com.stark.yiyu.UpdateUserInfo");
         registerReceiver(mReceiver, intentFilter);
+
 //        DisplayMetrics outMetrics=new DisplayMetrics();
 //        getWindow().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 //        screenWidth=outMetrics.widthPixels;
+
         //构造适配器
         List<Fragment> fragments = new ArrayList<Fragment>();
         fragments.add(new Fragment1());
@@ -138,6 +148,29 @@ public class TransferActivity extends FragmentActivity{
         });
     }
 
+    class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
+        SharedPreferences sp=getSharedPreferences("action", Context.MODE_PRIVATE);
+        SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        @Override
+        protected Void doInBackground(Void...values) {
+            JsonConvert.UpdateDB(db, sp, (Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(sp.getString("id", null), 0, new JSONArray()))));
+            publishProgress(0);
+            return null;
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            if(values[0]==0){
+                Intent intent=new Intent();
+                intent.setAction("com.stark.yiyu.userInfo");
+                sendBroadcast(intent);
+            }
+        }
+    }
 
 
     public static void setViewPager(int i){//跳页数

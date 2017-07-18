@@ -21,6 +21,7 @@ import com.stark.yiyu.Format.Ack;
 import com.stark.yiyu.Format.CmdType;
 import com.stark.yiyu.Format.Format;
 import com.stark.yiyu.Format.Msg;
+import com.stark.yiyu.Format.UserInfo;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.SQLite.Data;
 import com.stark.yiyu.SQLite.DatabaseHelper;
@@ -91,7 +92,7 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String cmd= Try.getStringExtra(intent, "CMD");
-        Log.i("MyService", "in onStartCommand:"+cmd);
+        Log.i("MyService", "in onStartCommand:" + cmd);
         if(cmd!=null&&!cmd.equals("")) {
             if (cmd.equals("Welcome")) {
                 if(NetState!=0&&!Connected()) {
@@ -116,6 +117,8 @@ public class MyService extends Service {
                 Agree(intent);
             }else if(cmd.equals("Comment")){
                 Comment(intent);
+            }else if(cmd.equals("Change")){
+                Change(intent);
             }
         }else {
             Log.i("MyService","null CMD");
@@ -134,6 +137,15 @@ public class MyService extends Service {
         }else{
             return MsgSocket.isConnected();
         }
+    }
+    public boolean Change(Intent intent){
+        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
+        UserInfo temp=(UserInfo)intent.getSerializableExtra("user");
+        temp.Nick=sp.getString("nick",null);
+        temp.Mail=sp.getString("mail",null);
+        JsonMsg = NetPackage.Change(temp)+"\n";
+        new Thread(send).start();
+        return true;
     }
     public boolean Comment(Intent intent) {
         SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
@@ -288,6 +300,10 @@ public class MyService extends Service {
                                 Intent intent = new Intent();
                                 intent.setAction("com.stark.yiyu.login");
                                 intent.putExtra("key", temp);
+                                sendBroadcast(intent);
+                            }else if(format.Cmd.equals("userinfo")){
+                                Intent intent=new Intent();
+                                intent.setAction("com.stark.yiyu.UpdateUserInfo");
                                 sendBroadcast(intent);
                             }
                             break;

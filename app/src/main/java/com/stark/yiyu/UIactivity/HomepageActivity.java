@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -109,11 +110,19 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                     mArrays.remove(0);
                     mArrays.add(0, new ItemHomepageTitle(5, DesId,ImgStorage.getHead(HomepageActivity.this), Nick, Auto));
                     adapter.notifyDataSetChanged();
+                }else if(intent.getAction().equals("com.stark.yiyu.userInfo")&&DesId.equals(SrcID)){
+                    mArrays.clear();
+                    SharedPreferences sp=getSharedPreferences("action",MODE_PRIVATE);
+                    Nick= sp.getString("nick","");
+                    Auto=sp.getString("auto","");
+                    mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(HomepageActivity.this), Nick, Auto));
+                    adapter.notifyDataSetChanged();
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.yiyu.changeHead");
+        intentFilter.addAction("com.stark.yiyu.userInfo");
         registerReceiver(mReceiver, intentFilter);
     }
     @Override

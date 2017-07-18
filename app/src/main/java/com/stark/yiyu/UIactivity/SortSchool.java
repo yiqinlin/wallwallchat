@@ -135,6 +135,7 @@ public class SortSchool extends Activity {
                     isProvince = true;
                     Intent it = new Intent();
                     it.putExtra("college", ((SortModel) adapter.getItem(position)).getName());
+                    it.putExtra("edu", code);
                     getSharedPreferences("action", Context.MODE_PRIVATE).edit().putString("edu",code).apply();
                     setResult(666, it);
                     finish();

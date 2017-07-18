@@ -172,11 +172,11 @@ public class JsonConvert {
             try {
                 User = (UserInfo) getObject(new UserInfo(),get.Data.getJSONObject(i));
                 Cursor cr=db.query("userdata",new String[]{"id"},"id=?",new String[]{User.Id},null,null,null);
-                sp.edit().putString("nick",User.Nick);
+                sp.edit().putString("nick",User.Nick).putString("auto",User.Auto).apply();
                 if(cr!=null&&cr.getCount()>0&&cr.moveToNext()) {
-                    db.update("userdata", Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth, User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme), "id=?", new String[]{User.Id});
+                    db.update("userdata", Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth,User.College,User.Edu,User.Mail,User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme), "id=?", new String[]{User.Id});
                 }else{
-                    db.insert("userdata", null,Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth, User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme));
+                    db.insert("userdata", null,Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth,User.College,User.Edu,User.Mail, User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme));
                 }
             } catch (Exception e) {
                 Log.i("UpdateDB", e.toString());

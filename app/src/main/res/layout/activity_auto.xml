@@ -12,8 +12,16 @@
     <include layout="@layout/transfer_title" />
 
     <EditText
-        android:id="@+id/edtAuto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:padding="@dimen/magic_2margin"
+        android:gravity="top|left"
+        android:background="@drawable/input_bkg"
+        android:textCursorDrawable="@drawable/cursor_bkg"
+        android:textSize="@dimen/text_size"
+        android:minLines="8"
+        android:id="@+id/edtAuto"/>
 
 </LinearLayout>

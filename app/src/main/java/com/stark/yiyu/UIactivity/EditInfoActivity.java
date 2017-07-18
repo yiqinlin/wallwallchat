@@ -4,33 +4,33 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.stark.yiyu.CustomDialog.MyDateDialog;
+import com.stark.yiyu.Format.UserInfo;
 import com.stark.yiyu.Listview.ElasticListView;
+import com.stark.yiyu.MyService;
 import com.stark.yiyu.R;
-import com.stark.yiyu.Util.Status;
+import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemEditInfo;
 import com.stark.yiyu.bean.ItemEditInfo2;
 import com.stark.yiyu.bean.ItemEditMail;
 import com.stark.yiyu.bean.ItemMargin;
-import com.stark.yiyu.bean.ItemSimpleList;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by asus on 2017/7/7.
@@ -43,27 +43,16 @@ public class EditInfoActivity extends Activity {
 
     private static int RES_AUTO_CODE = 0;
     private static int RES_NOTE_CODE = 1;
-
-    private Drawable imgHead = null;
-    private String nick = null;
-    private String auto = null;
-    private String sex = null;
-    private String birthday = null;
-    private String school = null;
-    private String address = null;
-    private String hometown = null;
-    private String mail = null;
-    private String selfInfo = null;
-
+    UserInfo User;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edtinfo);
-        Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));
         ImageButton left = (ImageButton) findViewById(R.id.button_transfer_title_left);
         TextView title = (TextView) findViewById(R.id.text_transfer_title);
         left.setBackgroundResource(R.drawable.title_back);
+        Button right=(Button)findViewById(R.id.button_transfer_title_right);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,27 +60,47 @@ public class EditInfoActivity extends Activity {
             }
         });
         title.setText("编辑资料");
+        right.setText("完成");
 
         listView = (ElasticListView) findViewById(R.id.listView_edtinfo);
         mArrays = new ArrayList<>();
         adapter = new MyAdapter(EditInfoActivity.this, mArrays);
         listView.setAdapter(adapter);
 
-        imgHead = getResources().getDrawable(R.drawable.tianqing);
-        nick = "哈库纳玛塔塔";
-        auto = "踏破虚空无一事，涅槃生死绝安排";
-        sex = "男";
-        birthday = "1997-2-22";
-        school = "成都东软学院";
-        address = "四川";
-        hometown = "成都";
-        mail = "919664295@qq.com";
-        selfInfo = "人必自侮,而后人侮之。";
-
+        SQLiteDatabase db=new DatabaseHelper(EditInfoActivity.this).getWritableDatabase();
+        Cursor cr=db.query("userdata", null, "id=?", new String[]{getSharedPreferences("action",MODE_PRIVATE).getString("id",null)}, null, null, null);
+        if(cr!=null&&cr.getCount()>0&&cr.moveToNext()){
+            User=new UserInfo();
+            User.Id=cr.getString(0);
+            User.Nick=cr.getString(1);
+            User.Auto=cr.getString(2);
+            User.Sex=cr.getInt(3);
+            User.Birth=cr.getString(4);
+            User.College=cr.getString(5);
+            User.Edu=cr.getString(6);
+            User.Mail=cr.getString(7);
+            User.Pnumber=cr.getString(8);
+            User.Catdate=cr.getInt(10);
+            User.Typeface=cr.getInt(11);
+            User.Theme=cr.getInt(12);
+            User.Bubble=cr.getInt(13);
+        }
+        getSharedPreferences("action",MODE_PRIVATE).edit().putString("nick",User.Nick).putString("mail",User.Mail).apply();
         refreshAdapter();
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
-
+        right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(EditInfoActivity.this, MyService.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("user", User);
+                intent.putExtra("CMD","Change");
+                intent.putExtras(bundle);
+                startService(intent);
+                finish();
+            }
+        });
     }
 
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
@@ -99,40 +108,32 @@ public class EditInfoActivity extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
-                case 0:
-                    Toast.makeText(EditInfoActivity.this, "" + position, Toast.LENGTH_SHORT).show();
-                    break;
-                case 3:
+                case 1:
                     it = new Intent(EditInfoActivity.this, AutoActivity.class);
-                    it.putExtra("auto", auto);
+                    it.putExtra("auto", User.Auto);
                     startActivityForResult(it,RES_AUTO_CODE);
                     break;
-                case 5:
+                case 3:
                     new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{"男", "女"}, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (which == 0) {
-                                sex = "男";
-                            } else {
-                                sex = "女";
-                            }
+                            User.Sex=which;
                             refreshAdapter();
                             dialog.dismiss();
                         }
                     }).show();
                     break;
-                case 6://birthday = "1997-2-22";
-                    Calendar now = Calendar.getInstance();
-                    int year = now.get(Calendar.YEAR);
-                    int monthOfYear = now.get(Calendar.MONTH);
-                    int dayOfMonth = now.get(Calendar.DAY_OF_MONTH);
+                case 4://birthday = "1997-2-22";
+                    //Calendar now = Calendar.getInstance();
+                    int year =Integer.parseInt(User.Birth.substring(0, 4));
+                    int monthOfYear =Integer.parseInt(User.Birth.substring(5,7))-1;
+                    int dayOfMonth =Integer.parseInt(User.Birth.substring(8,10));
 
-                    MyDateDialog myDateDialog = new MyDateDialog(EditInfoActivity.this, android.R.style.Theme_Holo_Dialog_NoActionBar
-                            , new MyDateDialog.OnDateSetListener() {
+                    MyDateDialog myDateDialog = new MyDateDialog(EditInfoActivity.this, android.R.style.Theme_Holo_Dialog_NoActionBar, new MyDateDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             int month = monthOfYear + 1;
-                            birthday = year + "-" + month + "-" + dayOfMonth;
+                            User.Birth = year + "-" + month + "-" + dayOfMonth;
                             refreshAdapter();
                         }
                     }, year, monthOfYear, dayOfMonth);
@@ -144,14 +145,9 @@ public class EditInfoActivity extends Activity {
                     lp.width = (int) (display.getWidth() * 0.8);
                     myDateDialog.getWindow().setAttributes(lp);
                     break;
-                case 8:
+                case 6:
                     it = new Intent(EditInfoActivity.this, SortSchool.class);
                     startActivityForResult(it, 123);
-                    break;
-                case 13:
-                    it = new Intent(EditInfoActivity.this, SelfInfoActivity.class);
-                    it.putExtra("selfInfo", selfInfo);
-                    startActivityForResult(it, RES_NOTE_CODE);
                     break;
             }
         }
@@ -159,20 +155,14 @@ public class EditInfoActivity extends Activity {
 
     private void refreshAdapter() {
         mArrays.clear();
-        mArrays.add(new ItemSimpleList(6, "头像", imgHead));
+        mArrays.add(new ItemEditInfo2(9, "昵称", User.Nick));
+        mArrays.add(new ItemEditInfo(7, "签名", User.Auto));
         mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo2(9, "昵称", nick));
-        mArrays.add(new ItemEditInfo(7, "签名", auto));
+        mArrays.add(new ItemEditInfo(7, "性别", User.Sex==0?"男":"女"));
+        mArrays.add(new ItemEditInfo(7, "生日", User.Birth));
         mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "性别", sex));
-        mArrays.add(new ItemEditInfo(7, "生日", birthday));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "学校", school));
-        mArrays.add(new ItemEditInfo(7, "所在地", address));
-        mArrays.add(new ItemEditInfo(7, "家乡", hometown));
-        mArrays.add(new ItemEditMail(10, "邮箱", mail));
-        mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "个人说明", selfInfo));
+        mArrays.add(new ItemEditInfo(7, "学校", User.College));
+        mArrays.add(new ItemEditMail(10, "邮箱", User.Mail));
         adapter.notifyDataSetChanged();
     }
 
@@ -181,32 +171,26 @@ public class EditInfoActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 123) {
             if (resultCode == 666) {
-                school = data.getStringExtra("college");
-                Log.i("college", "college = " + school);
+                User.College = data.getStringExtra("college");
+                User.Edu=data.getStringExtra("edu");
                 refreshAdapter();
             }
         } else if (requestCode == RES_AUTO_CODE) {
             if (resultCode == 4) {
-                auto = data.getStringExtra("auto");
-                Log.e("EditInfoActivity", auto);
-                refreshAdapter();
-            }
-        } else if (requestCode == RES_NOTE_CODE) {
-            if (resultCode == 5) {
-                selfInfo = data.getStringExtra("selfInfo");
+                User.Auto = data.getStringExtra("auto");
+                Log.e("EditInfoActivity", User.Auto);
                 refreshAdapter();
             }
         }
     }
-
-    @Override
-    public void onBackPressed() {
-        /**
-         * 保存个人信息
-         */
-
-
-
-        super.onBackPressed();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        /**
+//         * 保存个人信息
+//         */
+//
+//
+//
+//        super.onBackPressed();
+//    }
 }

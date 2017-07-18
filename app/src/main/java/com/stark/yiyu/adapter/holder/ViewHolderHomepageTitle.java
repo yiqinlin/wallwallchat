@@ -1,7 +1,7 @@
 package com.stark.yiyu.adapter.holder;
 
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 /**
  * Created by Stark on 2017/4/15.
@@ -9,6 +9,6 @@ import android.widget.ImageButton;
 public class ViewHolderHomepageTitle {
     public String id;
     public ImageButton head;
-    public Button nick;
-    public Button auto;
+    public TextView nick;
+    public TextView auto;
 }

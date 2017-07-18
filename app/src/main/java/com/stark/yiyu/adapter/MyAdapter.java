@@ -2,6 +2,9 @@ package com.stark.yiyu.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -279,8 +282,8 @@ public interface Callback{
             viewHolder=new ViewHolderHomepageTitle();
             convertView = mInflater.inflate(R.layout.list_homepage_title,null);
             viewHolder.head=(ImageButton)convertView.findViewById(R.id.list_homepage_head);
-            viewHolder.nick=(Button)convertView.findViewById(R.id.list_homepage_nick);
-            viewHolder.auto=(Button)convertView.findViewById(R.id.list_homepage_auto);
+            viewHolder.nick=(TextView)convertView.findViewById(R.id.list_homepage_nick);
+            viewHolder.auto=(TextView)convertView.findViewById(R.id.list_homepage_auto);
             convertView.setTag(viewHolder);
         }else{
             viewHolder=(ViewHolderHomepageTitle)convertView.getTag();
@@ -443,6 +446,21 @@ public interface Callback{
         }
         viewHolder.txvLeft.setText(msg.getStrLeft());
         viewHolder.edtRight.setText(msg.getStrRight());
+        viewHolder.edtRight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.e("e", s.toString());
+                mContext.getSharedPreferences("action", Context.MODE_PRIVATE).edit().putString("nick", s.toString()).apply();
+            }
+        });
         return convertView;
     }
 
@@ -460,9 +478,23 @@ public interface Callback{
         }
         viewHolder.txvLeft.setText(msg.getStrLeft());
         viewHolder.edtRight.setText(msg.getStrRight());
+        viewHolder.edtRight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mContext.getSharedPreferences("action",Context.MODE_PRIVATE).edit().putString("mail",s.toString()).apply();
+
+            }
+        });
         return converView;
     }
-
     View.OnClickListener Click=new View.OnClickListener(){
         @Override
         public void onClick(View v) {
@@ -483,11 +515,6 @@ public interface Callback{
                 case R.id.list_homepage_head:
                     mCallback.click(v);
                     break;
-                case R.id.list_homepage_nick:
-                    mCallback.click(v);
-                    break;
-                case R.id.list_homepage_auto:
-                    mCallback.click(v);
             }
         }
     };

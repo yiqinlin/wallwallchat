@@ -11,6 +11,7 @@ import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Format.Refresh;
 import com.stark.yiyu.Format.Registion;
 import com.stark.yiyu.Format.TransFile;
+import com.stark.yiyu.Format.UserInfo;
 import com.stark.yiyu.Format.WallMsgSend;
 import com.stark.yiyu.json.JsonConvert;
 
@@ -31,10 +32,9 @@ public class NetPackage {
         login.Type=type;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(login);
             format.Type = "Registion";
             format.Cmd = "login";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(login);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -51,10 +51,9 @@ public class NetPackage {
         register.PassWord =password;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(register);/**序列化：封装成json格式*/
             format.Type = "Registion";
             format.Cmd = "register";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(register);/**序列化：封装成json格式*/
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -73,16 +72,29 @@ public class NetPackage {
         message.MsgCode=msgCode;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(message);
             format.Type = "Message";
             format.Cmd = "csend";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(message);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
             Log.i("Send",e.toString());
         }
-        Log.i("Send",JsonStr);
+        Log.i("Send", JsonStr);
+        return JsonStr;
+    }
+    public static String Change(UserInfo userInfo){
+        Format format=new Format();
+        String JsonStr=null;
+        try {
+            format.Type="Change";
+            format.Cmd="changeUser";
+            format.JsonMsg=JsonConvert.SerializeObject(userInfo);
+            JsonStr=JsonConvert.SerializeObject(format);
+        }catch (Exception e){
+            Log.i("Change",e.toString());
+        }
+        Log.i("Change",JsonStr);
         return JsonStr;
     }
     public static String Comment(String sponsor,String receiver,String msgcode,String msgcode2,String msg,String edu,int mode,int type){
@@ -98,10 +110,9 @@ public class NetPackage {
         interact.Type=type;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(interact);
             format.Type = "Interact";
             format.Cmd = "comment";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(interact);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -121,10 +132,9 @@ public class NetPackage {
         interact.Type=type;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(interact);
             format.Type = "Interact";
             format.Cmd = "agree";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(interact);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -144,10 +154,9 @@ public class NetPackage {
         wallmsg.Type=type;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(wallmsg);
             format.Type = "WallMsg";
             format.Cmd = "wsend";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(wallmsg);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -166,10 +175,9 @@ public class NetPackage {
         message.MsgCode=msgCode;
         String JsonStr=null;
         try {
-            JsonStr= JsonConvert.SerializeObject(message);
             format.Type = "Message";
             format.Cmd = "gsend";
-            format.JsonMsg = JsonStr;
+            format.JsonMsg = JsonConvert.SerializeObject(message);
             JsonStr = JsonConvert.SerializeObject(format);
         }catch (Exception e)
         {
@@ -217,19 +225,18 @@ public class NetPackage {
         }
         refresh.Start=start;
         refresh.Msg=msg;
-        String JsonStr;
+        String JsonStr=null;
         try {
-            JsonStr=JsonConvert.SerializeObject(refresh);
             Format format = new Format();
             format.Type = "Refresh";
             format.Cmd = (cmd==0?"sRefresh":"wRefresh");
-            format.JsonMsg = JsonStr;
-            Log.i("Refresh",JsonStr);
-            return JsonConvert.SerializeObject(format);
+            format.JsonMsg = JsonConvert.SerializeObject(refresh);
+            JsonStr=JsonConvert.SerializeObject(format);
         }catch (Exception e){
             Log.i("Refresh",e.toString());
         }
-        return null;
+        Log.i("Refresh",JsonStr);
+        return JsonStr;
     }
     public static String Friend(String SrcId,String DesId,String Remarks,int dynamic){
         Msg msg=new Msg();
@@ -237,19 +244,18 @@ public class NetPackage {
         msg.DesId=DesId;
         msg.Remarks=Remarks;
         msg.SendType=dynamic;
-        String JsonStr;
+        String JsonStr=null;
         try{
-            JsonStr=JsonConvert.SerializeObject(msg);
             Format format=new Format();
             format.Type="Message";
             format.Cmd="friend";
-            format.JsonMsg=JsonStr;
-            Log.i("Friend",JsonStr);
-            return JsonConvert.SerializeObject(format);
+            format.JsonMsg=JsonConvert.SerializeObject(msg);
+            JsonStr= JsonConvert.SerializeObject(format);
         }catch(Exception e){
             Log.i("Friend", e.toString());
         }
-        return null;
+        Log.i("Friend",JsonStr);
+        return JsonStr;
     }
     public static String SendFile(String hashcode,String name,long size,boolean longtime ) {
         TransFile transFile = new TransFile();
@@ -257,50 +263,52 @@ public class NetPackage {
         transFile.HashCode = hashcode;
         transFile.Name=name;
         transFile.IsLong=longtime;
+        String JsonStr=null;
         try{
             Format format=new Format();
             format.Type="File";
             format.Cmd="up";
             format.JsonMsg=JsonConvert.SerializeObject(transFile);
-            Log.e("SendFile", format.JsonMsg);
-            return JsonConvert.SerializeObject(format);
+            JsonStr= JsonConvert.SerializeObject(format);
         }catch (Exception e) {
             Log.e("SendFile", "" + e);
-            return null;
         }
+        Log.e("GetFile", JsonStr);
+        return JsonStr;
     }
     public static String getFile(String hashcode){
         TransFile transFile = new TransFile();
         transFile.HashCode = hashcode;
+        String JsonStr=null;
         try{
             Format format=new Format();
             format.Type="File";
             format.Cmd="down";
             format.JsonMsg=JsonConvert.SerializeObject(transFile);
-            return JsonConvert.SerializeObject(format);
+            JsonStr= JsonConvert.SerializeObject(format);
         }catch (Exception e) {
             Log.e("SendFile", "" + e);
-            return null;
         }
+        Log.e("SendFile", JsonStr);
+        return JsonStr;
     }
     public static String Get(String SrcId,int Type,JSONArray data){
         Get get=new Get();
         get.Guestid=SrcId;
         get.Type=Type;
         get.Data=data;
-        String JsonStr;
+        String JsonStr=null;
         try{
-            JsonStr=JsonConvert.SerializeObject(get);
             Format format=new Format();
             format.Type="Get";
             format.Cmd="userinfo";
-            format.JsonMsg=JsonStr;
-            Log.i("Get",JsonStr);
-            return JsonConvert.SerializeObject(format);
+            format.JsonMsg=JsonConvert.SerializeObject(get);
+            JsonStr= JsonConvert.SerializeObject(format);
         }catch (Exception e){
             Log.i("Get",e.toString());
         }
-        return null;
+        Log.i("Get",JsonStr);
+        return JsonStr;
     }
     public static Object getBag(String str){
         return getBag(getFormatBag(str));

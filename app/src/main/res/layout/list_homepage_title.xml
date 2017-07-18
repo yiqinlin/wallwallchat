@@ -15,26 +15,28 @@
             android:orientation="vertical"
             android:background="@android:color/white"
             android:layout_marginTop="42dp">
-            <Button
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="42dp"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:padding="@dimen/magic_2margin"
                 android:textColor="@android:color/black"
                 android:background="@null"
-                android:textSize="@dimen/text_size_mbig"
+                android:textSize="@dimen/text_size_sbig"
                 android:id="@+id/list_homepage_nick"/>
-            <Button
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:paddingBottom="@dimen/magic_2margin"
                 android:textColor="@android:color/darker_gray"
                 android:background="@null"
-                android:textSize="@dimen/text_size_small"
+                android:textSize="@dimen/text_size_xmid"
                 android:id="@+id/list_homepage_auto"/>
         </LinearLayout>
         <ImageButton

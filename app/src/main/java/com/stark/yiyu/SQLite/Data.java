@@ -44,7 +44,7 @@ public class Data {
         }
         return cv;
     }
-    public static ContentValues getUserContentValues(String id,String nick,String auto,int sex,String birth,String pnumber,String startdate,int catdate,int typeface,int theme,int bubble,int iknow,int knowme){
+    public static ContentValues getUserContentValues(String id,String nick,String auto,int sex,String birth,String college,String edu,String mail,String pnumber,String startdate,int catdate,int typeface,int theme,int bubble,int iknow,int knowme){
         ContentValues cv=new ContentValues();
         if(id!=null){
             cv.put("id", id);
@@ -56,6 +56,12 @@ public class Data {
             cv.put("sex",sex);
         }if(birth!=null) {
             cv.put("birth", birth);
+        }if(college!=null) {
+            cv.put("college", college);
+        }if(edu!=null) {
+            cv.put("edu", edu);
+        }if(mail!=null) {
+            cv.put("mail", mail);
         }if(pnumber!=null) {
             cv.put("pnumber", pnumber);
         }if(startdate!=null) {

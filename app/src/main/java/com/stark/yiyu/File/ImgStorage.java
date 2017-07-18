@@ -31,8 +31,9 @@ public class ImgStorage {
         File imgPath = new File(photoPath);
         if (imgPath.exists()) {
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
-            Drawable drawable = new BitmapDrawable(bitmap);
-            return drawable;
+            if(bitmap!=null){
+                return  new BitmapDrawable(bitmap);
+            }
         }
         Intent intent = new Intent(context, MyService.class);
         intent.putExtra("CMD", "Image");

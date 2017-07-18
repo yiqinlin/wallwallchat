@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,10 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.stark.yiyu.File.ImgStorage;
-import com.stark.yiyu.Format.Get;
 import com.stark.yiyu.Listview.ElasticListView;
-import com.stark.yiyu.NetWork.NetPackage;
-import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
 import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.UIactivity.HomepageActivity;
@@ -30,9 +26,6 @@ import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemKnow;
 import com.stark.yiyu.bean.ItemRightHead;
 import com.stark.yiyu.bean.ItemSimpleList;
-import com.stark.yiyu.json.JsonConvert;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -50,16 +43,15 @@ public class Fragment3 extends Fragment {
         View view=inflater.inflate(R.layout.transfer_right, container, false);
         mArrays=new ArrayList<BaseItem>();
         adapter=new MyAdapter(getActivity(),mArrays);
-        MyAsyncTask asyncTask = new MyAsyncTask();
-        asyncTask.execute();
         ElasticListView listView = (ElasticListView) view.findViewById(R.id.listView_right);
+        final SQLiteDatabase db = new DatabaseHelper(getActivity()).getWritableDatabase();
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new MyOnItemClickListener());
+        init(db);
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.yiyu.changeHead")) {
-                    SQLiteDatabase db = new DatabaseHelper(getActivity()).getWritableDatabase();
                     SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
                     db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
                     Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
@@ -68,11 +60,15 @@ public class Fragment3 extends Fragment {
                         mArrays.add(0,new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity()), cr.getString(0), cr.getString(1)));
                         adapter.notifyDataSetChanged();
                     }
+                }else if(intent.getAction().equals("com.stark.yiyu.userInfo")){
+                    mArrays.clear();
+                    init(db);
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.yiyu.changeHead");
+        intentFilter.addAction("com.stark.yiyu.userInfo");
         getActivity().registerReceiver(mReceiver, intentFilter);
         return view;
     }
@@ -93,29 +89,6 @@ public class Fragment3 extends Fragment {
         }
         mArrays.add(new ItemSimpleList(6,"世界",getResources().getDrawable(R.drawable.tianqing)));
         adapter.notifyDataSetChanged();
-    }
-    class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
-        SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
-        SQLiteDatabase db=new DatabaseHelper(getActivity()).getWritableDatabase();
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            init(db);
-        }
-        @Override
-        protected Void doInBackground(Void...values) {
-            JsonConvert.UpdateDB(db,sp, (Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(sp.getString("id", null), 0, new JSONArray()))));
-            publishProgress(0);
-            return null;
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            if(values[0]==0){
-                mArrays.clear();
-                init(db);
-            }
-        }
     }
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
         @Override
