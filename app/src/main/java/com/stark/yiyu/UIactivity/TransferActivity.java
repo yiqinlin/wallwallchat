@@ -84,6 +84,8 @@ public class TransferActivity extends FragmentActivity{
             cr.close();
         }
 
+        new MyAsyncTask().execute();
+
         title.setText("消 息");
         titleRight.setText("添加");
         titleRight.setOnClickListener(Click);
@@ -91,10 +93,10 @@ public class TransferActivity extends FragmentActivity{
         titleLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =new Intent(TransferActivity.this,HomepageActivity.class);
-                intent.putExtra("id",SrcId);
-                intent.putExtra("nick",Nick);//昵称
-                intent.putExtra("auto",Auto);//签名
+                Intent intent = new Intent(TransferActivity.this, HomepageActivity.class);
+                intent.putExtra("id", SrcId);
+                intent.putExtra("nick", Nick);//昵称
+                intent.putExtra("auto", Auto);//签名
                 startActivity(intent);
             }
         });

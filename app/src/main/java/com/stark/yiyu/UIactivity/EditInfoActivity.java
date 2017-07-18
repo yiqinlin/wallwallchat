@@ -67,10 +67,10 @@ public class EditInfoActivity extends Activity {
         adapter = new MyAdapter(EditInfoActivity.this, mArrays);
         listView.setAdapter(adapter);
 
+        User=new UserInfo();
         SQLiteDatabase db=new DatabaseHelper(EditInfoActivity.this).getWritableDatabase();
         Cursor cr=db.query("userdata", null, "id=?", new String[]{getSharedPreferences("action",MODE_PRIVATE).getString("id",null)}, null, null, null);
         if(cr!=null&&cr.getCount()>0&&cr.moveToNext()){
-            User=new UserInfo();
             User.Id=cr.getString(0);
             User.Nick=cr.getString(1);
             User.Auto=cr.getString(2);
