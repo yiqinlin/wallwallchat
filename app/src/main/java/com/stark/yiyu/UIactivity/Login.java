@@ -82,7 +82,7 @@ public class Login extends Activity {
             public void afterTextChanged(Editable s) {
                 String temp=s.toString();
                 if(temp!=null&&!temp.equals("")){
-                    clear_id.setImageResource(android.R.drawable.ic_notification_clear_all);
+                    clear_id.setImageResource(R.drawable.edit_delete);
                     clear_id.setClickable(true);
                 }else{
                     clear_id.setImageDrawable(null);
@@ -102,7 +102,7 @@ public class Login extends Activity {
             public void afterTextChanged(Editable s) {
                 String temp=s.toString();
                 if(!temp.equals("")){
-                    clear_ps.setImageResource(android.R.drawable.ic_notification_clear_all);
+                    clear_ps.setImageResource(R.drawable.edit_delete);
                     clear_ps.setClickable(true);
                 }else{
                     clear_ps.setImageDrawable(null);

@@ -52,7 +52,7 @@
         <ImageButton
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:background="@drawable/tianqing"
+            android:background="@drawable/wall_more"
             android:id="@+id/list_info_ordinary_more"/>
     </LinearLayout>
 </LinearLayout>

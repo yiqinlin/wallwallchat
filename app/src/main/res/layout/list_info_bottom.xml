@@ -18,7 +18,7 @@
             <ImageButton
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:background="@drawable/tianqing"
+                android:background="@drawable/wall_comment_dark"
                 android:id="@+id/list_info_comment"
                 android:gravity="center"/>
         </LinearLayout>
@@ -67,7 +67,7 @@
             <ImageButton
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:background="@drawable/tianqing"
+                android:background="@drawable/wall_agree"
                 android:id="@+id/list_info_agree"/>
         </LinearLayout>
     </LinearLayout>

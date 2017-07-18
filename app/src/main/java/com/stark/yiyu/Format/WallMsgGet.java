@@ -16,4 +16,5 @@ public class WallMsgGet {
     public String MsgCode;
     public String Cnum;
     public String Anum;
+    public boolean IsAgree;
 }

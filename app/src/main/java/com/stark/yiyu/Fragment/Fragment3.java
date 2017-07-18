@@ -25,7 +25,6 @@ import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
 import com.stark.yiyu.bean.ItemKnow;
 import com.stark.yiyu.bean.ItemRightHead;
-import com.stark.yiyu.bean.ItemSimpleList;
 
 import java.util.ArrayList;
 
@@ -87,7 +86,6 @@ public class Fragment3 extends Fragment {
             mArrays.add(new ItemKnow(4, cr.getString(0), cr.getString(1)));
             cr.close();
         }
-        mArrays.add(new ItemSimpleList(6,"世界",getResources().getDrawable(R.drawable.tianqing)));
         adapter.notifyDataSetChanged();
     }
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {

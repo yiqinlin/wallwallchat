@@ -127,7 +127,7 @@ public class JsonConvert {
                         item_type=11;
                         break;
                 }
-                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
+                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum,Msg.IsAgree));
             } catch (Exception e) {
                 Log.i("UpdateWall", e.toString());
             }
@@ -151,7 +151,7 @@ public class JsonConvert {
                         item_type=13;
                         break;
                 }
-                mArrays.add(new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum));
+                mArrays.add(new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum,Msg.IsAgree));
             } catch (Exception e) {
                 Log.i("UpdateComment", e.toString());
             }
@@ -172,7 +172,7 @@ public class JsonConvert {
             try {
                 User = (UserInfo) getObject(new UserInfo(),get.Data.getJSONObject(i));
                 Cursor cr=db.query("userdata",new String[]{"id"},"id=?",new String[]{User.Id},null,null,null);
-                sp.edit().putString("nick",User.Nick).putString("auto",User.Auto).apply();
+                sp.edit().putString("nick",User.Nick).putString("auto",User.Auto).putString("edu",User.Edu).apply();
                 if(cr!=null&&cr.getCount()>0&&cr.moveToNext()) {
                     db.update("userdata", Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth,User.College,User.Edu,User.Mail,User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme), "id=?", new String[]{User.Id});
                 }else{

@@ -298,9 +298,9 @@ public interface Callback{
         viewHolder.auto.setOnClickListener(Click);
         return convertView;
     }
-    private View getWallInfoConvertView(int type,int position, View convertView){
+    private View getWallInfoConvertView(int type,final int position, View convertView){
         ViewHolderWallInfo viewHolder;
-        final ItemWallInfo msg=(ItemWallInfo)mData.get(position);
+        ItemWallInfo msg=(ItemWallInfo)mData.get(position);
         if(convertView==null){
             viewHolder=new ViewHolderWallInfo();
             viewHolder.id=msg.getId();
@@ -362,8 +362,8 @@ public interface Callback{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WallMsgActivity.class);
-                intent.putExtra("sponsor",msg.getId());
-                intent.putExtra("msgcode", msg.getMsgcode());
+                intent.putExtra("sponsor", ((ItemWallInfo) mData.get(position)).getId());
+                intent.putExtra("msgcode", ((ItemWallInfo)mData.get(position)).getMsgcode());
                 mContext.startActivity(intent);
             }
         });
@@ -371,16 +371,29 @@ public interface Callback{
         viewHolder.content.setText(msg.getContent());
         viewHolder.cnum.setText(msg.getCnum());
         viewHolder.anum.setText(msg.getAnum());
+        viewHolder.agree.setActivated(msg.IsAgree());
         viewHolder.agree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int mode;
+                ItemWallInfo msg=(ItemWallInfo)mData.get(position);
+                if(msg.IsAgree()) {
+                    ((ItemWallInfo) mData.get(position)).setAgree(false);
+                    ((ItemWallInfo) mData.get(position)).setAnum(Integer.parseInt(msg.getAnum()) - 1);
+                    mode=1;
+                }else{
+                    ((ItemWallInfo) mData.get(position)).setAgree(true);
+                    ((ItemWallInfo) mData.get(position)).setAnum(Integer.parseInt(msg.getAnum()) + 1);
+                    mode=0;
+                }
                 Intent intent=new Intent(mContext, MyService.class);
                 intent.putExtra("CMD","Agree");
                 intent.putExtra("msgcode",msg.getMsgcode());
                 intent.putExtra("receiver",msg.getId());
-                intent.putExtra("mode",0);
+                intent.putExtra("mode",mode);
                 intent.putExtra("type",0);
                 mContext.startService(intent);
+                notifyDataSetChanged();
             }
         });
         return convertView;

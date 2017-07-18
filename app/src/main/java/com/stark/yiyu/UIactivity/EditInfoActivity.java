@@ -125,6 +125,9 @@ public class EditInfoActivity extends Activity {
                     break;
                 case 4://birthday = "1997-2-22";
                     //Calendar now = Calendar.getInstance();
+                    if(User.Birth==null||User.Birth.equals("")){
+                        User.Birth="1980-01-01";
+                    }
                     int year =Integer.parseInt(User.Birth.substring(0, 4));
                     int monthOfYear =Integer.parseInt(User.Birth.substring(5,7))-1;
                     int dayOfMonth =Integer.parseInt(User.Birth.substring(8,10));
@@ -133,7 +136,7 @@ public class EditInfoActivity extends Activity {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             int month = monthOfYear + 1;
-                            User.Birth = year + "-" + month + "-" + dayOfMonth;
+                            User.Birth = String.format("%04d",year) + "-" + String.format("%02d",month) + "-" + String.format("%02d",dayOfMonth);
                             refreshAdapter();
                         }
                     }, year, monthOfYear, dayOfMonth);

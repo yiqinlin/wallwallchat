@@ -72,7 +72,7 @@ public class MyListView extends ListView implements OnScrollListener {
     private void init() {
         mInflater = LayoutInflater.from(context);
         mHeadView = (LinearLayout) mInflater.inflate(R.layout.list_head, null);
-        mTailView=(LinearLayout)mInflater.inflate(R.layout.list_refresh,null);
+        mTailView=(LinearLayout)mInflater.inflate(R.layout.list_refresh, null);
         mArrowImageView = (ImageView) mHeadView.findViewById(R.id.head_arrowImageView);
         mProgressBar = (ListAnimImageView) mHeadView.findViewById(R.id.head_progressBar);
         headHint=(TextView)mHeadView.findViewById(R.id.refresh_head_text);
@@ -83,7 +83,7 @@ public class MyListView extends ListView implements OnScrollListener {
         mHeadView.setPadding(0, -mHeadContentHeight, 0, 0);
         mHeadView.invalidate();
         addHeaderView(mHeadView, null, false);
-        addFooterView(mTailView, null, false);
+//        addFooterView(mTailView, null, false);
         mTailView.setVisibility(GONE);
         setOnScrollListener(this);
 
@@ -157,7 +157,7 @@ public class MyListView extends ListView implements OnScrollListener {
         mHeadView.setPadding(0, -mHeadContentHeight, 0, 0);
         this.setPadding(0, 0, 0, 0);
         mProgressBar.setVisibility(GONE);
-        mArrowImageView.setImageResource(R.drawable.tianqing);
+        mArrowImageView.setImageResource(R.drawable.refresh_head_arrow);
     }
     public void setonBackListener(OnBackListener onBackListener) {
         this.mBackListener = onBackListener;
@@ -282,7 +282,7 @@ public class MyListView extends ListView implements OnScrollListener {
                 mHeadView.setPadding(0,-mHeadContentHeight,0,0);
                 mArrowImageView.clearAnimation();
                 mProgressBar.setVisibility(GONE);
-                mArrowImageView.setImageResource(R.drawable.tianqing);
+                mArrowImageView.setImageResource(R.drawable.refresh_head_arrow);
                 break;
             case DONE:
                 if(Offset>0) {
@@ -293,7 +293,7 @@ public class MyListView extends ListView implements OnScrollListener {
                 Offset=0;
                 mArrowImageView.clearAnimation();
                 mProgressBar.setVisibility(GONE);
-                mArrowImageView.setImageResource(R.drawable.tianqing);
+                mArrowImageView.setImageResource(R.drawable.refresh_head_arrow);
                 break;
 
             case REFRESHING:

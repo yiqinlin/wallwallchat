@@ -10,6 +10,7 @@ import com.stark.yiyu.R;
 public class ItemWallInfo extends BaseItem{
     private String id;
     private String id2;
+    private boolean isAgree=false;
     private String msgCode;
     private Drawable head;
     private int type;
@@ -19,7 +20,7 @@ public class ItemWallInfo extends BaseItem{
     private String content;
     private String cnum;
     private String anum;
-    public ItemWallInfo(int itemType, int type, String id,String id2,String msgCode, Drawable head, String nick, String nick2,String time, String content, String cnum, String anum){
+    public ItemWallInfo(int itemType, int type, String id,String id2,String msgCode, Drawable head, String nick, String nick2,String time, String content, String cnum, String anum,boolean isAgree){
         super(itemType);
         this.type=type;
         this.id=id;
@@ -32,6 +33,7 @@ public class ItemWallInfo extends BaseItem{
         this.content=content;
         this.cnum=cnum;
         this.anum =anum;
+        this.isAgree=isAgree;
     }
     public String getId(){
         return this.id+"";
@@ -39,6 +41,12 @@ public class ItemWallInfo extends BaseItem{
     public String getId2(){
         return this.id2;
     }
+    public void setAgree(boolean isAgree){
+        this.isAgree=isAgree;
+    }public void setAnum(int anum){
+        this.anum=anum+"";
+    }
+    public boolean IsAgree(){return this.isAgree;}
     public String getMsgcode(){return this.msgCode+"";}
     public Drawable getHead(){
         return this.head;

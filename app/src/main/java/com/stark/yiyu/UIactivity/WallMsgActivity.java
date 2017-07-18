@@ -90,12 +90,11 @@ public class WallMsgActivity extends Activity {
                 intent.putExtra("msg",input.getText().toString());
                 intent.putExtra("msgcode",MsgCode);
                 intent.putExtra("receiver",DesID);
-                intent.putExtra("mode",0);
+                intent.putExtra("mode", 0);
                 intent.putExtra("type", isComment ? 1 : 0);
                 startService(intent);
-                mArrays.add(new ItemWallInfo(13, 0, SrcID, DesID, DateUtil.getMsgCode(WallMsgActivity.this), ImgStorage.getHead(WallMsgActivity.this), sp.getString("nick",""), null, new SimpleDateFormat("mm:ss", Locale.CHINA).format(new Date()),input.getText().toString(),"0","0"));
+                mArrays.add(new ItemWallInfo(13, 0, SrcID, DesID, DateUtil.getMsgCode(WallMsgActivity.this), ImgStorage.getHead(WallMsgActivity.this), sp.getString("nick", ""), null, new SimpleDateFormat("mm:ss", Locale.CHINA).format(new Date()), input.getText().toString(), "0", "0",false));
                 input.setText(null);
-
             }
         });
         input.addTextChangedListener(new TextWatcher() {
@@ -149,15 +148,17 @@ public class WallMsgActivity extends Activity {
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (!isComment){
-                ItemWallInfo msg = (ItemWallInfo) mArrays.get(position - 1);
-                Intent intent = new Intent(WallMsgActivity.this, WallMsgActivity.class);
-                intent.putExtra("isComment", true);
-                 intent.putExtra("sponsor", msg.getId());
-                intent.putExtra("msgcode", msg.getMsgcode());
-                startActivity(intent);
-             }else{
+            if(position!=1&&position!=2) {
+                if (!isComment) {
+                    ItemWallInfo msg = (ItemWallInfo) mArrays.get(position - 1);
+                    Intent intent = new Intent(WallMsgActivity.this, WallMsgActivity.class);
+                    intent.putExtra("isComment", true);
+                    intent.putExtra("sponsor", msg.getId());
+                    intent.putExtra("msgcode", msg.getMsgcode());
+                    startActivity(intent);
+                } else {
 
+                }
             }
         }
     }

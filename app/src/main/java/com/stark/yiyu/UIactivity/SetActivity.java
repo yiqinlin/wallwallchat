@@ -39,7 +39,7 @@ public class SetActivity extends Activity {
         ArrayList<BaseItem> mArrays=new ArrayList<BaseItem>();
         MyAdapter adapter=new MyAdapter(SetActivity.this,mArrays);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemSimpleList(6, "退出当前账号", getResources().getDrawable(R.drawable.tianqing)));
+        mArrays.add(new ItemSimpleList(6, "退出当前账号", getResources().getDrawable(R.drawable.into_detial)));
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
         left.setOnClickListener(Click);
