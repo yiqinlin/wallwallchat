@@ -3,6 +3,7 @@ package com.stark.yiyu.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import com.stark.yiyu.Listview.MyListView;
 import com.stark.yiyu.NetWork.NetPackage;
 import com.stark.yiyu.NetWork.NetSocket;
 import com.stark.yiyu.R;
+import com.stark.yiyu.SQLite.DatabaseHelper;
 import com.stark.yiyu.UIactivity.WallMsgActivity;
 import com.stark.yiyu.adapter.MyAdapter;
 import com.stark.yiyu.bean.BaseItem;
@@ -35,8 +37,8 @@ public class Fragment1 extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savesInstanceState){
         View view=inflater.inflate(R.layout.transfer_left, container, false);
-        // final SQLiteDatabase db=new DatabaseHelper(getActivity()).getWritableDatabase();
-        //db.execSQL("CREATE TABLE IF NOT EXISTS g10001(id varchar(20),type integer,bubble integer,msg varchar(1024),msgcode varchar(20),date varchar(10),time varchar(12),ack integer)");
+        final SQLiteDatabase db=new DatabaseHelper(getActivity()).getWritableDatabase();
+        //db.execSQL("CREATE TABLE IF NOT EXISTS wall(item_type int,type int,sponsor char(20),receiver char(20),msgcode char(20),nick  varchar(16),nick2  varchar(16),msg varchar(1024),cnum char(10),anum char(10),boolean isAgree)");
         listView =(MyListView)view.findViewById(R.id.listView_left);
         final SharedPreferences sp = getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
         SrcID=sp.getString("id",null);
