@@ -101,7 +101,6 @@ public class Fragment2 extends Fragment {
 
     private void msgRefresh(MyAdapter adapter,ArrayList<BaseItem> mArrays){
         SQLiteDatabase db=new DatabaseHelper(getActivity()).getWritableDatabase();
-        //db.execSQL("CREATE TABLE IF NOT EXISTS mid(id varchar(20),head varchar(20),remarks varchar(20),message varchar(100),msgcode varchar(20),count varchar(3))");
         Cursor cr=db.query("mid",null,null,null,null,null,"msgcode desc");
         if(cr!=null&&cr.getCount()>0){
             mArrays.clear();
