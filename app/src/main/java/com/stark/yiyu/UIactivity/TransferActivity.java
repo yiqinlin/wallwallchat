@@ -198,6 +198,9 @@ public class TransferActivity extends FragmentActivity{
                     right.setBackgroundResource(R.drawable.theme_transfer_tab_me_nor);
                     title.setText("校 园");
                     titleRight.setText("发布");
+                    Intent intent=new Intent();
+                    intent.setAction("com.stark.yiyu.updateWall");
+                    sendBroadcast(intent);
                     break;
                 case 1:
                     left.setBackgroundResource(R.drawable.theme_transfer_tab_group_nor);
@@ -212,6 +215,9 @@ public class TransferActivity extends FragmentActivity{
                     right.setBackgroundResource(R.drawable.theme_transfer_tab_me_focused);
                     title.setText("我");
                     titleRight.setText("设置");
+                    Intent intent2=new Intent();
+                    intent2.setAction("com.stark.yiyu.userInfo");
+                    sendBroadcast(intent2);
                     break;
             }
             if(position==0&&mInputLine.getVisibility()==View.GONE){//第一页世界,输入框为不可见(默认也为不可见)。

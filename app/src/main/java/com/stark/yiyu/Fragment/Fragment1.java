@@ -1,12 +1,15 @@
 package com.stark.yiyu.Fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +37,7 @@ public class Fragment1 extends Fragment{
     MyAdapter adapter=null;
     MyListView listView;
     String SrcID;
+    private BroadcastReceiver mReceiver = null;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savesInstanceState){
         View view=inflater.inflate(R.layout.transfer_left, container, false);
@@ -49,22 +53,20 @@ public class Fragment1 extends Fragment{
         listView.setonRefreshListener(new MyListView.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Refresh refresh = (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, "nsu", 0, 2, 1, "",0)));
-                        mArrays.clear();
-                        JsonConvert.UpdateWall(getActivity(), refresh, mArrays);
-                        return null;
-                    }
-
-                    protected void onPostExecute(Void result) {
-                        adapter.notifyDataSetChanged();
-                        listView.onRefreshComplete();
-                    }
-                }.execute();
+                new MyAsyncTask().execute();
             }
         });
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("com.stark.yiyu.updateWall")) {
+                    new MyAsyncTask().execute();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.stark.yiyu.updateWall");
+        getActivity().registerReceiver(mReceiver, intentFilter);
         return view;
     }
     private class MyOnItemClickListener implements AdapterView.OnItemClickListener {
@@ -77,9 +79,35 @@ public class Fragment1 extends Fragment{
             startActivity(intent);
         }
     }
+    class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
+        SharedPreferences sp = getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
+        @Override
+        protected Void doInBackground(Void... values) {
+            Refresh refresh = (Refresh) NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, sp.getString("edu","nsu"), 0, 2, 1, "",0)));
+            mArrays.clear();
+            JsonConvert.UpdateWall(getActivity(), refresh, mArrays);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            adapter.notifyDataSetChanged();
+            listView.onRefreshComplete();
+        }
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+    @Override
+    public void onDestroyView() {
+        Log.e("onDestroyView", "Fragment");
+        getActivity().unregisterReceiver(mReceiver);
+        super.onDestroyView();
     }
 }
