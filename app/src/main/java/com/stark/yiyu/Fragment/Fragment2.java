@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import com.stark.yiyu.File.ImgStorage;
 import com.stark.yiyu.Format.Msg;
 import com.stark.yiyu.Listview.MyListView;
 import com.stark.yiyu.NetWork.NetPackage;
@@ -105,7 +106,7 @@ public class Fragment2 extends Fragment {
         if(cr!=null&&cr.getCount()>0){
             mArrays.clear();
             while(cr.moveToNext()){
-                mArrays.add(new ItemMid(2, cr.getString(0), getResources().getDrawable(R.drawable.tianqing), cr.getString(2), cr.getString(3), DateUtil.MtoST(cr.getString(4)), cr.getString(5)));
+                mArrays.add(new ItemMid(2, cr.getString(0), ImgStorage.getHead(getActivity()), cr.getString(2), cr.getString(3), DateUtil.MtoST(cr.getString(4)), cr.getString(5)));
             }
             cr.close();
             adapter.notifyDataSetChanged();

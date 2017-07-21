@@ -2,14 +2,12 @@ package com.stark.yiyu.File;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.stark.yiyu.Format.FileType;
 import com.stark.yiyu.MyService;
@@ -38,13 +36,7 @@ public class ImgStorage {
         Intent intent = new Intent(context, MyService.class);
         intent.putExtra("CMD", "Image");
         context.startService(intent);
-        SharedPreferences sp =context.getSharedPreferences("action", Context.MODE_PRIVATE);
-        if (sp.getBoolean("sex",true)) {
-            Log.e("圆形图片路径", "不存在,男");
-            return context.getResources().getDrawable(R.drawable.tianqing);
-        }
-        Log.e("圆形图片路径", "不存在,女");
-        return context.getResources().getDrawable(R.drawable.tianqing);
+        return context.getResources().getDrawable(R.drawable.default_head);
     }
 
     public static String getPhotoPath(Context context) {

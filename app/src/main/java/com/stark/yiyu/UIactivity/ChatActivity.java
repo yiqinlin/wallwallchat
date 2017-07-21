@@ -158,7 +158,7 @@ public class ChatActivity extends Activity {
                 Msg msg= (Msg)NetPackage.getBag(msgStr,cmdStr);
                 if(msg.SrcId.equals(DesId)) {
                     start++;
-                    mArrays.add(new ItemSMsg(1, msg.SrcId, ChatActivity.this.getResources().getDrawable(R.drawable.tianqing), msg.SendType, msg.Bubble, msg.Msg, msg.MsgCode, msg.Date, msg.Time, 1));
+                    mArrays.add(new ItemSMsg(1, msg.SrcId, ImgStorage.getHead(ChatActivity.this), msg.SendType, msg.Bubble, msg.Msg, msg.MsgCode, msg.Date, msg.Time, 1));
                     adapter.notifyDataSetChanged();
                 }else{
                     msgNumber.setText(Integer.parseInt(msgNumber.getText().toString())+1);
@@ -255,7 +255,7 @@ public class ChatActivity extends Activity {
             DateFormat TimeTemp=new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
             msgCode= DateUtil.getMsgCode(ChatActivity.this);
             db.insert("u" + DesId, null, Data.getSChatContentValues(SrcId, 1, 0, MsgTemp,msgCode, DateTemp.format(date), TimeTemp.format(date), 0));
-            mArrays.add(new ItemSMsg(0, SrcId, ChatActivity.this.getResources().getDrawable(R.drawable.tianqing), 1, 0, MsgTemp, msgCode, DateTemp.format(date), TimeTemp.format(date), 0));
+            mArrays.add(new ItemSMsg(0, SrcId, ImgStorage.getHead(ChatActivity.this), 1, 0, MsgTemp, msgCode, DateTemp.format(date), TimeTemp.format(date), 0));
             adapter.notifyDataSetChanged();
             listView.setSelection(listView.getBottom());
         }
