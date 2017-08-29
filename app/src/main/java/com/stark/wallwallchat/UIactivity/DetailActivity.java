@@ -1,4 +1,4 @@
-package com.stark.yiyu.UIactivity;
+package com.stark.wallwallchat.UIactivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.stark.yiyu.R;
-import com.stark.yiyu.Util.Status;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.Util.Status;
 
 public class DetailActivity extends AppCompatActivity {
 

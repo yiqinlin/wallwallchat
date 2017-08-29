@@ -1,4 +1,4 @@
-package com.stark.yiyu.UIactivity;
+package com.stark.wallwallchat.UIactivity;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -20,23 +20,23 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stark.yiyu.File.ImgStorage;
-import com.stark.yiyu.Format.Ack;
-import com.stark.yiyu.Format.Msg;
-import com.stark.yiyu.Format.Refresh;
-import com.stark.yiyu.Listview.MyListView;
-import com.stark.yiyu.NetWork.NetPackage;
-import com.stark.yiyu.NetWork.NetSocket;
-import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.Data;
-import com.stark.yiyu.SQLite.DatabaseHelper;
-import com.stark.yiyu.Util.DateUtil;
-import com.stark.yiyu.Util.Error;
-import com.stark.yiyu.Util.ListUtil;
-import com.stark.yiyu.adapter.MyAdapter;
-import com.stark.yiyu.bean.BaseItem;
-import com.stark.yiyu.bean.ItemSMsg;
-import com.stark.yiyu.json.JsonConvert;
+import com.stark.wallwallchat.File.ImgStorage;
+import com.stark.wallwallchat.Format.Ack;
+import com.stark.wallwallchat.Format.Msg;
+import com.stark.wallwallchat.Format.Refresh;
+import com.stark.wallwallchat.Listview.MyListView;
+import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetSocket;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.SQLite.Data;
+import com.stark.wallwallchat.SQLite.DatabaseHelper;
+import com.stark.wallwallchat.Util.DateUtil;
+import com.stark.wallwallchat.Util.Error;
+import com.stark.wallwallchat.Util.ListUtil;
+import com.stark.wallwallchat.adapter.MyAdapter;
+import com.stark.wallwallchat.bean.BaseItem;
+import com.stark.wallwallchat.bean.ItemSMsg;
+import com.stark.wallwallchat.json.JsonConvert;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -166,7 +166,7 @@ public class ChatActivity extends Activity {
             }
         };
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.stark.yiyu.msg");
+        intentFilter.addAction("com.stark.wallwallchat.msg");
         ChatActivity.this.registerReceiver(mReceiver, intentFilter);
         left.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,4 +1,4 @@
-package com.stark.yiyu.SQLite;
+package com.stark.wallwallchat.SQLite;
 
 import android.content.ContentValues;
 

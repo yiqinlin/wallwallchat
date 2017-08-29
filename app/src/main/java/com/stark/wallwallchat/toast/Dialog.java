@@ -1,17 +1,7 @@
-package com.stark.yiyu.toast;
+package com.stark.wallwallchat.toast;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-
-import com.stark.yiyu.UIactivity.HomepageActivity;
 
 /**
  * Created by asus on 2017/6/27.
