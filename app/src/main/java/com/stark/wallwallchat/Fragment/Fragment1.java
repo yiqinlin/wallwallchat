@@ -1,4 +1,4 @@
-package com.stark.yiyu.Fragment;
+package com.stark.wallwallchat.Fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,17 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.stark.yiyu.Format.Refresh;
-import com.stark.yiyu.Listview.MyListView;
-import com.stark.yiyu.NetWork.NetPackage;
-import com.stark.yiyu.NetWork.NetSocket;
-import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.DatabaseHelper;
-import com.stark.yiyu.UIactivity.WallMsgActivity;
-import com.stark.yiyu.adapter.MyAdapter;
-import com.stark.yiyu.bean.BaseItem;
-import com.stark.yiyu.bean.ItemWallInfo;
-import com.stark.yiyu.json.JsonConvert;
+import com.stark.wallwallchat.Format.Refresh;
+import com.stark.wallwallchat.Listview.MyListView;
+import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetSocket;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.SQLite.DatabaseHelper;
+import com.stark.wallwallchat.UIactivity.WallMsgActivity;
+import com.stark.wallwallchat.adapter.MyAdapter;
+import com.stark.wallwallchat.bean.BaseItem;
+import com.stark.wallwallchat.bean.ItemWallInfo;
+import com.stark.wallwallchat.json.JsonConvert;
 
 import java.util.ArrayList;
 
@@ -59,13 +59,13 @@ public class Fragment1 extends Fragment{
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("com.stark.yiyu.updateWall")) {
+                if (intent.getAction().equals("com.stark.wallwallchat.updateWall")) {
                     new MyAsyncTask().execute();
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.stark.yiyu.updateWall");
+        intentFilter.addAction("com.stark.wallwallchat.updateWall");
         getActivity().registerReceiver(mReceiver, intentFilter);
         return view;
     }
