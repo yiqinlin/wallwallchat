@@ -1,4 +1,4 @@
-package com.stark.yiyu.File;
+package com.stark.wallwallchat.File;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.stark.yiyu.Format.FileType;
+import com.stark.wallwallchat.Format.FileType;
 
 import java.io.File;
 import java.io.FileInputStream;

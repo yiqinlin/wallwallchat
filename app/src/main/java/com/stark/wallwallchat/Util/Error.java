@@ -1,4 +1,4 @@
-package com.stark.yiyu.Util;
+package com.stark.wallwallchat.Util;
 
 /**
  * Created by Stark on 2017/2/13.
