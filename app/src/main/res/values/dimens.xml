@@ -24,6 +24,7 @@
 
     <dimen name="magic_0.5margin">3dp</dimen>
     <dimen name="magic_margin">7dp</dimen>
+    <dimen name="magic_1.5margin">12dp</dimen>
     <dimen name="magic_2margin">14dp</dimen>
     <dimen name="magic_3margin">21dp</dimen>
     <dimen name="magic_4margin">28dp</dimen>

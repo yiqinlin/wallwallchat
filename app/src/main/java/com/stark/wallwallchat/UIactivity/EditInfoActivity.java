@@ -1,4 +1,4 @@
-package com.stark.yiyu.UIactivity;
+package com.stark.wallwallchat.UIactivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,18 +17,18 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.stark.yiyu.CustomDialog.MyDateDialog;
-import com.stark.yiyu.Format.UserInfo;
-import com.stark.yiyu.Listview.ElasticListView;
-import com.stark.yiyu.MyService;
-import com.stark.yiyu.R;
-import com.stark.yiyu.SQLite.DatabaseHelper;
-import com.stark.yiyu.adapter.MyAdapter;
-import com.stark.yiyu.bean.BaseItem;
-import com.stark.yiyu.bean.ItemEditInfo;
-import com.stark.yiyu.bean.ItemEditInfo2;
-import com.stark.yiyu.bean.ItemEditMail;
-import com.stark.yiyu.bean.ItemMargin;
+import com.stark.wallwallchat.CustomDialog.MyDateDialog;
+import com.stark.wallwallchat.Format.UserInfo;
+import com.stark.wallwallchat.Listview.ElasticListView;
+import com.stark.wallwallchat.MyService;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.SQLite.DatabaseHelper;
+import com.stark.wallwallchat.adapter.MyAdapter;
+import com.stark.wallwallchat.bean.BaseItem;
+import com.stark.wallwallchat.bean.ItemEditInfo;
+import com.stark.wallwallchat.bean.ItemEditInfo2;
+import com.stark.wallwallchat.bean.ItemEditMail;
+import com.stark.wallwallchat.bean.ItemMargin;
 
 import java.util.ArrayList;
 

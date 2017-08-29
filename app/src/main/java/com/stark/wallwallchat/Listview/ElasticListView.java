@@ -1,11 +1,11 @@
-package com.stark.yiyu.Listview;
+package com.stark.wallwallchat.Listview;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ListView;
 
-import com.stark.yiyu.Util.Elastic;
+import com.stark.wallwallchat.Util.Elastic;
 
 /**
  * Created by Stark on 2017/3/26.

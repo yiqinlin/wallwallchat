@@ -1,4 +1,4 @@
-package com.stark.yiyu.Util;
+package com.stark.wallwallchat.Util;
 
 import android.os.Handler;
 import android.os.Message;
