@@ -1,4 +1,4 @@
-package com.stark.yiyu.UIactivity;
+package com.stark.wallwallchat.UIactivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,19 +13,19 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stark.yiyu.Format.Get;
-import com.stark.yiyu.Format.UserInfo;
-import com.stark.yiyu.Listview.ElasticListView;
-import com.stark.yiyu.NetWork.NetPackage;
-import com.stark.yiyu.NetWork.NetSocket;
-import com.stark.yiyu.R;
-import com.stark.yiyu.Util.Status;
-import com.stark.yiyu.adapter.MyAdapter;
-import com.stark.yiyu.adapter.holder.ViewHolderMid;
-import com.stark.yiyu.bean.BaseItem;
-import com.stark.yiyu.bean.ItemMid;
-import com.stark.yiyu.json.JsonConvert;
-import com.stark.yiyu.toast.ToastDialog;
+import com.stark.wallwallchat.Format.Get;
+import com.stark.wallwallchat.Format.UserInfo;
+import com.stark.wallwallchat.Listview.ElasticListView;
+import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetSocket;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.Util.Status;
+import com.stark.wallwallchat.adapter.MyAdapter;
+import com.stark.wallwallchat.adapter.holder.ViewHolderMid;
+import com.stark.wallwallchat.bean.BaseItem;
+import com.stark.wallwallchat.bean.ItemMid;
+import com.stark.wallwallchat.json.JsonConvert;
+import com.stark.wallwallchat.toast.ToastDialog;
 
 import org.json.JSONArray;
 

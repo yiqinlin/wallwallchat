@@ -18,7 +18,7 @@
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/tianqing"
+            android:background="@drawable/default_head"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="70dp"
             android:id="@+id/Login_head"
@@ -56,7 +56,7 @@
                     android:layout_width="23dp"
                     android:layout_height="23dp"
                     android:id="@+id/button_clear_login_id"
-                    android:background="@drawable/list_driver"
+                    android:background="@drawable/edit_clear"
                     android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"/>
@@ -100,7 +100,7 @@
                     android:layout_width="23dp"
                     android:layout_height="23dp"
                     android:id="@+id/button_clear_login_ps"
-                    android:background="@drawable/list_driver"
+                    android:background="@drawable/edit_clear"
                     android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"/>

@@ -6,8 +6,8 @@
     android:id="@+id/layout_homepage"
     android:orientation="vertical"
     android:background="@color/LayoutBackground"
-    tools:context="com.stark.yiyu.UIactivity.HomepageActivity">
-    <com.stark.yiyu.Listview.ElasticListView
+    tools:context="com.stark.wallwallchat.UIactivity.HomepageActivity">
+    <com.stark.wallwallchat.Listview.ElasticListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -17,7 +17,7 @@
         android:id="@+id/listView_homePage"
         android:transcriptMode="disabled"
         android:layout_gravity="top" >
-    </com.stark.yiyu.Listview.ElasticListView>
+    </com.stark.wallwallchat.Listview.ElasticListView>
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"

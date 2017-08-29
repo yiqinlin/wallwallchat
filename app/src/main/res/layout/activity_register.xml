@@ -2,177 +2,191 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:layout_marginTop="@dimen/magic_8margin"
     android:orientation="vertical"
     android:background="@color/LayoutBackground"
-    android:layoutAnimation="@anim/layout_rtom"
     tools:context=".UIactivity.Register">
-    <LinearLayout
+    <include layout="@layout/transfer_title"/>
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:orientation="horizontal">
-        <TextView
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="昵称:"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/input_bkg"
-            android:textColor="@android:color/darker_gray"
-            android:layout_weight="4"/>
-        <EditText
-            android:id="@+id/edit_regi_nick"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:textSize="18dp"
-            android:background="@drawable/input_bkg"
-            android:textCursorDrawable="@drawable/cursor_bkg"
-            android:maxLines="1"
-            android:maxLength="16"
-            android:singleLine="true" />
-    </LinearLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/magic_margin"
-        android:layout_marginBottom="@dimen/magic_margin"
-        android:text="16位以内的任意字符"
-        android:textColor="@android:color/secondary_text_dark" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="密码:"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/input_bkg"
-            android:textColor="@android:color/darker_gray"
-            android:layout_weight="4"/>
-        <EditText
-            android:id="@+id/edit_regi_pass"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bkg"
-            android:textCursorDrawable="@drawable/cursor_bkg"
-            android:maxLength="16"
-            android:textSize="18dp"
-            android:digits="1234567890.,.?!:/@;'~()&lt;&gt;&quot;&amp;*[]\\`#$%^_+-={}|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true" />
-    </LinearLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/magic_margin"
-        android:layout_marginBottom="@dimen/magic_margin"
-        android:text="6-16位的英文字符、数字或字母"
-        android:textColor="@android:color/secondary_text_dark" />
+            android:layoutAnimation="@anim/layout_rtom"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/magic_4margin"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="昵称:"
+                    android:textSize="@dimen/text_size"
+                    android:background="@drawable/input_bkg"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_weight="4"/>
+                <EditText
+                    android:id="@+id/edit_regi_nick"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:textSize="18dp"
+                    android:background="@drawable/input_bkg"
+                    android:textCursorDrawable="@drawable/cursor_bkg"
+                    android:maxLines="1"
+                    android:maxLength="16"
+                    android:singleLine="true" />
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/magic_margin"
+                android:layout_marginBottom="@dimen/magic_margin"
+                android:text="16位以内的任意字符"
+                android:textColor="@android:color/secondary_text_dark" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="密码:"
+                    android:textSize="@dimen/text_size"
+                    android:background="@drawable/input_bkg"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_weight="4"/>
+                <EditText
+                    android:id="@+id/edit_regi_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_bkg"
+                    android:textCursorDrawable="@drawable/cursor_bkg"
+                    android:maxLength="16"
+                    android:textSize="18dp"
+                    android:digits="1234567890.,.?!:/@;'~()&lt;&gt;&quot;&amp;*[]\\`#$%^_+-={}|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/magic_margin"
+                android:layout_marginBottom="@dimen/magic_margin"
+                android:text="6-16位的英文字符、数字或字母"
+                android:textColor="@android:color/secondary_text_dark" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="确认:"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/input_bkg"
-            android:textColor="@android:color/darker_gray"
-            android:layout_weight="4"/>
-        <EditText
-            android:id="@+id/edit_right_pass"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bkg"
-            android:textCursorDrawable="@drawable/cursor_bkg"
-            android:maxLength="16"
-            android:textSize="18dp"
-            android:digits="1234567890.,.?!:/@;'~()&lt;&gt;&quot;&amp;*[]\\`#$%^_+-={}|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true" />
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="确认:"
+                    android:textSize="@dimen/text_size"
+                    android:background="@drawable/input_bkg"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_weight="4"/>
+                <EditText
+                    android:id="@+id/edit_right_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_bkg"
+                    android:textCursorDrawable="@drawable/cursor_bkg"
+                    android:maxLength="16"
+                    android:textSize="18dp"
+                    android:digits="1234567890.,.?!:/@;'~()&lt;&gt;&quot;&amp;*[]\\`#$%^_+-={}|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/magic_margin"
-        android:layout_marginBottom="@dimen/magic_margin"
-        android:text="再次输入密码，以确保密码正确"
-        android:textColor="@android:color/secondary_text_dark" />
-    <!--  < = &lt;   > = &gt;   " = &quot;   & = &amp;  \ = \\ -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/magic_margin"
+                android:layout_marginBottom="@dimen/magic_margin"
+                android:text="再次输入密码，以确保密码正确"
+                android:textColor="@android:color/secondary_text_dark" />
+            <!--  < = &lt;   > = &gt;   " = &quot;   & = &amp;  \ = \\ -->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
-        android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standard_margin"
+                android:paddingRight="@dimen/standard_margin"
+                android:layout_marginBottom="@dimen/standard_margin"
+                android:orientation="horizontal">
 
-        <TextView
-            android:paddingLeft="@dimen/standard_margin"
-            android:paddingRight="@dimen/standard_margin"
-            android:id="@+id/txvCollege"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="请选择学校"
-            android:gravity="center_vertical"
-            android:textColorHint="@android:color/darker_gray"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/input_bkg"
-            android:textColor="@android:color/darker_gray"
-            android:layout_marginRight="7dp"
-            android:layout_weight="8"/>
+                <TextView
+                    android:paddingLeft="@dimen/standard_margin"
+                    android:paddingRight="@dimen/standard_margin"
+                    android:paddingTop="@dimen/magic_1.5margin"
+                    android:paddingBottom="@dimen/magic_1.5margin"
+                    android:id="@+id/txvCollege"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="请选择学校"
+                    android:gravity="center_vertical"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/text_size"
+                    android:background="@drawable/input_bkg"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginRight="7dp"
+                    android:layout_weight="1"/>
 
-        <Button
-            android:id="@+id/btnCollege"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_size"
-            android:text="选择"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/borderlessButtonStyle"
-            android:background="@drawable/big_button"/>
+                <Button
+                    android:id="@+id/btnCollege"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size"
+                    android:text="选 择"
+                    android:layout_weight="3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/big_button"
+                    style="?android:attr/borderlessButtonStyle"/>
 
-    </LinearLayout>
+            </LinearLayout>
 
-    <Button
-        android:id="@+id/button_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/standard_margin"
-        android:layout_marginRight="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:background="@drawable/gray_button"
-        android:text="注  册"
-        android:textStyle="bold"
-        android:textSize="@dimen/text_size_xmid"
-        android:textColor="@android:color/white"
-        style="?android:attr/borderlessButtonStyle"/>
+            <Button
+                android:id="@+id/button_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/magic_5margin"
+                android:layout_marginLeft="@dimen/standard_margin"
+                android:layout_marginRight="@dimen/standard_margin"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:background="@drawable/gray_button"
+                android:text="注  册"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_size_xmid"
+                android:textColor="@android:color/white"
+                style="?android:attr/borderlessButtonStyle"/>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

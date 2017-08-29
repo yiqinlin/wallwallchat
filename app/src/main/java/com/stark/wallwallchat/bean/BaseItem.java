@@ -1,4 +1,4 @@
-package com.stark.yiyu.bean;
+package com.stark.wallwallchat.bean;
 
 public class BaseItem {
 

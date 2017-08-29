@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.stark.yiyu.MainActivity"
+    tools:context="com.stark.wallwallchat.MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top"
     android:background="@color/LayoutBackground"
     android:orientation="vertical">
     <include layout="@layout/transfer_title" />
-    <com.stark.yiyu.Listview.MyListView
+    <com.stark.wallwallchat.Listview.MyListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.stark.yiyu.UIactivity.SortSchool">
+    tools:context="com.stark.wallwallchat.UIactivity.SortSchool">
     <include layout="@layout/transfer_title"/>
     <EditText
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
             android:textSize="30sp"
             android:visibility="invisible"
             />
-        <com.stark.yiyu.SortListView.SideBar
+        <com.stark.wallwallchat.SortListView.SideBar
             android:id="@+id/sidrbar"
             android:layout_width="30dp"
             android:layout_height="match_parent"

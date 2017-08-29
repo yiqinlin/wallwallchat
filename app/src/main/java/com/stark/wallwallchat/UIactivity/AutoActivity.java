@@ -1,4 +1,4 @@
-package com.stark.yiyu.UIactivity;
+package com.stark.wallwallchat.UIactivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,8 +11,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stark.yiyu.R;
-import com.stark.yiyu.Util.Status;
+import com.stark.wallwallchat.R;
+import com.stark.wallwallchat.Util.Status;
 
 public class AutoActivity extends Activity {
     private EditText edtAuto;

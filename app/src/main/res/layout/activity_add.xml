@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/LayoutBackground"
-    tools:context="com.stark.yiyu.UIactivity.AddActivity">
+    tools:context="com.stark.wallwallchat.UIactivity.AddActivity">
     <include layout="@layout/transfer_title"/>
     <include layout="@layout/input"/>
     <include layout="@layout/list_refresh"
     android:id="@+id/layout_refresh"
     android:visibility="gone"/>
-    <com.stark.yiyu.Listview.ElasticListView
+    <com.stark.wallwallchat.Listview.ElasticListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/listView_add"

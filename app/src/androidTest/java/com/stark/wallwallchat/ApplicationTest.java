@@ -1,4 +1,4 @@
-package com.stark.yiyu;
+package com.stark.wallwallchat;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -6,7 +6,7 @@
     android:gravity="top"
     android:background="@color/LayoutBackground"
     android:orientation="vertical"
-    tools:context="com.stark.yiyu.UIactivity.SelfInfoActivity">
+    tools:context="com.stark.wallwallchat.UIactivity.SelfInfoActivity">
 
     <include layout="@layout/transfer_title" />
 
