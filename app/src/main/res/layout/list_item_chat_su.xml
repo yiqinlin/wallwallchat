@@ -18,7 +18,7 @@
             android:layout_marginRight="@dimen/magic_margin"
             android:layout_marginEnd="@dimen/magic_margin"
             android:layout_gravity="right|bottom">
-            <com.stark.yiyu.toast.ListAnimImageView
+            <com.stark.wallwallchat.toast.ListAnimImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/list_chat_su_ListAnim"

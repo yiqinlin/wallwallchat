@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.stark.yiyu.Listview.ElasticListView
+    <com.stark.wallwallchat.Listview.ElasticListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@drawable/list_driver_dark"
@@ -12,5 +12,5 @@
         android:id="@+id/listView_right"
         android:transcriptMode="disabled"
         android:layout_gravity="top" >
-    </com.stark.yiyu.Listview.ElasticListView>
+    </com.stark.wallwallchat.Listview.ElasticListView>
 </LinearLayout>

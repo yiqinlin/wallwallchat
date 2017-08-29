@@ -13,7 +13,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="@dimen/magic_margin">
-        <com.stark.yiyu.toast.ListAnimImageView
+        <com.stark.wallwallchat.toast.ListAnimImageView
             android:layout_width="@dimen/magic_4margin"
             android:layout_height="@dimen/magic_4margin"
             android:layout_gravity="center"

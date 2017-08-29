@@ -33,7 +33,7 @@
                     android:src="@drawable/refresh_head_arrow"/>
 
                 <!-- 进度条 -->
-                <com.stark.yiyu.toast.ListAnimImageView
+                <com.stark.wallwallchat.toast.ListAnimImageView
                     android:layout_width="@dimen/magic_4margin"
                     android:layout_height="@dimen/magic_4margin"
                     android:layout_gravity="center"
