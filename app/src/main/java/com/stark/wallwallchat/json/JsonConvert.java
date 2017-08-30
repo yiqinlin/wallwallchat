@@ -1,29 +1,19 @@
 package com.stark.wallwallchat.json;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.stark.wallwallchat.File.ImgStorage;
-import com.stark.wallwallchat.Format.Get;
-import com.stark.wallwallchat.Format.Refresh;
-import com.stark.wallwallchat.Format.SimpleMsg;
-import com.stark.wallwallchat.Format.UserInfo;
-import com.stark.wallwallchat.Format.WallMsgGet;
-import com.stark.wallwallchat.R;
-import com.stark.wallwallchat.SQLite.Data;
-import com.stark.wallwallchat.Util.DateUtil;
-import com.stark.wallwallchat.bean.BaseItem;
-import com.stark.wallwallchat.bean.ItemSMsg;
-import com.stark.wallwallchat.bean.ItemWallInfo;
-
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Stark on 2017/2/8.
@@ -35,7 +25,7 @@ public class JsonConvert {
         Field[] fields = obj.getClass().getDeclaredFields();//用反射获取内部类的属性
         for (Field field : fields) {
             try {
-                switch(TypeInt.getType(field.getType()))//field.getType:获取属性声明时类型对象（返回class对象）
+                switch(getType(field.getType()))//field.getType:获取属性声明时类型对象（返回class对象）
                 {
                     case 0://字符串类型,//field.getName():获取属性声明时名字
                         json.put(field.getName(),(field.get(obj)==null?"":field.get(obj)));//get(Object obj):取得obj对象这个Field上的值
@@ -50,17 +40,19 @@ public class JsonConvert {
                         json.put(field.getName(),(float)(field.get(obj)==null?0:field.get(obj)));
                         break;
                     case 4:
-                         json.put(field.getName(),(double)(field.get(obj)==null?0:field.get(obj)));
+                        json.put(field.getName(),(double)(field.get(obj)==null?0:field.get(obj)));
                         break;
                     case 5:
                         json.put(field.getName(),(boolean)(field.get(obj)==null?false:field.get(obj)));
                         break;
                     case 6:
                     case 7:
-                    case 8:
+                    case 8://JsonArray型
                     case 9:
-                    case 10://JsonArray型
                         json.put(field.getName(),(field.get(obj)==null?null:field.get(obj)));
+                        break;
+                    case 10:
+                        json.put(field.getName(),new  JSONObject((HashMap)field.get(obj)));
                         break;
                 }
             } catch (Exception e) {
@@ -69,154 +61,114 @@ public class JsonConvert {
         }
         return json.toString();
     }
-    public static Object DeserializeObject(String JsonStr,Object obj)/**反序列化*/
-    {
-        JSONObject jsonobj=new JSONObject();
-        try{
-            JSONTokener jsonTokener = new JSONTokener(JsonStr);
-            jsonobj=(JSONObject)jsonTokener.nextValue();
-        }catch (Exception e)
-        {
-            Log.i("JsonTokener",e.toString());
-        }
-        return getObject(obj, jsonobj);
-    }
-    public static void UpdateData(Context context, SQLiteDatabase db, String DesId, Refresh refresh, ArrayList<BaseItem> mArray){
-        int length=refresh.ChatData.length();
-        SimpleMsg Msg;
-        Cursor cursor;
-        int item_type;
-        for (int i=0;i<length;i++) {
-            try {
-                Msg = (SimpleMsg) getObject(new SimpleMsg(), refresh.ChatData.getJSONObject(i));
-                if (Msg.Guestid.equals(DesId)) {
-                    item_type = 1;
-                } else if (Msg.Guestid.equals("10000")) {
-                    item_type = 2;
-                } else {
-                    item_type = 0;
-                }
-                mArray.add(0,new ItemSMsg(item_type,Msg.Guestid,ImgStorage.getHead(context), Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1));
-                cursor= db.query("u" + DesId,null, "msgcode=?", new String[]{Msg.MsgCode}, null, null, null);
-                if(cursor!=null&&cursor.getCount()>0&&cursor.moveToNext()){
-                    db.update("u" + DesId,Data.getSChatContentValues(Msg.Guestid, Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1),"msgcode=?", new String[]{Msg.MsgCode});
-                    cursor.close();
-                }else{
-                    db.insert("u" + DesId, null, Data.getSChatContentValues(Msg.Guestid, Msg.SendType, Msg.Bubble, Msg.Msg, Msg.MsgCode, Msg.Date, Msg.Time, 1));
-                }
-            } catch (Exception e) {
-                Log.i("UpdateDB", e.toString());
-            }
-        }
-    }
-    public static void UpdateWall(Context context, Refresh refresh, ArrayList<BaseItem> mArrays){
-        int length=refresh.WallData.length();
-        WallMsgGet Msg;
-        int item_type;
-        for (int i=0;i<length;i++) {
-            try {
-                Msg = (WallMsgGet) getObject(new WallMsgGet(), refresh.WallData.getJSONObject(i));
-                switch (Msg.Mode){
-                    case 0:
-                        item_type = 11;
-                        break;
-                    case 1:
-                        item_type = 12;
-                        break;
-                    default:
-                        item_type=11;
-                        break;
-                }
-                mArrays.add(0, new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum,Msg.IsAgree));
-            } catch (Exception e) {
-                Log.i("UpdateWall", e.toString());
-            }
-        }
-    }
-    public static void UpdateComment(Context context, Refresh refresh, ArrayList<BaseItem> mArrays){
-        int length=refresh.WallData.length();
-        WallMsgGet Msg;
-        int item_type;
-        for (int i=0;i<length;i++) {
-            try {
-                Msg = (WallMsgGet) getObject(new WallMsgGet(), refresh.WallData.getJSONObject(i));
-                switch (Msg.Mode){
-                    case 0:
-                        item_type = 13;
-                        break;
-                    case 1:
-                        item_type = 14;
-                        break;
-                    default:
-                        item_type=13;
-                        break;
-                }
-                mArrays.add(new ItemWallInfo(item_type, Msg.Type, Msg.Sponsor,Msg.Receiver, Msg.MsgCode, ImgStorage.getHead(context), Msg.Nick,Msg.Nick2, DateUtil.MtoNT(Msg.MsgCode), Msg.Msg, Msg.Cnum, Msg.Anum,Msg.IsAgree));
-            } catch (Exception e) {
-                Log.i("UpdateComment", e.toString());
-            }
-        }
-    }
-    public static UserInfo GetInfo(Get get,int i){
+    public static Object DeserializeObject(String JsonStr,Object obj){
+        Field[] fields= obj.getClass().getDeclaredFields();
         try {
-            return (UserInfo) getObject(new UserInfo(),get.Data.getJSONObject(i));
-        }catch (Exception e){
-            Log.i("GetInfo",e.toString());
-            return null;
+            JSONObject jsonObject=(JSONObject)new JSONTokener(JsonStr).nextValue();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                field.set(obj,JsonObjectToObject(jsonObject, field));
+            }
+        } catch (Exception e) {
+            Log.i("Jsonobj", e.toString());
         }
+        return obj;
     }
-    public static void UpdateDB(SQLiteDatabase db,SharedPreferences sp,Get get){
-        int length=get.Data.length();
-        UserInfo User;
-        for (int i=0;i<length;i++) {
-            try {
-                User = (UserInfo) getObject(new UserInfo(),get.Data.getJSONObject(i));
-                Cursor cr=db.query("userdata",new String[]{"id"},"id=?",new String[]{User.Id},null,null,null);
-                sp.edit().putString("nick",User.Nick).putString("auto",User.Auto).putString("edu",User.Edu).apply();
-                if(cr!=null&&cr.getCount()>0&&cr.moveToNext()) {
-                    db.update("userdata", Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth,User.College,User.Edu,User.Mail,User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme), "id=?", new String[]{User.Id});
-                }else{
-                    db.insert("userdata", null,Data.getUserContentValues(User.Id, User.Nick, User.Auto, User.Sex, User.Birth,User.College,User.Edu,User.Mail, User.Pnumber, User.Startdate, User.Catdate, User.Typeface, User.Theme, User.Bubble,User.Iknow,User.Knowme));
-                }
-            } catch (Exception e) {
-                Log.i("UpdateDB", e.toString());
+    private static Object JsonObjectToObject(JSONObject obj,Field field){
+        try {
+            switch (getType(field.getType()))//field.getType:获取属性声明时类型对象（返回class对象）
+            {
+                case 0:
+                    return obj.opt(field.getName());
+                case 1:
+                    return obj.optInt(field.getName());
+                case 2:
+                    return obj.optLong(field.getName());
+                case 3:
+                case 4:
+                    return obj.optDouble(field.getName());
+                case 5:
+                    return obj.optBoolean(field.getName());
+                case 6:
+                case 7:
+                case 8://JsonArray型
+                case 9:
+                    return JsonArrayToList(obj.optJSONArray(field.getName()));
+                case 10:
+                    return JsonObjectToMap(obj.optJSONObject(field.getName()));
+            }
+        }catch (Exception e){
+            Log.e("JsonObjectToObject", e.toString());
+        }
+        return null;
+    }
+    private static Map<String, Object> JsonObjectToMap(JSONObject jsonResult) throws JSONException {
+        Map<String, Object> result = new HashMap<String, Object>();
+        Iterator<String> keyIt = jsonResult.keys();
+        while (keyIt.hasNext()) {
+            String key = keyIt.next();
+            Object val = jsonResult.get(key);
+            if (!(val instanceof JSONObject) && !(val instanceof JSONArray)) {
+                result.put(key, val);
+                continue;
+            }
+            if (val instanceof JSONObject) {
+                Map<String, Object> valMap = JsonObjectToMap((JSONObject) val);
+                result.put(key, valMap);
+                continue;
+            }
+            if (val instanceof JSONArray) {
+                JSONArray ja = (JSONArray) val;
+                result.put(key, JsonArrayToList(ja));
+            }
+        }
+        return result;
+    }
+    private static List<Object> JsonArrayToList(JSONArray jsonArray) throws JSONException {
+        List<Object> list = new ArrayList<Object>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            Object val = jsonArray.get(i);
+            if (!(val instanceof JSONObject) && !(val instanceof JSONArray)) {
+                list.add(val);
+                continue;
+            }
+            if (val instanceof JSONObject) {
+                Map<String, Object> map = JsonObjectToMap((JSONObject) val);
+                list.add(map);
+                continue;
+            }
+            if (val instanceof JSONArray) {
+                list.add(JsonArrayToList((JSONArray) val));
+                continue;
             }
 
         }
+        return list;
     }
-    public static ArrayList<BaseItem> AddList(Context context,String SrcID,ArrayList<BaseItem> mArrays,Refresh refresh){
-        int length=refresh.ChatData.length();
-        for (int i=0;i<length;i++) {
-            JSONObject jsonobj;
-            SimpleMsg Msg=new SimpleMsg();
-            try {
-                jsonobj = refresh.ChatData.getJSONObject(i);
-                Msg=(SimpleMsg)getObject(new SimpleMsg(),jsonobj);
-            }catch (Exception e){
-                Log.i("Array",e.toString());
-            }
-            int typeTemp;
-            if(Msg.Guestid.equals(SrcID)){
-                typeTemp=0;
-            }else if(Msg.Guestid.equals("10000")){
-                typeTemp=2;
-            }else {
-                typeTemp=1;
-            }
-            mArrays.add(0,new ItemSMsg(typeTemp,Msg.Guestid,context.getResources().getDrawable(R.drawable.tianqing),Msg.SendType,Msg.Bubble,Msg.Msg,Msg.MsgCode,Msg.Date,Msg.Time,1));
-        }
-        return mArrays;
-    }
-    private static Object getObject(Object obj,JSONObject jsonobj){
-        Field[] fields=obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                field.set(obj, jsonobj.get(field.getName()));//set(Object obj, Object value):向obj对象的这个Field设置新值value
-            } catch (Exception e) {
-                Log.i("Jsonobj", e.toString());
-            }
-        }
-        return obj;
+    private static int getType(Class<?> type)//Class<?>它是个通配泛型，?可以代表任何类型
+    {
+        if(type!=null&&(String.class.isAssignableFrom(type)||Character.class.isAssignableFrom(type)||Character.TYPE.isAssignableFrom(type)||char.class.isAssignableFrom(type)))
+            return 0;
+        if(type!=null&&(Byte.TYPE.isAssignableFrom(type)||Short.TYPE.isAssignableFrom(type)||Integer.TYPE.isAssignableFrom(type)||Integer.class.isAssignableFrom(type)||Number.class.isAssignableFrom(type)||int.class.isAssignableFrom(type)||byte.class.isAssignableFrom(type)||short.class.isAssignableFrom(type)))
+            return 1;
+        if(type!=null&&(Long.TYPE.isAssignableFrom(type)||long.class.isAssignableFrom(type)))
+            return 2;
+        if(type!=null&&(Float.TYPE.isAssignableFrom(type)||float.class.isAssignableFrom(type)))
+            return 3;
+        if(type!=null&&(Double.TYPE.isAssignableFrom(type)||double.class.isAssignableFrom(type)))
+            return 4;
+        if(type!=null&&(Boolean.TYPE.isAssignableFrom(type)||Boolean.class.isAssignableFrom(type)||boolean.class.isAssignableFrom(type)))
+            return 5;
+        if(type!=null&&type.isArray())
+            return 6;
+        if(type!=null&&Connection.class.isAssignableFrom(type))
+            return 7;
+        if(type!=null&&JSONArray.class.isAssignableFrom(type))
+            return 8;
+        if(type!=null&&List.class.isAssignableFrom(type))
+            return 9;
+        if(type!=null&&Map.class.isAssignableFrom(type))
+            return 10;
+        return 11;
     }
 }
