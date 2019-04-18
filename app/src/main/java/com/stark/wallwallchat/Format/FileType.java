@@ -8,4 +8,5 @@ public enum FileType {
     Head,
     mHead,
     oHead,
+    File
 }

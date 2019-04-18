@@ -34,8 +34,8 @@ public class AutoActivity extends Activity {
 
         Intent it = getIntent();
         String auto = it.getStringExtra("auto");
-        if (auto.equals("") || auto == null) {
-            auto = "  ";
+        if ( auto == null||auto.equals("") ) {
+            auto = "";
         }
         edtAuto.setText(auto);
         edtAuto.setSelection(auto.length());

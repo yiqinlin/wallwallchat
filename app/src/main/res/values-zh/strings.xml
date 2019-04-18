@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">墙墙说</string>
+    <string name="app_name">友你啊</string>
     <string name="large_text">
 
     </string>
@@ -7,7 +7,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_set">SetActivity</string>
-    <string name="title_activity_welcome">墙墙说</string>
+    <string name="title_activity_welcome">友你啊</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="action_sign_in">Sign in</string>

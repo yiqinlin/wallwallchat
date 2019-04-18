@@ -18,9 +18,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.stark.wallwallchat.CustomDialog.MyDateDialog;
-import com.stark.wallwallchat.Format.UserInfo;
 import com.stark.wallwallchat.Listview.ElasticListView;
 import com.stark.wallwallchat.MyService;
+import com.stark.wallwallchat.NetWork.NetPackage;
 import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.SQLite.DatabaseHelper;
 import com.stark.wallwallchat.adapter.MyAdapter;
@@ -29,8 +29,10 @@ import com.stark.wallwallchat.bean.ItemEditInfo;
 import com.stark.wallwallchat.bean.ItemEditInfo2;
 import com.stark.wallwallchat.bean.ItemEditMail;
 import com.stark.wallwallchat.bean.ItemMargin;
+import com.stark.wallwallchat.json.JsonConvert;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by asus on 2017/7/7.
@@ -41,9 +43,9 @@ public class EditInfoActivity extends Activity {
     ArrayList<BaseItem> mArrays;
     MyAdapter adapter;
 
+    final HashMap<String,Object> SqlPkg=new HashMap<String,Object>();
     private static int RES_AUTO_CODE = 0;
     private static int RES_NOTE_CODE = 1;
-    UserInfo User;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,25 +69,24 @@ public class EditInfoActivity extends Activity {
         adapter = new MyAdapter(EditInfoActivity.this, mArrays);
         listView.setAdapter(adapter);
 
-        User=new UserInfo();
         SQLiteDatabase db=new DatabaseHelper(EditInfoActivity.this).getWritableDatabase();
         Cursor cr=db.query("userdata", null, "id=?", new String[]{getSharedPreferences("action",MODE_PRIVATE).getString("id",null)}, null, null, null);
         if(cr!=null&&cr.getCount()>0&&cr.moveToNext()){
-            User.Id=cr.getString(0);
-            User.Nick=cr.getString(1);
-            User.Auto=cr.getString(2);
-            User.Sex=cr.getInt(3);
-            User.Birth=cr.getString(4);
-            User.College=cr.getString(5);
-            User.Edu=cr.getString(6);
-            User.Mail=cr.getString(7);
-            User.Pnumber=cr.getString(8);
-            User.Catdate=cr.getInt(10);
-            User.Typeface=cr.getInt(11);
-            User.Theme=cr.getInt(12);
-            User.Bubble=cr.getInt(13);
+            SqlPkg.put("id", cr.getString(cr.getColumnIndex("id")));
+            SqlPkg.put("nick",cr.getString(cr.getColumnIndex("nick")));
+            SqlPkg.put("auto",cr.getString(cr.getColumnIndex("auto")));
+            SqlPkg.put("sex",cr.getString(cr.getColumnIndex("sex")));
+            SqlPkg.put("birth", cr.getString(cr.getColumnIndex("birth")));
+            SqlPkg.put("college",cr.getString(cr.getColumnIndex("college")));
+            SqlPkg.put("edu",cr.getString(cr.getColumnIndex("edu")));
+            SqlPkg.put("mail",cr.getString(cr.getColumnIndex("mail")));
+            SqlPkg.put("pnumber",cr.getString(cr.getColumnIndex("pnumber")));
+            SqlPkg.put("catdate",cr.getString(cr.getColumnIndex("catdate")));
+            SqlPkg.put("typeface",cr.getString(cr.getColumnIndex("typeface")));
+            SqlPkg.put("bubble",cr.getString(cr.getColumnIndex("bubble")));
+            SqlPkg.put("theme",cr.getString(cr.getColumnIndex("theme")));
         }
-        getSharedPreferences("action",MODE_PRIVATE).edit().putString("nick",User.Nick).putString("mail",User.Mail).apply();
+        getSharedPreferences("action",MODE_PRIVATE).edit().putString("nick", (String) SqlPkg.get("nick")).putString("mail", (String) SqlPkg.get("mail")).apply();
         refreshAdapter();
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
@@ -93,12 +94,17 @@ public class EditInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(EditInfoActivity.this, MyService.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user", User);
-                intent.putExtra("CMD","Change");
-                intent.putExtras(bundle);
-                startService(intent);
-                finish();
+                SqlPkg.put("nick", getSharedPreferences("action",MODE_PRIVATE).getString("nick",(String)SqlPkg.get("nick")));
+                SqlPkg.put("mail", getSharedPreferences("action",MODE_PRIVATE).getString("mail",(String)SqlPkg.get("mail")));
+                    try {
+                    NetPackage data = new NetPackage(EditInfoActivity.this, SqlPkg);
+                    intent.putExtra("CMD", "Change");
+                    intent.putExtra("data", JsonConvert.SerializeObject(data.ChangeUser()));
+                    startService(intent);
+                    finish();
+                }catch (Exception e){
+                        Log.e("change",e.toString());
+                }
             }
         });
     }
@@ -110,14 +116,14 @@ public class EditInfoActivity extends Activity {
             switch (position) {
                 case 1:
                     it = new Intent(EditInfoActivity.this, AutoActivity.class);
-                    it.putExtra("auto", User.Auto);
+                    it.putExtra("auto",  (String) SqlPkg.get("auto"));
                     startActivityForResult(it,RES_AUTO_CODE);
                     break;
                 case 3:
-                    new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{"男", "女"}, new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(EditInfoActivity.this).setItems(new String[]{ "女","男"}, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            User.Sex=which;
+                            SqlPkg.put("sex",which+"");
                             refreshAdapter();
                             dialog.dismiss();
                         }
@@ -125,18 +131,19 @@ public class EditInfoActivity extends Activity {
                     break;
                 case 4://birthday = "1997-2-22";
                     //Calendar now = Calendar.getInstance();
-                    if(User.Birth==null||User.Birth.equals("")){
-                        User.Birth="1980-01-01";
+                    String temp=(String)SqlPkg.get("birth");
+                    if(temp==null||temp.equals("")){
+                        temp="1990-01-01";
                     }
-                    int year =Integer.parseInt(User.Birth.substring(0, 4));
-                    int monthOfYear =Integer.parseInt(User.Birth.substring(5,7))-1;
-                    int dayOfMonth =Integer.parseInt(User.Birth.substring(8,10));
+                    int year =Integer.parseInt(temp.substring(0, 4));
+                    int monthOfYear =Integer.parseInt(temp.substring(5,7))-1;
+                    int dayOfMonth =Integer.parseInt(temp.substring(8,10));
 
                     MyDateDialog myDateDialog = new MyDateDialog(EditInfoActivity.this, android.R.style.Theme_Holo_Dialog_NoActionBar, new MyDateDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             int month = monthOfYear + 1;
-                            User.Birth = String.format("%04d",year) + "-" + String.format("%02d",month) + "-" + String.format("%02d",dayOfMonth);
+                            SqlPkg.put("birth", String.format("%04d",year) + "-" + String.format("%02d",month) + "-" + String.format("%02d",dayOfMonth));
                             refreshAdapter();
                         }
                     }, year, monthOfYear, dayOfMonth);
@@ -158,14 +165,14 @@ public class EditInfoActivity extends Activity {
 
     private void refreshAdapter() {
         mArrays.clear();
-        mArrays.add(new ItemEditInfo2(9, "昵称", User.Nick));
-        mArrays.add(new ItemEditInfo(7, "签名", User.Auto));
+        mArrays.add(new ItemEditInfo2(9, "昵称", (String) SqlPkg.get("nick")));
+        mArrays.add(new ItemEditInfo(7, "签名", (String) SqlPkg.get("auto")));
         mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "性别", User.Sex==0?"男":"女"));
-        mArrays.add(new ItemEditInfo(7, "生日", User.Birth));
+        mArrays.add(new ItemEditInfo(7, "性别", SqlPkg.get("sex")==null?null:SqlPkg.get("sex").equals("0")?"女":"男"));
+        mArrays.add(new ItemEditInfo(7, "生日",  (String)SqlPkg.get("birth")));
         mArrays.add(new ItemMargin(8));//设置间隔空格.
-        mArrays.add(new ItemEditInfo(7, "学校", User.College));
-        mArrays.add(new ItemEditMail(10, "邮箱", User.Mail));
+        mArrays.add(new ItemEditInfo(7, "学校",  (String)SqlPkg.get("college")));
+        mArrays.add(new ItemEditMail(10, "邮箱",  (String)SqlPkg.get("mail")));
         adapter.notifyDataSetChanged();
     }
 
@@ -174,14 +181,13 @@ public class EditInfoActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 123) {
             if (resultCode == 666) {
-                User.College = data.getStringExtra("college");
-                User.Edu=data.getStringExtra("edu");
+                SqlPkg.put("college",data.getStringExtra("college"));
+                SqlPkg.put("edu",data.getStringExtra("edu"));
                 refreshAdapter();
             }
         } else if (requestCode == RES_AUTO_CODE) {
             if (resultCode == 4) {
-                User.Auto = data.getStringExtra("auto");
-                Log.e("EditInfoActivity", User.Auto);
+                SqlPkg.put("auto", data.getStringExtra("auto"));
                 refreshAdapter();
             }
         }

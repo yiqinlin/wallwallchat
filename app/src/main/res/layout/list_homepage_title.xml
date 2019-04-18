@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp">
+        android:layout_marginTop="200dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,13 +39,17 @@
                 android:textSize="@dimen/text_size_xmid"
                 android:id="@+id/list_homepage_auto"/>
         </LinearLayout>
-        <ImageButton
-            android:layout_width="84dp"
-            android:layout_height="84dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
-            android:scaleType="centerInside"
-            android:id="@+id/list_homepage_head"/>
+            android:scaleType="centerInside">
+            <com.stark.wallwallchat.CircleImageView
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:id="@+id/list_homepage_head"/>
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

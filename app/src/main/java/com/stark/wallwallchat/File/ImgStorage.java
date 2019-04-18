@@ -23,9 +23,9 @@ import java.io.IOException;
  */
 public class ImgStorage {
 
-    public static Drawable getHead(Context context) {
+    public static Drawable getHead(Context context,int i) {
         String photoPath = FileUtil.getPath(FileType.mHead);
-        photoPath = photoPath + "/cir.png";
+        photoPath = photoPath + "/head.png";
         File imgPath = new File(photoPath);
         if (imgPath.exists()) {
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
@@ -64,9 +64,9 @@ public class ImgStorage {
         intent.putExtra("crop", "true");//开启的Intent 显示View是可裁减的
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
-        intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);//裁剪的图片的宽高。最终得到的输出图片的宽高252
-        intent.putExtra("circleCrop", true);
+        intent.putExtra("outputX", 400);
+        intent.putExtra("outputY", 400);//裁剪的图片的宽高。最终得到的输出图片的宽高400
+        intent.putExtra("circleCrop", false);
         intent.putExtra(MediaStore.EXTRA_OUTPUT,out);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.PNG.toString());
         intent.putExtra("return-data", false);//裁剪后的数据通过intent返回回来

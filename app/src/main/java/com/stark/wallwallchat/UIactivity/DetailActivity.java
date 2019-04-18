@@ -20,7 +20,9 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent=getIntent();
         Button MsgButton=(Button)findViewById(R.id.button_detail_msg);
         TextView Msg=(TextView)findViewById(R.id.text_detail_msg);
+        TextView time=(TextView)findViewById(R.id.text_detail_time);
         Msg.setText(intent.getStringExtra("msg"));
+        time.setText(intent.getStringExtra("date")+"   "+intent.getStringExtra("time"));
         MsgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -15,10 +15,10 @@
         android:layout_marginRight="@dimen/standard_margin"
         android:orientation="vertical">
 
-        <ImageView
+        <com.stark.wallwallchat.CircleImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/default_head"
+            android:src="@drawable/default_head"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="70dp"
             android:id="@+id/Login_head"

@@ -30,7 +30,7 @@
                     android:textSize="@dimen/text_size"
                     android:background="@drawable/input_bkg"
                     android:textColor="@android:color/darker_gray"
-                    android:layout_weight="4"/>
+                    android:layout_weight="3"/>
                 <EditText
                     android:id="@+id/edit_regi_nick"
                     android:layout_width="match_parent"
@@ -51,6 +51,7 @@
                 android:layout_marginTop="@dimen/magic_margin"
                 android:layout_marginBottom="@dimen/magic_margin"
                 android:text="16位以内的任意字符"
+                android:textSize="@dimen/text_size_small"
                 android:textColor="@android:color/secondary_text_dark" />
             <LinearLayout
                 android:layout_width="match_parent"
@@ -66,7 +67,7 @@
                     android:textSize="@dimen/text_size"
                     android:background="@drawable/input_bkg"
                     android:textColor="@android:color/darker_gray"
-                    android:layout_weight="4"/>
+                    android:layout_weight="3"/>
                 <EditText
                     android:id="@+id/edit_regi_pass"
                     android:layout_width="match_parent"
@@ -88,6 +89,7 @@
                 android:paddingRight="@dimen/standard_margin"
                 android:layout_marginTop="@dimen/magic_margin"
                 android:layout_marginBottom="@dimen/magic_margin"
+                android:textSize="@dimen/text_size_small"
                 android:text="6-16位的英文字符、数字或字母"
                 android:textColor="@android:color/secondary_text_dark" />
 
@@ -105,7 +107,7 @@
                     android:textSize="@dimen/text_size"
                     android:background="@drawable/input_bkg"
                     android:textColor="@android:color/darker_gray"
-                    android:layout_weight="4"/>
+                    android:layout_weight="3"/>
                 <EditText
                     android:id="@+id/edit_right_pass"
                     android:layout_width="match_parent"
@@ -130,6 +132,7 @@
                 android:layout_marginTop="@dimen/magic_margin"
                 android:layout_marginBottom="@dimen/magic_margin"
                 android:text="再次输入密码，以确保密码正确"
+                android:textSize="@dimen/text_size_small"
                 android:textColor="@android:color/secondary_text_dark" />
             <!--  < = &lt;   > = &gt;   " = &quot;   & = &amp;  \ = \\ -->
 

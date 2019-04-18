@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -13,9 +14,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stark.wallwallchat.Format.Get;
-import com.stark.wallwallchat.Format.UserInfo;
 import com.stark.wallwallchat.Listview.ElasticListView;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetPackage;
 import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.R;
@@ -27,9 +27,8 @@ import com.stark.wallwallchat.bean.ItemMid;
 import com.stark.wallwallchat.json.JsonConvert;
 import com.stark.wallwallchat.toast.ToastDialog;
 
-import org.json.JSONArray;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AddActivity extends Activity {
     private ToastDialog mToastDialog=null;
@@ -99,7 +98,7 @@ public class AddActivity extends Activity {
         }
     }
     class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
-        Get get;
+        NetBuilder out;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -107,8 +106,31 @@ public class AddActivity extends Activity {
         }
         @Override
         protected Void doInBackground(Void...values) {
-            get=(Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(info, Mode, new JSONArray())));
-            publishProgress(0);
+
+            HashMap<String,Object> SqlPkg=new HashMap<String,Object>();
+            SqlPkg.put("receiver", info);
+            try {
+                NetPackage netPkg=new NetPackage(AddActivity.this,SqlPkg);
+                String temp = JsonConvert.SerializeObject(netPkg.UserInfo(Mode));
+                String result;
+                try{
+                    result=NetSocket.request(temp);
+                }catch (Exception e){
+                    publishProgress(-1);
+                    return null;
+                }
+                Log.e("request", temp);
+                Log.e("result",result);
+                out = (NetBuilder) JsonConvert.DeserializeObject(result, new NetBuilder());
+                if(out.getBool("flag", false))
+                    publishProgress(0);/**告诉UI线程 更新*/
+                else {
+                    publishProgress(out.getInt("error", -2));/**告诉UI线程 更新*/
+                }
+            }catch (Exception e){
+                publishProgress(7);
+                Log.e("NetWork",e.toString());
+            }
             return null;
         }
         @Override
@@ -121,11 +143,11 @@ public class AddActivity extends Activity {
                 refreshView.setVisibility(View.GONE);
                 info=null;
             }
-            if(values[0]==0&&get!=null){
-                UserInfo user;
-                for(int i=0;i<get.Data.length();i++) {
-                    user= JsonConvert.GetInfo(get,i);
-                    mArrays.add(new ItemMid(2, user.Id, getResources().getDrawable(R.drawable.tianqing), user.Nick, user.Auto, "", ""));
+            if(values[0]==0&& out !=null){
+                HashMap user;
+                for(int i=0;i< out.ListSize();i++) {
+                    user= (HashMap)out.getList(i);
+                    mArrays.add(new ItemMid(2 ,user));
                 }
                 adapter.notifyDataSetChanged();
             }

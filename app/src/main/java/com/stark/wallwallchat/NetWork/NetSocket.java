@@ -1,138 +1,107 @@
 package com.stark.wallwallchat.NetWork;
 
+
 import android.util.Log;
 
-import com.stark.wallwallchat.File.FileMode;
-import com.stark.wallwallchat.File.FileUtil;
-import com.stark.wallwallchat.Format.Ack;
-import com.stark.wallwallchat.Format.Format;
-import com.stark.wallwallchat.Util.Try;
+import com.stark.wallwallchat.Listener.DownFileListener;
+import com.stark.wallwallchat.Listener.UpFileListener;
+import com.stark.wallwallchat.Util.Client;
 import com.stark.wallwallchat.json.JsonConvert;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
+import java.io.RandomAccessFile;
+import java.net.InetAddress;
 
 /**
  * Created by Stark on 2017/2/11.
  */
 public class NetSocket {
-    private static String IP="60.205.191.131";
-    private static int PORT=12345;
-    private static int FILEPORT=12344;
-    public static String request(String Package)
+    private static int PORT=12346;
+    private static int FILEPORT=12347;
+    public static String request(String Package)throws  NullPointerException,IOException
     {
-        Socket socket= Try.getSocket(IP, PORT);////第一个服务器
-        if(!SocketConnect(socket)) {//没连接起
-            Try.CloseSocket(socket);
-            socket=Try.getSocket(IP,PORT+1);//第二个服务器
-        }
-        DataOutputStream bw= Try.getBW(socket);
-        InputStream is=Try.getIS(socket);
-        BufferedReader br= Try.getBR(is);
-        send(bw, Package);
-        String result=get(br);
-        NetDestroy(socket, bw, br);
+        Client client=getClient(PORT);
+        client.send(Package);
+        String result=client.receive();
+        client.Close();
         return result;
     }
-    public static String request(String Package,String FileSrc,int fileMode) {
-        Socket socket=Try.getSocket(IP, FILEPORT);
-        DataOutputStream bw = Try.getBW(socket);
-        InputStream is=Try.getIS(socket);
-        BufferedReader br = Try.getBR(is);
-        send(bw, Package);
-        String result=get(br);
-        Ack ack=(Ack) NetPackage.getBag(result);
-        switch (fileMode){
-            case FileMode.UPLOAD:
-                if(ack.Flag){
-                    send(bw,new File(FileSrc));
-                    result=get(br);
-                }
-                break;
-            case FileMode.DOWNLOAD:
-                if(ack.Flag){
-                    FileOutputStream fos;
-                    try {
-                        File file=new File(FileUtil.getUsefulPath(FileSrc,ack.BackMsg,ack.MsgCode));
-                        fos = new FileOutputStream(file);
-                        fos.write(get(is, Integer.parseInt(ack.BackMsg)));
-                        fos.close();
-                        ack.BackMsg=FileSrc;
-                        Format format=new Format();
-                        format.Cmd="down";
-                        format.Type="Ack";
-                        format.JsonMsg= JsonConvert.SerializeObject(ack);
-                        result=JsonConvert.SerializeObject(format);
-                    }catch (Exception e){
-                        Log.e("request",e.toString());
-                    }
-                }
-                break;
-        }
-        NetDestroy(socket, bw, br);
-        return result;
-    }
-    public static boolean send(DataOutputStream bw,File file){
-        try {
-            byte[] sendMsg=new byte[(int)file.length()];
-            FileInputStream fis = new FileInputStream(file);
-            fis.read(sendMsg);
-            fis.close();
-            bw.write(sendMsg);
-            bw.flush();
-        }catch (Exception e){
-            Log.e("Send", "File:" + e);
-        }
-        return true;
-    }
-    public static boolean send(DataOutputStream bw,String Package)
-    {
-        try{
-            bw.write(Package.getBytes("UTF-8"));
-            bw.flush();
-            return true;
-        }catch (Exception e){
-            Log.i("NetSocket", "W" + e.toString());
-        }
-        return false;
-    }
-    public static String get(BufferedReader br) {
-        try {
-            return br.readLine();
-        }catch (Exception e){
-            return null;
-        }
-    }
-    public static byte[] get(InputStream is,int count){
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        byte[] buf=new byte[512];
-        int a;
-        try {
-            while(count>0&&(a= is.read(buf))!=-1) {
-                bout.write(buf, 0, a);
-                count-=a;
+    public static String request(String Url,String JsonStr) throws Exception{
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(Url);
+        httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded;application/json;charset=utf-8");
+        StringEntity se = new StringEntity(JsonStr,"UTF-8");
+        se.setContentEncoding("UTF-8");
+        httpPost.setEntity(se);
+        HttpResponse response = httpclient.execute(httpPost);
+        if(response.getStatusLine().getStatusCode()== HttpStatus.SC_OK) {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                return EntityUtils.toString(entity, "UTF-8");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return bout.toByteArray();
+        return null;
     }
-    public static void NetDestroy(Socket socket,DataOutputStream bw,BufferedReader br){
-        Try.CloseSocket(socket);
-        Try.CloseBW(bw);
-        Try.CloseBR(br);
-    }
-    public static boolean SocketConnect(Socket socket){
-        if(socket==null||socket.isClosed()||!socket.isConnected()) {
-            return false;
+    public static void request(String Package,String FilePath, UpFileListener listener)throws NullPointerException,IllegalAccessException,JSONException,IOException{
+        Client client=getClient(FILEPORT);
+        client.send(Package);
+        String result=client.receive();
+        NetBuilder out=(NetBuilder) JsonConvert.DeserializeObject(result, new NetBuilder());
+        if(out.getBool("flag",false)){
+            RandomAccessFile tempFile=new RandomAccessFile(FilePath,"r");
+            tempFile.seek(out.getLong("range", 0l));
+            client.send(tempFile, listener);
+            result=client.receive();
+            NetBuilder temp=(NetBuilder) JsonConvert.DeserializeObject(result, new NetBuilder());
+            if(temp.getBool("flag",false)||temp.getInt("error",-2)==8){
+                listener.finish(temp.get("hashcode"));
+            }else{
+                listener.error(temp.getInt("error",-2));
+            }
+        }else{
+            listener.error(out.getInt("error",-2));
         }
-        return true;
+        client.Close();
+    }
+    public static void request(String Package,String FilePath, DownFileListener listener)throws NullPointerException,IllegalAccessException,JSONException,IOException{
+        Client client=getClient(FILEPORT);
+        client.send(Package);
+        String result=client.receive();
+        NetBuilder out=(NetBuilder)JsonConvert.DeserializeObject(result,new NetBuilder());
+        if(out.getBool("flag",false)){
+            RandomAccessFile  file=new RandomAccessFile(FilePath,"rw");
+            file.seek(out.getInt("range", 0));
+            client.receive(file, out.getLong("size", 0l), listener);
+        }else{
+            listener.error(out.getInt("error", -2));
+        }
+        client.Close();
+    }
+    public static Client getClient(int port)throws NullPointerException,IOException{
+        Client client=null;
+        InetAddress[] name=InetAddress.getAllByName("www.paikeji.cn");
+        for(InetAddress a:name){
+            try{
+                client = new Client(a.getHostAddress(), port, 20000, 400000);
+                break;
+            } catch (Exception e) {
+                Log.e("request", e.toString());
+            }
+        }
+        if(client==null){
+            throw new NullPointerException("Server is shutdown !");
+        }
+        return client;
     }
 }

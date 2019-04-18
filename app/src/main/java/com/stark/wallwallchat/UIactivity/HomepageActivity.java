@@ -4,13 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -20,39 +20,37 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 import com.stark.wallwallchat.File.FileMode;
 import com.stark.wallwallchat.File.FileUtil;
 import com.stark.wallwallchat.File.ImgStorage;
-import com.stark.wallwallchat.Format.Ack;
 import com.stark.wallwallchat.Format.FileType;
-import com.stark.wallwallchat.Format.Msg;
+import com.stark.wallwallchat.Listener.DownFileListener;
+import com.stark.wallwallchat.Listener.UpFileListener;
 import com.stark.wallwallchat.Listview.ElasticListView;
 import com.stark.wallwallchat.NetWork.MD5;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetPackage;
 import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.R;
-import com.stark.wallwallchat.Util.DateUtil;
+import com.stark.wallwallchat.SQLite.DatabaseHelper;
 import com.stark.wallwallchat.Util.Error;
-import com.stark.wallwallchat.Util.ImageRound;
 import com.stark.wallwallchat.Util.Status;
-import com.stark.wallwallchat.Util.Try;
 import com.stark.wallwallchat.adapter.MyAdapter;
 import com.stark.wallwallchat.bean.BaseItem;
 import com.stark.wallwallchat.bean.ItemHomepageTitle;
 import com.stark.wallwallchat.json.JsonConvert;
+import com.stark.wallwallchat.toast.ToastDialog;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class HomepageActivity extends Activity implements MyAdapter.Callback{
@@ -70,18 +68,18 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
     private ArrayList<BaseItem> mArrays = null;
     private MyAdapter adapter = null;
     private BroadcastReceiver mReceiver = null;
+    private ToastDialog mToastDialog=null;
     private String outPath;
     private String creamPath;
-    private String cirPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Status.setTranslucentStatus(getWindow());
         setContentView(R.layout.activity_homepage);
-
-        Button get = (Button) findViewById(R.id.button_homepage_left);//左边按钮
-        Button send = (Button) findViewById(R.id.button_homepage_right);//右边按钮
+        Button get = (Button) findViewById(R.id.button_homepage_right);//右边按钮
+        Button back = (Button) findViewById(R.id.button_homepage_left);//左边按钮
+        Button send = (Button) findViewById(R.id.button_send);//下边按钮
         Intent intent = getIntent();
         SrcID = HomepageActivity.this.getSharedPreferences("action", MODE_PRIVATE).getString("id", null);
         DesId = intent.getStringExtra("id");
@@ -91,86 +89,66 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         adapter = new MyAdapter(HomepageActivity.this, mArrays);
         ElasticListView listView = (ElasticListView) findViewById(R.id.listView_homePage);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(this), Nick, Auto));
+        mArrays.add(new ItemHomepageTitle(5, DesId, Nick, Auto));
         send.setOnClickListener(Click);
+        back.setOnClickListener(Click);
         if (!DesId.equals(SrcID)) {
+            send.setVisibility(View.VISIBLE);
+            get.setText("关 注");
             get.setOnClickListener(Click);
-        } else {
-            get.setText("待开发");
-            send.setText("编辑资料");
+        }else{
+            get.setText(null);
         }
         outPath=FileUtil.getPath(FileType.ImgTemp) + "/poly.png";
         creamPath=FileUtil.getPath(FileType.ImgTemp) + "/crm.png";
-        cirPath=FileUtil.getPath(FileType.ImgTemp) + "/cir.png";
 
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("com.stark.wallwallchat.changeHead")&&DesId.equals(SrcID)) {
-                    mArrays.remove(0);
-                    mArrays.add(0, new ItemHomepageTitle(5, DesId,ImgStorage.getHead(HomepageActivity.this), Nick, Auto));
-                    adapter.notifyDataSetChanged();
-                }else if(intent.getAction().equals("com.stark.wallwallchat.userInfo")&&DesId.equals(SrcID)){
+                if(DesId.equals(SrcID)){
                     mArrays.clear();
                     SharedPreferences sp=getSharedPreferences("action",MODE_PRIVATE);
-                    Nick= sp.getString("nick","");
-                    Auto=sp.getString("auto","");
-                    mArrays.add(new ItemHomepageTitle(5, DesId, ImgStorage.getHead(HomepageActivity.this), Nick, Auto));
+                    Nick= sp.getString("nick",null);
+                    Auto=sp.getString("auto",null);
+                    mArrays.add(new ItemHomepageTitle(5, DesId , Nick, Auto));
                     adapter.notifyDataSetChanged();
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.wallwallchat.changeHead");
-        intentFilter.addAction("com.stark.wallwallchat.userInfo");
+        intentFilter.addAction("com.stark.wallwallchat.DBUpdate");
         registerReceiver(mReceiver, intentFilter);
     }
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(event.getKeyCode()==KeyEvent.KEYCODE_BACK) {
-            unregisterReceiver(mReceiver);
-            finish();
-        }
-        return false;
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
     View.OnClickListener Click = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.button_homepage_left:
+                case R.id.button_homepage_right:
                     //环境检测
                     MyAsyncTask myAsyncTask = new MyAsyncTask();
                     myAsyncTask.execute();
                     break;
-                case R.id.button_homepage_right:
+                case R.id.button_send:
                     if (!DesId.equals(SrcID)) {
-                        Date date = new Date();
-                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
-                        DateFormat Time = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
-                        Msg msg = new Msg();
-                        msg.SrcId = DesId;
-                        msg.Remarks = Nick;
-                        msg.Msg = Auto;
-                        msg.Date = format.format(date);
-                        msg.Time = Time.format(date);
-                        Intent broad = new Intent();
-                        broad.setAction("com.stark.wallwallchat.msg");
-                        broad.putExtra("Msg", JsonConvert.SerializeObject(msg));
-                        broad.putExtra("BagType", "Message");
-                        sendBroadcast(broad);
-                        if (AddActivity.mThis != null) {
-                            AddActivity.mThis.finish();
-                        }
                         Intent intent = new Intent(HomepageActivity.this, ChatActivity.class);
                         intent.putExtra("nick", Nick);
                         intent.putExtra("id", DesId);
                         startActivityForResult(intent, 0);
-                        ChatActivity.This.finish();
+                        if(ChatActivity.This!=null)
+                            ChatActivity.This.finish();
                         finish();
-                    } else {
-                        Intent intent = new Intent(HomepageActivity.this, EditInfoActivity.class);
-                        startActivity(intent);
                     }
+                    break;
+
+                case R.id.button_homepage_left:
+                    //环境检测
+                    finish();
                     break;
             }
         }
@@ -223,11 +201,10 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                 startActivityForResult(ImgStorage.getCropIntent(Uri.fromFile(new File(FileUtil.getPhotoPathFromContentUri(this, data.getData()))),Uri.fromFile(new File(outPath))), CROP_REQUEST_CODE);
             } else if (requestCode == CROP_REQUEST_CODE) {
 
-                Bitmap rbm = ImageRound.toRoundBitmap(Try.UriToBm(this, Uri.fromFile(new File(outPath))));
-                ImgStorage.saveBitmap(rbm, cirPath);
-
                 FileAsyncTask fileAsyncTask = new FileAsyncTask();
-                fileAsyncTask.execute(cirPath);
+                fileAsyncTask.execute(outPath,FileUtil.getPath(FileType.Head));
+//                Bitmap rbm = ImageRound.toRoundBitmap(Try.UriToBm(this, Uri.fromFile(new File(outPath))));
+//                ImgStorage.saveBitmap(rbm, cirPath);
 
             } else if (requestCode == GOTO_APPSETTING) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -304,9 +281,7 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                     String nick = edtNick.getText().toString();
                                     if (!nick.equals("") && nick.length() != 0) {
                                         /**
-                                         *
                                          */
-
                                     } else {
                                         Toast.makeText(HomepageActivity.this, "请填写昵称", Toast.LENGTH_SHORT).show();
                                     }
@@ -325,7 +300,6 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
                                     String auto = edtAuto.getText().toString();
                                     if (!auto.equals("") && auto.length() != 0) {
                                         /**
-                                         *
                                          */
                                     } else {
                                         auto = "";
@@ -342,73 +316,158 @@ public class HomepageActivity extends Activity implements MyAdapter.Callback{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (mToastDialog == null)
+                mToastDialog = new ToastDialog(HomepageActivity.this);
+            mToastDialog.setOnTouchClose(false).show();
         }
         @Override
-        protected java.lang.Void doInBackground(String... values) {
+        protected java.lang.Void doInBackground(final String... values) {
             String path = values[0];
-            Log.e("path",path);
-            File file = new File(path);
-            String answer = NetSocket.request(NetPackage.SendFile(MD5.get(file), file.getName(), file.length(), true), path, FileMode.UPLOAD);
-            Ack ack = (Ack) NetPackage.getBag(answer);
-            Log.e("backmsg",answer);
-            if(ack.Error==8) {
-                answer = NetSocket.request(NetPackage.getFile(ack.BackMsg), FileUtil.getPath(FileType.mHead) + "/cir.png", FileMode.DOWNLOAD);
-                ack = (Ack) NetPackage.getBag(answer);
-            }else {
-                publishProgress(ack.Error);
-            }
-            if (ack.Flag) {
-                if(FileUtil.Move(path,FileUtil.getPath(FileType.mHead),true)&&FileUtil.Move(outPath, FileUtil.getPath(FileType.mHead), true)) {
-                    Intent intent = new Intent();
-                    intent.setAction("com.stark.wallwallchat.changeHead");
-                    intent.putExtra("hashcode", ack.BackMsg);
-                    sendBroadcast(intent);
-                    publishProgress(100);
-                }else{
-                    publishProgress(110);
-                }
-            }else {
-                publishProgress(ack.Error);
+            final String path2=values[1];
+            final HashMap<String,Object> SqlPkg=new HashMap<>();
+            Log.e("path", path);
+            try{
+                File file=new File(path);
+                SqlPkg.put("hashcode", MD5.get(file));
+                SqlPkg.put("islong", true);
+                SqlPkg.put("size", file.length());
+                SqlPkg.put("name", file.getName());
+                String temp1=JsonConvert.SerializeObject(new NetPackage(HomepageActivity.this,SqlPkg).UpFile());
+                Log.e("request", temp1);
+                SqlPkg.remove("islong");
+                SqlPkg.remove("size");
+                SqlPkg.remove("name");
+                SqlPkg.put("thumb", true);
+                SqlPkg.put("range",0);
+                SqlPkg.put("width", 200);
+                SqlPkg.put("height",200);
+                SqlPkg.put("mode", "HW");
+                final String temp2=JsonConvert.SerializeObject(new NetPackage(HomepageActivity.this, SqlPkg).DownFile());
+                NetSocket.request(temp1, path, new UpFileListener() {
+                    @Override
+                    public void update(int progress) {
+                        onProgressUpdate(FileMode.UPLOAD,-3,progress);
+                    }
+                    @Override
+                    public void finish(final String hash) {
+                        try {
+                            Log.e("request", temp2 + ":" + path2);
+                            NetSocket.request(temp2, path2, new DownFileListener() {
+                                @Override
+                                public void update(int progress) {
+                                    onProgressUpdate(FileMode.DOWNLOAD,-3,progress);
+                                }
+                                @Override
+                                public void finish() {
+                                    HashMap<String,Object> SqlPkg=new HashMap<String, Object>();
+                                    SqlPkg.put("head", hash);
+                                    NetPackage netPkg=new NetPackage(HomepageActivity.this,SqlPkg);
+                                    try {
+                                        String temp = JsonConvert.SerializeObject(netPkg.ChangeUser());
+                                        Log.e("temp", temp);
+                                        String re=NetSocket.request(temp);
+                                        Log.e("re",re);
+                                        NetBuilder out=(NetBuilder)JsonConvert.DeserializeObject(re, new NetBuilder());
+                                        if(out.getBool("flag",false)) {
+                                            out.UpdateDB(new DatabaseHelper(HomepageActivity.this).getWritableDatabase(), HomepageActivity.this.getSharedPreferences("action", MODE_PRIVATE));
+                                            String path=FileUtil.getPath(FileType.Head)+"/"+hash+".png";
+                                            File file=new File(path);
+                                            if(file.exists()){
+                                                ContentValues cv=new ContentValues();
+                                                cv.put("hashcode",hash);
+                                                cv.put("name",hash+".png");
+                                                cv.put("path",path);
+                                                cv.put("time", new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA).format(new Date()));
+                                                new DatabaseHelper(HomepageActivity.this).getWritableDatabase().insert("file", null, cv);
+                                            }
+                                            onProgressUpdate(FileMode.DOWNLOAD,out.getInt("error", -2));
+                                        }else{
+                                            onProgressUpdate(FileMode.DOWNLOAD,out.getInt("error", -2));
+                                        }
+                                    }catch (Exception e){
+                                        onProgressUpdate(FileMode.DOWNLOAD,10);
+                                    }
+                                    onProgressUpdate(FileMode.DOWNLOAD, 0);
+                                }
+                                @Override
+                                public void error(int error) {
+                                    onProgressUpdate(FileMode.DOWNLOAD, error);
+                                }
+                            });
+                        }catch (Exception e){
+                            onProgressUpdate(FileMode.DOWNLOAD,10);
+                        }
+                    }
+                    @Override
+                    public void error(int error) {
+                        onProgressUpdate(FileMode.UPLOAD,error);
+                    }
+                });
+            }catch (Exception e){
+                Log.e("file",e.toString());
             }
             return null;
         }
         @Override
         protected void onProgressUpdate(java.lang.Integer... values) {
             super.onProgressUpdate(values);
-            Toast.makeText(HomepageActivity.this, Error.error(values[0]),Toast.LENGTH_SHORT).show();
+            if(values[1]==-3) {
+                switch (values[0]) {
+                    case FileMode.UPLOAD:
+                        break;
+                    case FileMode.DOWNLOAD:
+                        Log.e("hhhh",values[2]+"");
+                        break;
+                }
+            }else if (values[1] == 0) {
+                mToastDialog.cancel();
+                Intent intent=new Intent();
+                intent.setAction("com.stark.wallwallchat.changeHead");
+                sendBroadcast(intent);
+            } else {
+                Toast.makeText(HomepageActivity.this, Error.error(values[1]), Toast.LENGTH_SHORT).show();
+            }
         }
     }
     class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
-        Ack ack = new Ack();
-        String msgcode = null;
-
+        NetBuilder ack = new NetBuilder();
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            msgcode = DateUtil.getMsgCode(HomepageActivity.this);
         }
-
         @Override
         protected Void doInBackground(Void... values) {
-            ack = (Ack) NetPackage.getBag(NetSocket.request(NetPackage.Friend(SrcID, DesId, Nick, 0)));
-
-            //db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 2), "msgcode=?", new String[]{ack.MsgCode});
-
-            if (!ack.Flag) {
-                publishProgress(-1);
-            } else {
-                publishProgress(1);
+            HashMap<String,Object> SqlPkg=new HashMap<>();
+            SqlPkg.put("receiver",DesId);
+            SqlPkg.put("remarks",Nick);
+            NetPackage netPkg=new NetPackage(HomepageActivity.this,SqlPkg);
+            try {
+                String temp = JsonConvert.SerializeObject(netPkg.Friend(0));
+                String result;
+                try {
+                    result = NetSocket.request(temp);
+                    ack = (NetBuilder) JsonConvert.DeserializeObject(result, new NetBuilder());
+                    Log.e("temp",temp);
+                    Log.e("result",result);
+                    publishProgress(ack.getInt("error", -2));
+                } catch (Exception e) {
+                    publishProgress(-1);
+                }
+            }catch (Exception e){
+                publishProgress(7);
+                Log.e("NetWork", e.toString());
+                e.printStackTrace();
             }
             return null;
+            //db.update("u" + ack.DesId, Data.getSChatContentValues(null, -1, -1, null, ack.BackMsg, DateUtil.Mtod(ack.BackMsg), DateUtil.Mtot(ack.BackMsg), ack.Flag ? 1 : 2), "msgcode=?", new String[]{ack.MsgCode});
         }
-
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            if (values[0] == -1) {
-                Toast.makeText(HomepageActivity.this, com.stark.wallwallchat.Util.Error.error(ack.Error), Toast.LENGTH_SHORT).show();
-            } else if (values[0] == 1) {
+            if(values[0]==0){
                 Toast.makeText(HomepageActivity.this, "留存成功", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(HomepageActivity.this, com.stark.wallwallchat.Util.Error.error(values[0]), Toast.LENGTH_SHORT).show();
             }
         }
     }

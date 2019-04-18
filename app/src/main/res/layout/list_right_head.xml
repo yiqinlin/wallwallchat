@@ -3,9 +3,11 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="91dp"
+    android:background="@color/item"
+    android:descendantFocusability="blocksDescendants"
     android:paddingLeft="@dimen/magic_2margin"
     android:paddingRight="@dimen/magic_2margin">
-    <ImageView
+    <com.stark.wallwallchat.CircleImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="@dimen/magic_margin"
@@ -31,6 +33,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="@dimen/magic_margin"
             android:layout_weight="1"
             android:id="@+id/right_head_auto"
             android:gravity="top|start"
@@ -42,6 +45,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:id="@+id/right_head_detail"/>
+        android:layout_weight="2"
+        android:id="@+id/right_head_detail"
+        android:background="@drawable/into_detial"/>
 </LinearLayout>

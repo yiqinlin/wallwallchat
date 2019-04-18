@@ -43,7 +43,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="7dp"
         android:layout_marginLeft="7dp">
-        <ImageButton
+        <com.stark.wallwallchat.CircleImageView
             android:id="@+id/list_chat_su_head"
             android:layout_width="42dp"
             android:layout_height="42dp" />

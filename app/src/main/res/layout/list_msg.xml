@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:descendantFocusability="blocksDescendants"
+    android:background="@color/item"
     android:paddingLeft="@dimen/magic_2margin"
     android:paddingRight="@dimen/magic_2margin">
-    <ImageView
+    <com.stark.wallwallchat.CircleImageView
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginTop="@dimen/magic_margin"
@@ -33,13 +34,21 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textSize="@dimen/text_size"/>
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_small"
-                android:id="@+id/mid_list_count"
-                android:layout_weight="5"/>
+                android:layout_weight="5"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="16dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size_small"
+                    android:background="@drawable/circle_red"
+                    android:id="@+id/mid_list_count"/>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

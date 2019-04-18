@@ -1,6 +1,6 @@
 package com.stark.wallwallchat.Format;
 
-import org.json.JSONArray;
+import java.util.List;
 
 /**
  * Created by Stark on 2017/3/4.
@@ -12,6 +12,6 @@ public class Refresh {
     public int Start;
     public int Mode;
     public String Sort;
-    public JSONArray WallData;
-    public JSONArray ChatData;
+    public List<Object> WallData;
+    public List<Object>  ChatData;
 }

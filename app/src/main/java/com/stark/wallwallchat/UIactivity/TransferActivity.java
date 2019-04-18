@@ -13,29 +13,25 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.stark.wallwallchat.File.ImgStorage;
-import com.stark.wallwallchat.Format.Get;
+import com.stark.wallwallchat.CircleImageView;
 import com.stark.wallwallchat.Fragment.FragAdapter;
 import com.stark.wallwallchat.Fragment.Fragment1;
 import com.stark.wallwallchat.Fragment.Fragment2;
 import com.stark.wallwallchat.Fragment.Fragment3;
-import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.SQLite.DatabaseHelper;
 import com.stark.wallwallchat.Util.Status;
-import com.stark.wallwallchat.json.JsonConvert;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +41,7 @@ public class TransferActivity extends FragmentActivity{
     static Button mid=null;
     static Button right=null;
     static EditText input=null;
-    private ImageButton titleLeft=null;
+    private CircleImageView titleLeft=null;
     private TextView title=null;
     private Button titleRight=null;
     public static Activity This;
@@ -62,7 +58,7 @@ public class TransferActivity extends FragmentActivity{
         setContentView(R.layout.activity_transfer);
         Status.setTranslucentStatus(getWindow(), this, (LinearLayout) findViewById(R.id.transfer_title_status));//设置最上面状态栏为透明。
         This=TransferActivity.this;
-        titleLeft=(ImageButton)findViewById(R.id.button_transfer_title_left);
+        titleLeft=(CircleImageView)findViewById(R.id.button_transfer_title_left);
         title=(TextView)findViewById(R.id.text_transfer_title);
         titleRight=(Button)findViewById(R.id.button_transfer_title_right);
 
@@ -76,7 +72,6 @@ public class TransferActivity extends FragmentActivity{
         SQLiteDatabase db=new DatabaseHelper(TransferActivity.this).getWritableDatabase();
         SharedPreferences sp=TransferActivity.this.getSharedPreferences("action", Context.MODE_PRIVATE);
         final String SrcId=sp.getString("id", null);//用户帐号
-        db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),college varchar(30),edu char(10),mail char(30),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
         Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{SrcId}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
             Nick=cr.getString(0);
@@ -89,7 +84,7 @@ public class TransferActivity extends FragmentActivity{
         title.setText("消 息");
         titleRight.setText("添加");
         titleRight.setOnClickListener(Click);
-        titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this));
+        titleLeft.setHead(TransferActivity.this,SrcId);
         titleLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,15 +99,15 @@ public class TransferActivity extends FragmentActivity{
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.wallwallchat.changeHead")) {
-                    titleLeft.setBackgroundDrawable(ImgStorage.getHead(TransferActivity.this));
-                }else if(intent.getAction().equals("com.stark.wallwallchat.UpdateUserInfo")){
+                    titleLeft.setHead(TransferActivity.this,SrcId);
+                }else if(intent.getAction().equals("com.stark.wallwallchat.DBUpdate")){
                     new MyAsyncTask().execute();
                 }
             }
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.wallwallchat.changeHead");
-        intentFilter.addAction("com.stark.wallwallchat.UpdateUserInfo");
+        intentFilter.addAction("com.stark.wallwallchat.DBUpdate");
         registerReceiver(mReceiver, intentFilter);
 
 //        DisplayMetrics outMetrics=new DisplayMetrics();
@@ -159,8 +154,28 @@ public class TransferActivity extends FragmentActivity{
         }
         @Override
         protected Void doInBackground(Void...values) {
-            JsonConvert.UpdateDB(db, sp, (Get) NetPackage.getBag(NetSocket.request(NetPackage.Get(sp.getString("id", null), 0, new JSONArray()))));
-            publishProgress(0);
+            try {
+                NetBuilder N=new NetBuilder();
+                N.add("receiver", sp.getString("id", null)).add("mode", 0);
+                String temp=N.build();
+                String result;
+                try{
+                    result=NetSocket.request("http://kwall.cn/userInfo.php",temp);
+                }catch (Exception e){
+                    publishProgress(-1);
+                    return null;
+                }
+                NetBuilder out = new NetBuilder(result);
+                if(out.getBool("flag",false)) {
+                    out.UpdateDB(db,sp);
+                    publishProgress(0);
+                }else{
+                    publishProgress(out.getInt("error",-2));
+                }
+            }catch (Exception e){
+                Log.e("NetWork",e.toString());
+                publishProgress(-1);
+            }
             return null;
         }
         @Override

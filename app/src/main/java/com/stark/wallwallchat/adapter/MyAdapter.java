@@ -1,7 +1,10 @@
 package com.stark.wallwallchat.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -15,8 +18,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.stark.wallwallchat.CircleImageView;
 import com.stark.wallwallchat.MyService;
 import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.UIactivity.AddActivity;
@@ -33,6 +38,7 @@ import com.stark.wallwallchat.adapter.holder.ViewHolderMid;
 import com.stark.wallwallchat.adapter.holder.ViewHolderRightHead;
 import com.stark.wallwallchat.adapter.holder.ViewHolderSChat;
 import com.stark.wallwallchat.adapter.holder.ViewHolderSimpleList;
+import com.stark.wallwallchat.adapter.holder.ViewHolderSwitch;
 import com.stark.wallwallchat.adapter.holder.ViewHolderTextSeparate;
 import com.stark.wallwallchat.adapter.holder.ViewHolderWallInfo;
 import com.stark.wallwallchat.bean.BaseItem;
@@ -46,6 +52,7 @@ import com.stark.wallwallchat.bean.ItemMid;
 import com.stark.wallwallchat.bean.ItemRightHead;
 import com.stark.wallwallchat.bean.ItemSMsg;
 import com.stark.wallwallchat.bean.ItemSimpleList;
+import com.stark.wallwallchat.bean.ItemSwitch;
 import com.stark.wallwallchat.bean.ItemTextSeparate;
 import com.stark.wallwallchat.bean.ItemWallInfo;
 import com.stark.wallwallchat.toast.ListAnimImageView;
@@ -149,7 +156,10 @@ public interface Callback{
                 convertView= getWallInfoConvertView(itemType,position, convertView);
                 break;
             case 15:
-                convertView=getTextSeparateConVertView(position,convertView);
+                convertView=getTextSeparateConVertView(position, convertView);
+                break;
+            case 16:
+                convertView=getSwitchConvertView(position, convertView);
                 break;
         }
         return convertView;
@@ -174,7 +184,7 @@ public interface Callback{
         if(convertView==null) {
             viewHolder=new ViewHolderMid();
             convertView = mInflater.inflate(R.layout.list_msg, null);
-            viewHolder.head = (ImageView) convertView.findViewById(R.id.mid_list_head);
+            viewHolder.head = (CircleImageView) convertView.findViewById(R.id.mid_list_head);
             viewHolder.nick = (TextView) convertView.findViewById(R.id.mid_list_nick);
             viewHolder.message = (TextView) convertView.findViewById(R.id.mid_list_msg);
             viewHolder.date = (TextView) convertView.findViewById(R.id.mid_list_date);
@@ -184,12 +194,13 @@ public interface Callback{
             viewHolder=(ViewHolderMid)convertView.getTag();
         }
         viewHolder.id=msg.getId();
-        viewHolder.head.setImageDrawable(msg.getHead());
+        viewHolder.head.setHead(mContext, msg.getId());
         viewHolder.nick.setText(msg.getNick());
         viewHolder.message.setText(msg.getMsg());
         viewHolder.date.setText(msg.getDate());
-        String tempStr = msg.getCount();
-        viewHolder.count.setText("0".equals(tempStr) ? null : "100".equals(tempStr) ? "99+" : tempStr);
+        int temp = Integer.parseInt(msg.getCount());
+        viewHolder.count.setText(temp<=0 ? null : temp>100 ? "99+" : temp+"");
+        viewHolder.count.setActivated(temp>0);
         return convertView;
     }
     private View getSChatConvertView(int type,int position,View convertView){
@@ -199,26 +210,26 @@ public interface Callback{
             viewHolder=new ViewHolderSChat();
             if(type==0) {
                 convertView = mInflater.inflate(R.layout.list_item_chat_su, null);
-                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_chat_su_head);
+                viewHolder.head = (CircleImageView) convertView.findViewById(R.id.list_chat_su_head);
                 viewHolder.message = (TextView) convertView.findViewById(R.id.list_chat_su_msg);
                 viewHolder.state=(ListAnimImageView)convertView.findViewById(R.id.list_chat_su_ListAnim);
             }else if(type==1){
                 convertView = mInflater.inflate(R.layout.list_item_chat_sf, null);
-                viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_chat_sf_head);
+                viewHolder.head = (CircleImageView) convertView.findViewById(R.id.list_chat_sf_head);
                 viewHolder.message = (TextView) convertView.findViewById(R.id.list_chat_sf_msg);
             }
             convertView.setTag(viewHolder);
         }else{
             viewHolder=(ViewHolderSChat) convertView.getTag();
         }
-        viewHolder.head.setBackgroundDrawable(msg.getHead());
+        viewHolder.head.setHead(mContext, msg.getId());
         viewHolder.message.setText(msg.getMsg());
         viewHolder.message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (msg.getSendType() == 1) {
                     Intent intent = new Intent(mContext, DetailActivity.class);
-                    intent.putExtra("id", msg.getid());
+                    intent.putExtra("id", msg.getId());
                     intent.putExtra("bubble", msg.getBubble());
                     intent.putExtra("msg", msg.getMsg());
                     intent.putExtra("date", msg.getDate());
@@ -242,7 +253,7 @@ public interface Callback{
         if(convertView==null) {
             viewHolder=new ViewHolderRightHead();
             convertView = mInflater.inflate(R.layout.list_right_head, null);
-            viewHolder.head = (ImageView) convertView.findViewById(R.id.right_head_img);
+            viewHolder.head = (CircleImageView) convertView.findViewById(R.id.right_head_img);
             viewHolder.nick = (TextView) convertView.findViewById(R.id.right_head_nick);
             viewHolder.auto = (TextView) convertView.findViewById(R.id.right_head_auto);
             convertView.setTag(viewHolder);
@@ -250,7 +261,7 @@ public interface Callback{
             viewHolder=(ViewHolderRightHead)convertView.getTag();
         }
         viewHolder.id=msg.getId();
-        viewHolder.head.setImageDrawable(msg.getHead());
+        viewHolder.head.setHead(mContext, msg.getId());
         viewHolder.nick.setText(msg.getNick());
         viewHolder.auto.setText(msg.getAuto());
         return convertView;
@@ -281,7 +292,7 @@ public interface Callback{
         if(convertView==null){
             viewHolder=new ViewHolderHomepageTitle();
             convertView = mInflater.inflate(R.layout.list_homepage_title,null);
-            viewHolder.head=(ImageButton)convertView.findViewById(R.id.list_homepage_head);
+            viewHolder.head=(CircleImageView)convertView.findViewById(R.id.list_homepage_head);
             viewHolder.nick=(TextView)convertView.findViewById(R.id.list_homepage_nick);
             viewHolder.auto=(TextView)convertView.findViewById(R.id.list_homepage_auto);
             convertView.setTag(viewHolder);
@@ -289,7 +300,7 @@ public interface Callback{
             viewHolder=(ViewHolderHomepageTitle)convertView.getTag();
         }
         viewHolder.id=msg.getId();
-        viewHolder.head.setBackgroundDrawable(msg.getHead());
+        viewHolder.head.setHead(mContext, msg.getId());
         mCallback = (Callback) mContext;
         viewHolder.nick.setText(msg.getNick());
         viewHolder.auto.setText(msg.getAuto());
@@ -307,7 +318,7 @@ public interface Callback{
             switch (type){
                 case 11:
                     convertView=mInflater.inflate(R.layout.list_info_ordinary, null);
-                    viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_head);
+                    viewHolder.head = (CircleImageView) convertView.findViewById(R.id.list_info_ordinary_head);
                     viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_ordinary_nick);
                     viewHolder.linear = (LinearLayout) convertView.findViewById(R.id.list_info_ordinary_linear);
                     viewHolder.more = (ImageButton) convertView.findViewById(R.id.list_info_ordinary_more);
@@ -319,7 +330,7 @@ public interface Callback{
                     break;
                 case 13:
                     convertView=mInflater.inflate(R.layout.list_wall_comment, null);
-                    viewHolder.head = (ImageButton) convertView.findViewById(R.id.list_info_comment_head);
+                    viewHolder.head = (CircleImageView) convertView.findViewById(R.id.list_info_comment_head);
                     viewHolder.nick = (TextView) convertView.findViewById(R.id.list_info_comment_nick);
                     viewHolder.reply=(TextView)convertView.findViewById(R.id.list_comment_reply);
                     break;
@@ -330,29 +341,30 @@ public interface Callback{
             }
             viewHolder.content = (TextView) convertView.findViewById(R.id.list_info_content);
             viewHolder.time = (TextView) convertView.findViewById(R.id.list_info_time);
-            viewHolder.comment=(ImageButton)convertView.findViewById(R.id.list_info_comment);
+            viewHolder.comment=(Button)convertView.findViewById(R.id.list_button_comment);
+            viewHolder.imageComment=(ImageView)convertView.findViewById(R.id.list_info_comment);
             viewHolder.cnum=(TextView)convertView.findViewById(R.id.list_info_cnum);
-            viewHolder.agree =(ImageButton)convertView.findViewById(R.id.list_info_agree);
+            viewHolder.agree =(Button)convertView.findViewById(R.id.list_button_agree);
+            viewHolder.imageAgree =(ImageView)convertView.findViewById(R.id.list_info_agree);
             viewHolder.anum =(TextView)convertView.findViewById(R.id.list_info_anum);
             convertView.setTag(viewHolder);
         }else{
             viewHolder=(ViewHolderWallInfo)convertView.getTag();
         }
         if(type==11||type==13){
-            viewHolder.head.setBackgroundDrawable(msg.getHead());
+            viewHolder.head.setHead(mContext, msg.getId());
             viewHolder.nick.setText(msg.getNick());
         }
        switch (type) {
            case 11:
            case 12:
-               viewHolder.linear.setBackgroundDrawable(mContext.getResources().getDrawable(msg.getType()));
                viewHolder.more.setOnClickListener(Click);
                break;
            case 13:
            case 14:
                if(msg.getNick2()!=null) {
                    viewHolder.reply.setVisibility(View.VISIBLE);
-                   viewHolder.reply.setText("回复: "+msg.getNick2());
+                   viewHolder.reply.setText("回复: " + msg.getNick2());
                }else{
                    viewHolder.reply.setVisibility(View.GONE);
                }
@@ -363,15 +375,41 @@ public interface Callback{
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WallMsgActivity.class);
                 intent.putExtra("sponsor", ((ItemWallInfo) mData.get(position)).getId());
-                intent.putExtra("msgcode", ((ItemWallInfo)mData.get(position)).getMsgcode());
-                mContext.startActivity(intent);
+                intent.putExtra("msgcode", ((ItemWallInfo) mData.get(position)).getMsgcode());
+                intent.putExtra("input", true);
+                switch (((ItemWallInfo) mData.get(position)).getType()) {
+                    case 0:
+                        mContext.startActivity(intent);
+                        break;
+                    case 1:
+                        intent.putExtra("isComment",true);
+                        mContext.startActivity(intent);
+                        break;
+                    case  2:
+                        new AlertDialog.Builder(mContext).setItems(new String[]{ "举报"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                        break;
+                }
             }
         });
         viewHolder.time.setText(msg.getTime());
         viewHolder.content.setText(msg.getContent());
         viewHolder.cnum.setText(msg.getCnum());
         viewHolder.anum.setText(msg.getAnum());
-        viewHolder.agree.setActivated(msg.IsAgree());
+        viewHolder.imageAgree.setActivated(msg.IsAgree());
+        if(((ItemWallInfo) mData.get(position)).getType()==2) {
+            viewHolder.cnum.setText(null);
+            viewHolder.imageComment.setBackground(mContext.getResources().getDrawable(R.drawable.wall_more));
+        }
+        if(msg.IsAgree()) {
+            viewHolder.anum.setTextColor(mContext.getResources().getColor(R.color.themeColor));
+        }else{
+            viewHolder.anum.setTextColor(mContext.getResources().getColor(android.R.color.darker_gray));
+        }
         viewHolder.agree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -391,7 +429,7 @@ public interface Callback{
                 intent.putExtra("msgcode",msg.getMsgcode());
                 intent.putExtra("receiver",msg.getId());
                 intent.putExtra("mode",mode);
-                intent.putExtra("type",0);
+                intent.putExtra("type",msg.getType());
                 mContext.startService(intent);
                 notifyDataSetChanged();
             }
@@ -412,6 +450,56 @@ public interface Callback{
         }
         viewHolder.Text.setText(msg.getText());
         viewHolder.Image.setImageDrawable(msg.getImage());
+        return convertView;
+    }
+    private View getSwitchConvertView(int position,View convertView){
+        ViewHolderSwitch viewHolder;
+        ItemSwitch msg=(ItemSwitch)mData.get(position);
+        if(convertView==null){
+            viewHolder=new ViewHolderSwitch();
+            convertView=mInflater.inflate(R.layout.lis_switch,null);
+            viewHolder.Text=(TextView)convertView.findViewById(R.id.list_switch_text);
+            viewHolder.aSwitch=(Switch)convertView.findViewById(R.id.list_switch);
+            convertView.setTag(viewHolder);
+        }else{
+            viewHolder=(ViewHolderSwitch)convertView.getTag();
+        }
+        viewHolder.Text.setText(msg.getText());
+        final Switch temp=viewHolder.aSwitch;
+        final SharedPreferences sp= mContext.getSharedPreferences("action",Context.MODE_PRIVATE);
+        final int mode=msg.getMode();
+        switch (mode){
+            case 0:
+                temp.setChecked(sp.getBoolean("vibrate", true));
+                break;
+            case 1:
+                temp.setChecked(sp.getBoolean("notification", true));
+                break;
+        }
+        temp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(temp.isChecked()) {
+                    switch (mode){
+                        case 0:
+                            sp.edit().putBoolean("vibrate",true).apply();
+                            break;
+                        case 1:
+                            sp.edit().putBoolean("notification",true).apply();
+                            break;
+                    }
+                }else{
+                    switch (mode){
+                        case 0:
+                            sp.edit().putBoolean("vibrate",false).apply();
+                            break;
+                        case 1:
+                            sp.edit().putBoolean("notification",false).apply();
+                            break;
+                    }
+                }
+            }
+        });
         return convertView;
     }
 
@@ -527,6 +615,15 @@ public interface Callback{
                 break;
                 case R.id.list_homepage_head:
                     mCallback.click(v);
+                    break;
+                case R.id.list_info_ordinary_more:
+                case R.id.list_info_anonymous_more:
+                    new AlertDialog.Builder(mContext).setItems(new String[]{ "举报"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
                     break;
             }
         }

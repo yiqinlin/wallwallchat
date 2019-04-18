@@ -40,6 +40,15 @@ public class FileUtil {
         }
         return "";
     }
+    public static String getTempPath(String oldPath,String hashCode){
+        oldPath += "/.tmp";
+        File dir = new File(oldPath);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        oldPath += "/" + hashCode + ".tmp";
+        return oldPath;
+    }
     public static String getUsefulPath(String oldPath,String hashCode,String oldName){
         File dir = new File(oldPath);
         if(dir.isDirectory()){
@@ -72,6 +81,9 @@ public class FileUtil {
                 break;
             case oHead:
                 path+="/head/ohead";
+                break;
+            case File:
+                path+="/file_rec";
                 break;
         }
         File f=new File(path);

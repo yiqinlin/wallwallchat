@@ -6,10 +6,12 @@ package com.stark.wallwallchat.Util;
 public class Error {
     public static String error(int i){
         switch (i){
+            case -2:
+                return "神奇的异常";
             case -1:
                 return "网络异常，请检查网络";
             case 0:
-                return "账号不存在！";
+                return "操作成功";
             case 1:
                 return "密码错误！";
             case 2:
@@ -19,13 +21,27 @@ public class Error {
             case 5:
                 return "服务器异常";
             case 6:
-                return "数据异常,请稍后重试";
+                return "数据异常";
+            case 7:
+                return "数据解析异常";
             case 8:
                 return "文件在服务器已存在";
+            case 9:
+                return "文件已失效";
+            case 10:
+                return "文件上传失败";
+            case 11:
+                return "文件服务器异常";
+            case 12:
+                return "文件下载失败";
+            case 13:
+                return "信息获取失败";
+            case 14:
+                return "该手机号已经注册过账号";
             case 100:
                 return "操作成功";
             case 101:
-                return "请输入壹语账号";
+                return "请输入账号";
             case 102:
                 return "密码不能为空";
             case 103:

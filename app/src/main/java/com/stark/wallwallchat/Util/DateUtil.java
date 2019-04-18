@@ -1,8 +1,5 @@
 package com.stark.wallwallchat.Util;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,13 +9,6 @@ import java.util.Locale;
  * Created by Stark on 2017/3/13.
  */
 public class DateUtil {
-    public static String getMsgCode(Context context){
-        SharedPreferences sp=context.getSharedPreferences("action",Context.MODE_PRIVATE);
-        String msgcode=sp.getString("msgcode", "900000000000000000");
-        msgcode=(Long.parseLong(msgcode)+1L)+"";
-        sp.edit().putString("msgcode", msgcode).apply();
-        return msgcode;
-    }
     public static String MtoST(String msgcode){
         if(msgcode!=null&&!msgcode.equals("")) {
             Date date = new Date();
@@ -55,6 +45,13 @@ public class DateUtil {
     public static String Mtot(String msgcode){
         if(msgcode!=null&&!msgcode.equals("")) {
             return msgcode.substring(8,10)+":"+msgcode.substring(10,12);
+        }else {
+            return msgcode;
+        }
+    }
+    public static String Mtodt(String msgcode){
+        if(msgcode!=null&&!msgcode.equals("")) {
+            return msgcode.substring(8,10)+":"+msgcode.substring(10,12)+":"+msgcode.substring(12,14);
         }else {
             return msgcode;
         }

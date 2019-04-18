@@ -14,17 +14,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
-import com.stark.wallwallchat.File.ImgStorage;
 import com.stark.wallwallchat.Listview.ElasticListView;
 import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.SQLite.DatabaseHelper;
+import com.stark.wallwallchat.UIactivity.EditInfoActivity;
 import com.stark.wallwallchat.UIactivity.HomepageActivity;
-import com.stark.wallwallchat.UIactivity.ZoneActivity;
+import com.stark.wallwallchat.UIactivity.Login;
+import com.stark.wallwallchat.UIactivity.TransferActivity;
 import com.stark.wallwallchat.adapter.MyAdapter;
 import com.stark.wallwallchat.bean.BaseItem;
 import com.stark.wallwallchat.bean.ItemKnow;
+import com.stark.wallwallchat.bean.ItemMargin;
 import com.stark.wallwallchat.bean.ItemRightHead;
+import com.stark.wallwallchat.bean.ItemSimpleList;
 
 import java.util.ArrayList;
 
@@ -51,15 +55,9 @@ public class Fragment3 extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.stark.wallwallchat.changeHead")) {
-                    SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
-                    db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
-                    Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
-                    if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
-                        mArrays.remove(0);
-                        mArrays.add(0,new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity()), cr.getString(0), cr.getString(1)));
-                        adapter.notifyDataSetChanged();
-                    }
-                }else if(intent.getAction().equals("com.stark.wallwallchat.userInfo")){
+                    mArrays.clear();
+                    init(db);
+                }else if(intent.getAction().equals("com.stark.wallwallchat.DBUpdate")){
                     mArrays.clear();
                     init(db);
                 }
@@ -67,23 +65,29 @@ public class Fragment3 extends Fragment {
         };
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.stark.wallwallchat.changeHead");
-        intentFilter.addAction("com.stark.wallwallchat.userInfo");
+        intentFilter.addAction("com.stark.wallwallchat.DBUpdate");
         getActivity().registerReceiver(mReceiver, intentFilter);
         return view;
-    }
+}
+
     public void init(SQLiteDatabase db){
         SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
-        db.execSQL("CREATE TABLE IF NOT EXISTS userdata(id varchar(20),nick varchar(16),auto varchar(50),sex integer,birth varchar(10),pnumber varchar(11),startdate varchar(10),catdate integer,typeface integer,theme integer,bubble integer,iknow integer,knowme integer)");
-        Cursor cr=db.query("userdata", new String[]{"nick", "auto"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
+        Cursor cr=db.query("userdata", new String[]{"nick", "auto","iknow", "knowme"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
         if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
-            mArrays.add(new ItemRightHead(3, sp.getString("id", null), ImgStorage.getHead(getActivity()), cr.getString(0), cr.getString(1)));
+            mArrays.add(new ItemMargin(8));
+            mArrays.add(new ItemRightHead(3, sp.getString("id", null), cr.getString(0), cr.getString(1)));
             Nick=cr.getString(0);
             Auto=cr.getString(1);
-            cr.close();
-        }
-        cr=db.query("userdata", new String[]{"iknow", "knowme"}, "id=?", new String[]{sp.getString("id", null)}, null, null, null);
-        if (cr != null && cr.getCount() > 0 && cr.moveToNext()) {
-            mArrays.add(new ItemKnow(4, cr.getString(0), cr.getString(1)));
+            mArrays.add(new ItemKnow(4, cr.getString(2), cr.getString(3)));
+            mArrays.add(new ItemMargin(8));
+            mArrays.add(new ItemSimpleList(6, "我的点赞", getResources().getDrawable(R.drawable.into_detial)));
+            mArrays.add(new ItemSimpleList(6, "我的评论", getResources().getDrawable(R.drawable.into_detial)));
+            mArrays.add(new ItemMargin(8));
+            mArrays.add(new ItemSimpleList(6, "好友回复", getResources().getDrawable(R.drawable.into_detial)));
+            mArrays.add(new ItemMargin(8));
+            mArrays.add(new ItemSimpleList(6, "资料设置", getResources().getDrawable(R.drawable.into_detial)));
+            mArrays.add(new ItemMargin(8));
+            mArrays.add(new ItemSimpleList(6, "退出账号", getResources().getDrawable(R.drawable.into_detial)));
             cr.close();
         }
         adapter.notifyDataSetChanged();
@@ -93,16 +97,33 @@ public class Fragment3 extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             SharedPreferences sp=getActivity().getSharedPreferences("action", Context.MODE_PRIVATE);
             switch(position){
-                case 0:
+                case 1:
                     Intent intent=new Intent(getActivity(), HomepageActivity.class);
                     intent.putExtra("nick",Nick);
                     intent.putExtra("id", sp.getString("id", null));
                     intent.putExtra("auto",Auto);
                     startActivity(intent);
                     break;
-                case 2:
-                    Intent intent1=new Intent(getActivity(), ZoneActivity.class);
-                    startActivity(intent1);
+                case 4:
+                    Toast.makeText(getActivity(),"待开发",Toast.LENGTH_SHORT).show();
+                    break;
+                case 5:
+                    Toast.makeText(getActivity(),"待开发",Toast.LENGTH_SHORT).show();
+                    break;
+                case 7:
+                    Toast.makeText(getActivity(),"待开发",Toast.LENGTH_SHORT).show();
+                    break;
+                case 9:
+                    Intent intent2= new Intent(getActivity(), EditInfoActivity.class);
+                    startActivity(intent2);
+                    break;
+                case 11:
+                    Intent intent3=new Intent(getActivity(),Login.class);
+                    startActivity(intent3);
+                    sp.edit().putBoolean("state",false).apply();
+                    TransferActivity.This.finish();
+                    getActivity().finish();
+                    getActivity().overridePendingTransition(R.anim.anim_null,R.anim.anim_null);
                     break;
             }
         }

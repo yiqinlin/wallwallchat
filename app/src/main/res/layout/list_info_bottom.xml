@@ -1,75 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="30dp"
-    android:layout_margin="12dp">
+    android:layout_height="38dp">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="1">
-        <LinearLayout
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="7dp"
-            android:gravity="center">
-            <ImageButton
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/wall_comment_dark"
-                android:id="@+id/list_info_comment"
-                android:gravity="center"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="@dimen/text_size_xsmall"
-            android:gravity="center_vertical|start"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/list_info_cnum"
-            android:text="评论"/>
-        </LinearLayout>
-
+        android:layout_height="1px"
+        android:background="@drawable/tab_shadow">
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="1">
-        <LinearLayout
+        android:orientation="horizontal">
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1" >
-            <TextView
+            android:gravity="center"
+            android:layout_weight="1">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="@dimen/text_size_xsmall"
-                android:gravity="center_vertical|end"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/list_info_anum"
-                android:text="点赞"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="7dp"
-            android:gravity="center">
-
-            <ImageButton
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/wall_agree"
-                android:id="@+id/list_info_agree"/>
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="7dp"
+                    android:background="@drawable/wall_comment_dark"
+                    android:id="@+id/list_info_comment"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="@dimen/text_size_xsmall"
+                    android:gravity="center_vertical|start"
+                    android:layout_gravity="center_vertical"
+                    android:id="@+id/list_info_cnum"
+                    android:text="评论"/>
+            </LinearLayout>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_press_shadow"
+                android:id="@+id/list_button_comment"
+                style="?android:attr/borderlessButtonStyle"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@drawable/tab_shadow"
+                android:layout_gravity="center_vertical"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="@dimen/text_size_xsmall"
+                    android:gravity="center_vertical|end"
+                    android:layout_gravity="center_vertical"
+                    android:id="@+id/list_info_anum"
+                    android:text="点赞"/>
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="7dp"
+                    android:background="@drawable/wall_agree"
+                    android:id="@+id/list_info_agree" />
+            </LinearLayout>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_press_shadow"
+                android:id="@+id/list_button_agree"
+                style="?android:attr/borderlessButtonStyle"/>
+        </RelativeLayout>
     </LinearLayout>
-
 </LinearLayout>

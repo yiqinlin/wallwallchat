@@ -1,6 +1,6 @@
 package com.stark.wallwallchat.bean;
 
-public class BaseItem {
+public class BaseItem{
 
     private int itemType = 0;
 

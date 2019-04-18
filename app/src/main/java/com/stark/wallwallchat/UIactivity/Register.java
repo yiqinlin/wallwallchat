@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -17,9 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stark.wallwallchat.Format.Ack;
 import com.stark.wallwallchat.NetWork.MD5;
-import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.Util.Error;
@@ -31,6 +31,9 @@ public class Register extends Activity implements View.OnClickListener {
     private String ID=null;
     private String PassWord="";
     private String RPassWord="";
+    private String College="";
+    private String Edu="";
+    private String Number="";
     private ToastDialog mToastDialog=null;
     private SharedPreferences sp=null;
     private SharedPreferences.Editor editor = null;
@@ -182,8 +185,9 @@ public class Register extends Activity implements View.OnClickListener {
         if (requestCode == 321) {
             if (resultCode == 666) {
 
-                String college = data.getStringExtra("college");
-                txvCollege.setText(college);
+                College = data.getStringExtra("college");
+                Edu = data.getStringExtra("edu");
+                txvCollege.setText(College);
             }
         }
     }
@@ -200,28 +204,45 @@ public class Register extends Activity implements View.OnClickListener {
         }
         return false;
     }
-    class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
+    class MyAsyncTask extends AsyncTask<Void, Integer, Void>{
         @Override
         protected void onPreExecute() {/** 线程开启之前在UI线程运行he **/
             super.onPreExecute();
             if (mToastDialog == null)
-                mToastDialog = new ToastDialog(Register.this);//旋转图标（缓冲）
+                mToastDialog = new ToastDialog(Register.this);
             mToastDialog.setText("注册中...").show();
         }
         @Override
-        protected Void doInBackground(Void...values) { /**后台执行，不影响UI线程**/
-            String JsonMsg=NetSocket.request(NetPackage.Register(sp.getString("PNumber",null),Nick, PassWord));
-            if(JsonMsg!=null){
-                Ack result=(Ack)NetPackage.getBag(JsonMsg);/**解析服务器所传来的数据报*/
-                if(!result.Flag)//如果注册不成功
-                    publishProgress(result.Error);/**告诉UI线程 更新*/
-                else {
-                    ID=result.BackMsg;
-                    ReID=true;
-                    publishProgress(10);/**告诉UI线程 更新*/
+        protected Void doInBackground(Void...values){ /**后台执行，不影响UI线程**/
+            NetBuilder N=new NetBuilder();
+            N.put("nick",Nick)
+                    .put("password",PassWord)
+                    .put("college",College)
+                    .put("edu",Edu)
+                    .put("pnumber", sp.getString("PNumber", null));
+            try {
+                String temp = N.build();
+                String result;
+                try{
+                    result=NetSocket.request("http://kwall.cn/register.php",temp);
+                }catch (Exception e){
+                    publishProgress(-1);
+                    return null;
                 }
-            }else {
-                publishProgress(-1);/**告诉UI线程 更新*/
+                Log.e("request", temp);
+                Log.e("result",result);
+                NetBuilder out = new NetBuilder(result);
+                if(out.getBool("flag", false)) {
+                    ID = out.get("id");
+                    ReID = true;
+                    publishProgress(0);/**告诉UI线程 更新*/
+                }
+                else {//如果注册不成功
+                    publishProgress(out.getInt("error", -2));/**告诉UI线程 更新*/
+                }
+            }catch (Exception e){
+                publishProgress(7);
+                Log.e("NetWork",e.toString());
             }
             return null;
         }
@@ -229,7 +250,7 @@ public class Register extends Activity implements View.OnClickListener {
         protected void onProgressUpdate(Integer... values) {/**后台更新界面**/
             super.onProgressUpdate(values);
             mToastDialog.cancel();
-            if(values[0]==10)
+            if(values[0]==0)
             {
                 setContentView(R.layout.register_success);
                 com.stark.wallwallchat.Util.Status.setTranslucentStatus(getWindow(), Register.this, (LinearLayout) findViewById(R.id.transfer_title_status));

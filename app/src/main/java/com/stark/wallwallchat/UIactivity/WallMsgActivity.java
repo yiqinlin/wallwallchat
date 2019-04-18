@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -15,34 +16,31 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.stark.wallwallchat.File.ImgStorage;
-import com.stark.wallwallchat.Format.Refresh;
 import com.stark.wallwallchat.Listview.MyListView;
 import com.stark.wallwallchat.MyService;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetPackage;
 import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.R;
-import com.stark.wallwallchat.Util.DateUtil;
 import com.stark.wallwallchat.adapter.MyAdapter;
 import com.stark.wallwallchat.bean.BaseItem;
 import com.stark.wallwallchat.bean.ItemTextSeparate;
 import com.stark.wallwallchat.bean.ItemWallInfo;
 import com.stark.wallwallchat.json.JsonConvert;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.HashMap;
 
 public class WallMsgActivity extends Activity {
     ArrayList<BaseItem> mArrays=null;
     MyAdapter adapter=null;
-    String SrcID;
-    String DesID;
     MyListView listView;
     String MsgCode;
     EditText input;
     boolean isComment;
+    String DesId;
+    int type=1;
+    int mode=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +54,6 @@ public class WallMsgActivity extends Activity {
         final SharedPreferences sp = getSharedPreferences("action", Context.MODE_PRIVATE);
         listView=(MyListView)findViewById(R.id.listView_wall_detail);
         mid.setText("详 情");
-        right.setText("筛选");
         left.setBackgroundResource(R.drawable.title_back);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,10 +61,12 @@ public class WallMsgActivity extends Activity {
                 finish();
             }
         });
-        SrcID=sp.getString("id", null);
-        DesID=intent.getStringExtra("sponsor");
-        MsgCode=intent.getStringExtra("msgcode");
         isComment=intent.getBooleanExtra("isComment",false);
+        DesId=intent.getStringExtra("sponsor");
+        MsgCode=intent.getStringExtra("msgcode");
+        if(isComment){
+            type=2;
+        }
         mArrays=new ArrayList<BaseItem>();
         adapter=new MyAdapter(this,mArrays);
         listView.setAdapter(adapter);
@@ -88,15 +87,18 @@ public class WallMsgActivity extends Activity {
                 Intent intent=new Intent(WallMsgActivity.this, MyService.class);
                 intent.putExtra("CMD","Comment");
                 intent.putExtra("msg",input.getText().toString());
-                intent.putExtra("msgcode",MsgCode);
-                intent.putExtra("receiver",DesID);
-                intent.putExtra("mode", 0);
-                intent.putExtra("type", isComment ? 1 : 0);
+                intent.putExtra("msgcode3",MsgCode);
+                intent.putExtra("receiver",DesId);
+                intent.putExtra("mode", mode);
+                intent.putExtra("type", type);
                 startService(intent);
-                mArrays.add(new ItemWallInfo(13, 0, SrcID, DesID, DateUtil.getMsgCode(WallMsgActivity.this), ImgStorage.getHead(WallMsgActivity.this), sp.getString("nick", ""), null, new SimpleDateFormat("mm:ss", Locale.CHINA).format(new Date()), input.getText().toString(), "0", "0",false));
+                //mArrays.add(new ItemWallInfo(13, 0, SrcID, DesID, DateUtil.getMsgCode(WallMsgActivity.this), ImgStorage.getHead(WallMsgActivity.this), sp.getString("nick", ""), null, new SimpleDateFormat("mm:ss", Locale.CHINA).format(new Date()), input.getText().toString(), "0", "0",false));
                 input.setText(null);
             }
         });
+        if(intent.getBooleanExtra("input",false)){
+            input.requestFocus();
+        }
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence text, int start, int before, int count) {
@@ -126,14 +128,51 @@ public class WallMsgActivity extends Activity {
         }
         @Override
         protected Void doInBackground(Void...values) {
-            Refresh refresh=(Refresh)NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, "nsu", 0, isComment?4:3, 1,MsgCode,2)));
-            mArrays.clear();
-            JsonConvert.UpdateWall(WallMsgActivity.this, refresh, mArrays);
-            mArrays.add(new ItemTextSeparate(15, "Comments"));
-            publishProgress(1);
-            refresh=(Refresh)NetPackage.getBag(NetSocket.request(NetPackage.Refresh(SrcID, "nsu", 0, isComment?6:5, 1,MsgCode,2)));
-            JsonConvert.UpdateComment(WallMsgActivity.this, refresh, mArrays);
-            publishProgress(2);
+            try {
+                    HashMap<String,Object> SqlPkg=new HashMap<String,Object>();
+                    SqlPkg.put("mode",isComment?4:3); //0非匿名，1匿名，2所有，3墙指定消息，4评论指定消息，5带回复，6不带回复
+                    SqlPkg.put("start",0);
+                    SqlPkg.put("msgcode",MsgCode);
+                    NetPackage netPkg=new NetPackage(WallMsgActivity.this,SqlPkg);
+                    String temp = JsonConvert.SerializeObject(netPkg.WRefresh(0));
+                    String result;
+                    try{
+                        result=NetSocket.request(temp);
+                    }catch (Exception e){
+                        publishProgress(-1);
+                        return null;
+                    }
+                    Log.e("request", temp);
+                    Log.e("result", result);
+                    NetBuilder out = (NetBuilder) JsonConvert.DeserializeObject(result, new NetBuilder());
+                    if(out.getBool("flag", false)) {
+                        mArrays.clear();
+                        out.UpdateWall(WallMsgActivity.this, mArrays);
+                        mArrays.add(new ItemTextSeparate(15, "Comments"));
+                        publishProgress(1);
+                        SqlPkg.put("mode", isComment ? 6 : 5); //0非匿名，1匿名，2所有，3墙指定消息，4评论指定消息，5不带回复，6带回复
+                        temp = JsonConvert.SerializeObject(netPkg.WRefresh(6));
+                        try{
+                            result=NetSocket.request(temp);
+                        }catch (Exception e){
+                            publishProgress(-1);
+                            return null;
+                        }
+                        Log.e("request", temp);
+                        Log.e("result", result);
+                        out = new NetBuilder(result);
+                        out.UpdateComment(WallMsgActivity.this,mArrays);
+                        publishProgress(2);
+                    }
+                    else {
+                        publishProgress(out.getInt("error", -2));/**告诉UI线程 更新*/
+                    }
+                    //没网或超时
+                    //SelectionTemp=AddList();
+            } catch (Exception e) {
+                publishProgress(7);
+                e.printStackTrace();
+            }
             return null;
         }
         @Override
@@ -157,8 +196,15 @@ public class WallMsgActivity extends Activity {
                     intent.putExtra("msgcode", msg.getMsgcode());
                     startActivity(intent);
                 } else {
-
+                    ItemWallInfo msg = (ItemWallInfo) mArrays.get(position - 1);
+                    input.setHint("回复:"+msg.getNick());
+                    mode=2;
+                    type=3;
                 }
+            }else if(position==1){
+                input.setHint(null);
+                mode=0;
+                type=isComment?2:1;
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.stark.wallwallchat.Util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
@@ -37,11 +38,29 @@ public class Status {
             window.setStatusBarColor(Color.TRANSPARENT);
             window.setNavigationBarColor(Color.TRANSPARENT);
         }
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
     }
     public static void setTranslucentStatus(Window window,Context context,LinearLayout layout){
         setTranslucentStatus(window);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             layout.setPadding(0,getStatusHeight(context),0,0);
         }
+    }
+    public boolean setStatusBarLightMode(Activity activity, boolean isFontColorDark) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (isFontColorDark) {
+                // 沉浸式
+                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                //非沉浸式
+                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                //非沉浸式
+                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -2,20 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginTop="14dp"
     android:layout_height="40dp">
     <LinearLayout
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center"
-        android:layout_marginLeft="7dp"
-        android:layout_marginRight="7dp">
-        <ImageButton
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp">
+        <com.stark.wallwallchat.CircleImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
-            android:background="@drawable/tianqing"
             android:id="@+id/list_info_ordinary_head" />
     </LinearLayout>
     <LinearLayout
@@ -36,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:layout_weight="1"
             android:text="20:30"
             android:textColor="@android:color/darker_gray"
@@ -49,7 +47,7 @@
         android:layout_marginRight="32dp"
         android:layout_marginLeft="7dp"
         android:gravity="center">
-        <ImageButton
+        <com.stark.wallwallchat.CircleImageView
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/wall_more"

@@ -10,6 +10,6 @@ public class ItemTextSeparate extends BaseItem {
         this.text=text;
     }
     public String getText(){
-        return this.text+"";
+        return this.text;
     }
 }

@@ -16,7 +16,7 @@
             <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"
+                android:src="@drawable/ic_action_back"
                 android:background="@null"
                 android:onClick="onClick"
                 android:id="@+id/set_title1" />

@@ -5,10 +5,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,21 +19,24 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.stark.wallwallchat.Format.Ack;
 import com.stark.wallwallchat.Format.CmdType;
-import com.stark.wallwallchat.Format.Format;
-import com.stark.wallwallchat.Format.Msg;
-import com.stark.wallwallchat.Format.UserInfo;
+import com.stark.wallwallchat.NetWork.NetBuilder;
 import com.stark.wallwallchat.NetWork.NetPackage;
+import com.stark.wallwallchat.NetWork.NetSocket;
 import com.stark.wallwallchat.SQLite.Data;
 import com.stark.wallwallchat.SQLite.DatabaseHelper;
-import com.stark.wallwallchat.Util.DateUtil;
 import com.stark.wallwallchat.Util.Try;
+import com.stark.wallwallchat.json.JsonConvert;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 
 /**
@@ -39,16 +44,14 @@ import java.util.Queue;
  */
 public class MyService extends Service {
     public Socket MsgSocket=null;
-    private String JsonMsg;
     private String ID=null;
     private String PassWord=null;
-    private String UUID=null;
     private String IP="60.205.191.131";
-    private int PORT=12345;
+    private int PORT=23333;
     private boolean outRec=true;
     private int NetState=1;
-    private int LogState=0;
-    private Queue<String>Msg=null;
+    private Queue<SendData>Msg=new LinkedList<SendData>() ;
+    private Thread ThreadSend=null;
     private SQLiteDatabase db=null;
     private BroadcastReceiver mReceiver;
     @Override
@@ -59,10 +62,10 @@ public class MyService extends Service {
     public void onCreate(){
         super.onCreate();
         db=new DatabaseHelper(MyService.this).getWritableDatabase();
-        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         Intent intent=new Intent(this,MyService.class);
         intent.putExtra("CMD", "Heart");
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, PendingIntent.getService(this, 0, intent, 0));
+        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 180000, PendingIntent.getService(this, 0, intent, 0));
         mReceiver=new BroadcastReceiver(){
             public void onReceive(Context context, Intent intent) {
                     ConnectivityManager mConnectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -77,7 +80,6 @@ public class MyService extends Service {
                         }
                         handle.postDelayed(Auto,3000);
                     } else {
-                        LogState=0;
                         NetState=0;
                         handle.removeCallbacks(Auto);
                         Try.CloseSocket(MsgSocket);
@@ -101,7 +103,6 @@ public class MyService extends Service {
             } else if (cmd.equals("Manual")) {
                 ID= Try.getStringExtra(intent, "id");
                 PassWord= Try.getStringExtra(intent, "password");
-                UUID=this.getSharedPreferences("action", MODE_PRIVATE).getString("MyUUID",null);
                 manualLogin();
             } else if (cmd.equals("Heart")){
                 if (Connected()) {
@@ -109,21 +110,22 @@ public class MyService extends Service {
                 }
             } else if (cmd.equals("Image")) {
                 /**
-                 *
                  */
             }else if(cmd.equals("WallMsg")){
-                WallMsgSend(intent);
+                WSend(intent);
             }else if(cmd.equals("Agree")){
                 Agree(intent);
             }else if(cmd.equals("Comment")){
                 Comment(intent);
             }else if(cmd.equals("Change")){
                 Change(intent);
+            }else if(cmd.equals("ChangeRead")){
+                ChangeRead(intent);
             }
         }else {
             Log.i("MyService","null CMD");
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
     @Override
     public void onDestroy() {
@@ -131,7 +133,21 @@ public class MyService extends Service {
         unregisterReceiver(mReceiver);
         super.onDestroy();
     }
-    public boolean Connected(){
+    private class SendData{
+        public String url;
+        public String str;
+        SendData(String url,String str){
+            this.url=url;
+            this.str=str;
+        }
+    }
+    private void Send(){
+        if(ThreadSend==null||!ThreadSend.isAlive()){
+            ThreadSend =new Thread(send);
+            ThreadSend.start();
+        }
+    }
+    private boolean Connected(){
         if(MsgSocket==null||MsgSocket.isClosed()){
             return false;
         }else{
@@ -139,46 +155,70 @@ public class MyService extends Service {
         }
     }
     public boolean Change(Intent intent){
-        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
-        UserInfo temp=(UserInfo)intent.getSerializableExtra("user");
-        temp.Nick=sp.getString("nick",null);
-        temp.Mail=sp.getString("mail",null);
-        JsonMsg = NetPackage.Change(temp)+"\n";
-        new Thread(send).start();
+        try {
+            Msg.add(new SendData("http://kwall.cn/changeUser.php",intent.getStringExtra("data")));
+        }catch (Exception e){
+            return false;
+        }
+        Send();
+        return true;
+    }
+    public boolean ChangeRead(Intent intent){
+        try {
+            NetBuilder N=new NetBuilder();
+            N.put("receiver", intent.getStringExtra("receiver"));
+            Msg.add(new SendData("http://kwall.cn/msgRead.php",N.build(MyService.this)));
+        }catch (Exception e){
+            return false;
+        }
+        Send();
         return true;
     }
     public boolean Comment(Intent intent) {
-        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
-        ID=sp.getString("id",null);
-        String Edu=sp.getString("edu",null);
-        if(ID!=null&&Edu!=null) {
-            JsonMsg = NetPackage.Comment(ID, Try.getStringExtra(intent, "receiver"), DateUtil.getMsgCode(MyService.this), Try.getStringExtra(intent, "msgcode"),Try.getStringExtra(intent, "msg"),Edu, intent.getIntExtra("mode", 0), intent.getIntExtra("type", 0))+"\n";
-            new Thread(send).start();
-            return true;
-        }else
+        try {
+            NetBuilder N=new NetBuilder();
+            N.put("msg", intent.getStringExtra("msg"))
+                    .put("type", intent.getIntExtra("type", 0))
+                    .put("mode",intent.getIntExtra("mode", 0))
+                    .put("receiver",intent.getStringExtra("receiver"))
+                    .put("msgcode3", intent.getStringExtra("msgcode3"))
+                    .put("msgcode2", new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA).format(new Date()));
+            Msg.add(new SendData("http://kwall.cn/comment.php",N.build(MyService.this)));
+        }catch (Exception e){
+            Log.e("service",e.toString());
             return false;
+        }
+        Send();
+        return true;
     }
     public boolean Agree(Intent intent){
-        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
-        ID=sp.getString("id",null);
-        String Edu=sp.getString("edu",null);
-        if(ID!=null&&Edu!=null) {
-            JsonMsg = NetPackage.Agree(ID,Try.getStringExtra(intent,"receiver"),Try.getStringExtra(intent,"msgcode"),Edu,intent.getIntExtra("mode",0),intent.getIntExtra("type",0))+"\n";
-            new Thread(send).start();
-            return true;
-        }else
+        try {
+            NetBuilder N=new NetBuilder();
+            N.add("mode", intent.getIntExtra("mode", 0))
+                    .put("msgcode", intent.getStringExtra("msgcode"))
+                    .put("receiver", intent.getStringExtra("receiver"));
+            Msg.add(new SendData("http://kwall.cn/agree.php",N.build(MyService.this)));
+        }catch (Exception e){
+            Log.e("service",e.toString());
             return false;
+        }
+        Send();
+        return true;
     }
-    public boolean WallMsgSend(Intent intent){
-        SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
-        ID=sp.getString("id",null);
-        String Edu=sp.getString("edu",null);
-        if(ID!=null&&Edu!=null) {
-            JsonMsg = NetPackage.SendWMsg(ID, Edu, Try.getStringExtra(intent, "msg"), "0", intent.getIntExtra("mode", 0), sp.getInt("sex", 0))+"\n";
-            new Thread(send).start();
-            return true;
-        }else
+    public boolean WSend(Intent intent){
+        try {
+            NetBuilder N=new NetBuilder();
+            N.put("msg", intent.getStringExtra("msg"))
+                    .put("mode", intent.getIntExtra("mode", 0))
+                    .put("type", intent.getIntExtra("type", 0))
+                    .put("msgcode2", new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.CHINA).format(new Date()));
+            Msg.add(new SendData("http://kwall.cn/wallSend.php",N.build(MyService.this)));
+        }catch (Exception e){
+            Log.e("service",e.toString());
             return false;
+        }
+        Send();
+        return true;
     }
     public boolean AutoLogin()
     {
@@ -186,20 +226,28 @@ public class MyService extends Service {
         if(!sp.getBoolean("state",false)) {
             return false;
         }
-        String UUID=sp.getString("MyUUID",null);
-        String id=sp.getString("id",null);
-        String password=sp.getString("password",null);
-        if(id!=null&& password!=null) {
-            JsonMsg=NetPackage.Login(id, password,UUID,0)+'\n';
-            new Thread(send).start();
-            return true;
-        }
-        else
+        try {
+            NetPackage netPkg = new NetPackage(MyService.this);
+            Msg.add(new SendData(null,JsonConvert.SerializeObject(netPkg.Login(true))));
+        }catch (Exception e){
+            Log.e("service",e.toString());
             return false;
+        }
+        Send();
+        return true;
     }
     public void manualLogin(){
-        JsonMsg=NetPackage.Login(ID,PassWord,UUID,1)+'\n';
-        new Thread(send).start();
+        try {
+            HashMap<String, Object> SqlPkg = new HashMap<String, Object>();
+            SqlPkg.put("user", ID);
+            SqlPkg.put("password", PassWord);
+            NetPackage netPkg = new NetPackage(MyService.this, SqlPkg);
+            Msg.add(new SendData(null,JsonConvert.SerializeObject(netPkg.Login(false))));
+        }catch (Exception e){
+            Log.e("service",e.toString());
+            return ;
+        }
+        Send();
     }
     public void sendHeart(){
         SharedPreferences sp = this.getSharedPreferences("action", MODE_PRIVATE);
@@ -209,8 +257,14 @@ public class MyService extends Service {
         String id=sp.getString("id",null);
         String password=sp.getString("password",null);
         if(id!=null&& password!=null) {
-            JsonMsg=NetPackage.Heart(id) + '\n';
-            new Thread(send).start();
+            try {
+                NetPackage netPkg = new NetPackage(MyService.this);
+                Msg.add(new SendData(null,JsonConvert.SerializeObject(netPkg.Heart())));
+            }catch (Exception e){
+                Log.e("service",e.toString());
+                return ;
+            }
+            Send();
         }
     }
     Handler handle=new Handler(new Handler.Callback() {
@@ -241,17 +295,24 @@ public class MyService extends Service {
             }else if(NetState!=0&&!Connected()){
                 new Thread(MsgTask).start();
             }
-            if(Connected()) {
-                try {
-                    DataOutputStream bw = new DataOutputStream(MsgSocket.getOutputStream());
-                    bw.write(JsonMsg.getBytes("UTF-8"));
-                    bw.flush();
-                } catch (Exception e) {
-                    Log.i("test","test");
-                    Try.CloseSocket(MsgSocket);
+            try {
+                DataOutputStream bw = new DataOutputStream(MsgSocket.getOutputStream());
+                while(Connected()&&Msg.peek()!=null){
+                    SendData data=Msg.poll();
+                    if(data.url==null) {
+                        bw.write(data.str.getBytes("UTF-8"));
+                        bw.flush();
+                    }else{
+                        String result =NetSocket.request(data.url,data.str);
+                        Intent intent=new Intent();
+                        intent.setAction("com.stark.wallwallchat.result");
+                        intent.putExtra("data",result);
+                        sendBroadcast(intent);
+                    }
                 }
-            }else{
-                //存入消息队列
+            }catch (Exception e){
+                Log.i("test",e.toString());
+                Try.CloseSocket(MsgSocket);
             }
         }
     };
@@ -281,44 +342,74 @@ public class MyService extends Service {
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(MsgSocket.getInputStream(),"UTF-8"));
                     String out = br.readLine();
-                    Log.i("rec",out);
-                    Format format=NetPackage.getFormatBag(out);
-                    switch (CmdType.valueOf(format.Type)) {
+                    Log.e("rec", out);
+                    NetBuilder format = new NetBuilder(out);
+                    switch (CmdType.valueOf(format.get("Type"))) {
                         case Ack:
-                            Ack ack=(Ack)NetPackage.getBag(format.JsonMsg,format.Type);
-                            if(format.Cmd.equals("login")){
-                                int temp=0;
-                                if(ack!=null){
-                                    if(ack.Flag){
-                                        LogState=1;
-                                        temp=10;
-                                    }else{
-                                        temp=ack.Error;
-                                        LogState=0;
+                            if(format.get("Cmd").equals("login")){
+                                if(format.getBool("flag", false)){
+                                    Cursor cursor = db.query("userdata",null, "id=?", new String[]{format.get("id")}, null, null, null);
+                                    if(cursor!=null&&cursor.getCount()>0&&cursor.moveToNext()) {
+                                        ContentValues temp= Data.MapToContentValues((HashMap) format.getList(0));
+                                        db.update("userdata", temp, "id=?", new String[]{format.get("id")});
+                                        cursor.close();
+                                    }else {
+                                        ContentValues temp=Data.MapToContentValues((HashMap) format.getList(0));
+                                        db.insert("userdata", null, temp);
                                     }
                                 }
                                 Intent intent = new Intent();
                                 intent.setAction("com.stark.wallwallchat.login");
-                                intent.putExtra("key", temp);
+                                intent.putExtra("id", format.get("id"));
+                                intent.putExtra("key", format.getInt("error", -2));
                                 sendBroadcast(intent);
-                            }else if(format.Cmd.equals("userinfo")){
+                            }else if(format.get("Cmd").equals("userinfo")){
                                 Intent intent=new Intent();
-                                intent.setAction("com.stark.wallwallchat.UpdateUserInfo");
+                                intent.setAction("com.stark.wallwallchat.DBUpdate");
+                                sendBroadcast(intent);
+                            }else if(format.get("Cmd").equals("changeUser")){
+                                ContentValues temp= Data.MapToContentValues((HashMap) format.Data.get(0));
+                                db.update("userdata", temp, "id=?", new String[]{format.get("id")});
+                                MyService.this.getSharedPreferences("action", MODE_PRIVATE).edit().putString("nick",temp.getAsString("nick")).putString("auto",temp.getAsString("auto")).apply();
+                                Intent intent=new Intent();
+                                intent.setAction("com.stark.wallwallchat.DBUpdate");
                                 sendBroadcast(intent);
                             }
+                            Intent intent=new Intent();
+                            intent.setAction("com.stark.wallwallchat.Ack");
+                            intent.putExtra("Cmd",format.get("Cmd"));
+                            sendBroadcast(intent);
                             break;
                         case Message:
-                            if(format.Cmd.equals("csend")) {
-                                Msg msg = (Msg) NetPackage.getBag(format.JsonMsg, format.Type);
-                                if(msg==null)
-                                    break;
-                                db.execSQL("CREATE TABLE IF NOT EXISTS u" + msg.SrcId + "(id varchar(20),type integer,bubble integer,msg varchar(1024),msgcode varchar(20),date varchar(10),time varchar(12),ack integer)");
-                                db.insert("u" + msg.SrcId, null, Data.getSChatContentValues(msg.SrcId, msg.SendType, msg.Bubble, msg.Msg, msg.MsgCode, msg.Date, msg.Time, 1));
-                                Intent intent = new Intent();
-                                intent.setAction("com.stark.wallwallchat.msg");
-                                intent.putExtra("Msg", format.JsonMsg);
-                                intent.putExtra("BagType", format.Type);
-                                sendBroadcast(intent);
+                            if(format.get("Cmd").equals("csend")) {
+                                HashMap Msg=(HashMap)format.Data.get(0);
+                                Msg.remove("sendack");
+                                Msg.put("ack", 1);
+                                db.insert("msg", null, Data.MapToContentValues(Msg));
+                                Msg.remove("receiver");
+                                Msg.remove("msgcode2");
+                                Msg.remove("ack");
+                                Msg.put("remarks", format.get("remarks"));
+                                //Msg.put("count", format.get("count"));
+                                Cursor cursor = db.query("mid",null, "sponsor=?", new String[]{format.get("sponsor")}, null, null, null);
+                                if(cursor!=null&&cursor.getCount()>0&&cursor.moveToNext()) {
+                                    db.update("mid", Data.MapToContentValues(Msg) , "sponsor=?", new String[]{format.get("sponsor")});
+                                    cursor.close();
+                                }else {
+                                    db.insert("mid", null, Data.MapToContentValues(Msg));
+                                }
+                                SharedPreferences sp=getSharedPreferences("action",MODE_PRIVATE);
+                                if(sp.getBoolean("vibrate",true)) {
+                                    MyVibrator.getVibrator(MyService.this, 0);
+                                }
+                                if(sp.getBoolean("notification", true)) {
+                                    MyNotification.Send(MyService.this,(String)Msg.get("remarks"),(String)Msg.get("msg"),10000);
+                                }
+                                Intent intent1 = new Intent();
+                                intent1.setAction("com.stark.wallwallchat.msg");
+                                intent1.putExtra("sponsor", format.get("sponsor"));
+                                intent1.putExtra("msgcode",format.get("msgcode"));
+                                sendBroadcast(intent1);
                             }
                             break;
                         default:

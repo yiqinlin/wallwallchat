@@ -3,15 +3,16 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@drawable/list_driver_dark" />
+        android:layout_height="1dp"
+        android:background="@drawable/tab_shadow">
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/magic_7margin"
         android:orientation="horizontal"
-        android:background="#f5f5f5">
+        android:background="@color/tab">
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"

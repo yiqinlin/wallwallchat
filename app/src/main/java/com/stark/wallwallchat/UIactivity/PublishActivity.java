@@ -51,6 +51,7 @@ public class PublishActivity extends Activity {
                     intent.putExtra("CMD","WallMsg");
                     intent.putExtra("msg",editText.getText().toString());
                     intent.putExtra("mode",anonymous.isChecked()?1:0);
+                    intent.putExtra("type",0);
                     startService(intent);
                     finish();
                     break;

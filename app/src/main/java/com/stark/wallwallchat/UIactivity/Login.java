@@ -14,10 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.stark.wallwallchat.File.ImgStorage;
+import com.stark.wallwallchat.CircleImageView;
 import com.stark.wallwallchat.MyService;
 import com.stark.wallwallchat.NetWork.MD5;
 import com.stark.wallwallchat.R;
@@ -32,6 +31,7 @@ import com.stark.wallwallchat.toast.ToastDialog;
 public class Login extends Activity {
     public String ID="";
     public String PassWord="";
+    public String Md5Psd ="";
     private ToastDialog mToastDialog=null;
     private SharedPreferences sp=null;
     private EditText IdEdit=null;
@@ -50,9 +50,10 @@ public class Login extends Activity {
         Button register=(Button)findViewById(R.id.button_to_register);
         Button forget=(Button)findViewById(R.id.button_to_forget);
         sp= this.getSharedPreferences("action", MODE_PRIVATE);
-        ((ImageView)findViewById(R.id.Login_head)).setImageDrawable(ImgStorage.getHead(Login.this));
         ID=sp.getString("id", null);//用户帐号
-        PassWord=sp.getString("password",null);
+        ((CircleImageView)findViewById(R.id.Login_head)).setHead(Login.this,ID);
+        PassWord=sp.getString("psd",null);
+        Md5Psd =sp.getString("password",null);
         if(ID!=null) {
             IdEdit.setText(ID);
             IdEdit.setSelection(ID.length());
@@ -117,9 +118,9 @@ public class Login extends Activity {
         });
         mReceiver=new BroadcastReceiver(){
             public void onReceive(Context context, Intent intent) {
-                int temp=intent.getIntExtra("key",-1);
-                if (temp == 10) {
-                    sp.edit().putBoolean("state", true).putString("id", ID).putString("password", PassWord).apply();
+                int temp=intent.getIntExtra("key",-2);
+                if (temp == 0) {
+                    sp.edit().putBoolean("state", true).putString("id", intent.getStringExtra("id")).putString("password", Md5Psd).putString("psd",PassWord).apply();
                     Intent ToTransfer=new Intent(Login.this,TransferActivity.class);
                     ToTransfer.putExtra("CMD", "MAuto");
                     startActivity(ToTransfer);
@@ -169,9 +170,7 @@ public class Login extends Activity {
                     } else if (PassWord.length() < 6) {
                         Error= com.stark.wallwallchat.Util.Error.error(104);
                     } else {
-                        if (sp.getString("password",null)==null) {
-                            PassWord = MD5.get(PassWord);
-                        }
+                        Md5Psd = MD5.get(PassWord);
                         if (mToastDialog == null)
                             mToastDialog = new ToastDialog(Login.this);
                         mToastDialog.setOnTouchClose(false);
@@ -179,7 +178,7 @@ public class Login extends Activity {
                         Intent intent1 = new Intent(Login.this, MyService.class);
                         intent1.putExtra("CMD", "Manual");
                         intent1.putExtra("id", ID);
-                        intent1.putExtra("password", PassWord);
+                        intent1.putExtra("password", Md5Psd);
                         startService(intent1);
                     }
                     if (Error != null) {

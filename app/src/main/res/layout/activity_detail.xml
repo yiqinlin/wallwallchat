@@ -26,6 +26,17 @@
                 android:textSize="@dimen/text_size_xbig"
                 android:background="@null"/>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_detail_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="#55000000"
+            android:textSize="@dimen/text_size"
+            android:background="@null"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"

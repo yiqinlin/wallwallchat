@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">墙墙说</string>
+    <string name="app_name">uniah</string>
     <string name="large_text">
 
     </string>
@@ -7,7 +7,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_set">SetActivity</string>
-    <string name="title_activity_welcome">墙墙说</string>
+    <string name="title_activity_welcome">uniah</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="action_sign_in">Sign in</string>
@@ -16,24 +16,6 @@
     <string name="title_activity_transfer">TransferActivity</string>
     <string name="title_activity_zone">ZoneActivity</string>
 
-    <string-array name="data">
-        <item>的吗</item>
-        <item>西亚</item>
-        <item>的吗</item>
-        <item>12亚</item>
-        <item>ewq</item>
-        <item>任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务任务</item>
-        <item>撒旦</item>
-        <item>自行车</item>
-        <item>vb</item>
-        <item>古风</item>
-        <item>毒药</item>
-        <item>iuy</item>
-        <item>好贵</item>
-        <item>你们</item>
-        <item>比你们</item>
-        <item>个</item>
-    </string-array>
-    <string name="title_activity_personal_note">PersonalNoteActivity</string>
+
 
 </resources>

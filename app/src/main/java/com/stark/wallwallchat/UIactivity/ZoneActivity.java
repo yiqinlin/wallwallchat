@@ -48,10 +48,7 @@ public class ZoneActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

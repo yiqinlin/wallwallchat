@@ -5,7 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.NotificationCompat;
+import android.graphics.BitmapFactory;
+import android.support.v4.app.NotificationCompat;
 
 import com.stark.wallwallchat.UIactivity.TransferActivity;
 
@@ -13,11 +14,7 @@ import com.stark.wallwallchat.UIactivity.TransferActivity;
  * Created by Stark on 2017/1/21.
  */
 public class MyNotification {
-    private Context context=null;
-    public MyNotification(Context context){
-        this.context=context;
-    }
-    public void SendNotifi(String title,String text,int id,int n){
+    public static void Send(Context context,String title,String text,int id){
         Intent intent = new Intent(context,TransferActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
@@ -28,11 +25,11 @@ public class MyNotification {
                 .setPriority(Notification.PRIORITY_MAX) //设置该通知优先级
                 .setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
                 .setOngoing(false)//ture，设置他为一个正在进行的通知。他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
-                .setSmallIcon(R.mipmap.ic_launcher)//设置通知小ICON
+                //.setSmallIcon(R.drawable.tianqing)//设置通知小ICON
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.drawable.tianqing))//设置通知小ICON
                 .setContentIntent(pendingIntent);
 
         Notification notification=mBuilder.build();
         mNotificationManager.notify(id,notification);
-        MyVibrator.getVibrator(context,n);
     }
 }

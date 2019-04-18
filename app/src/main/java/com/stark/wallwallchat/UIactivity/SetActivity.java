@@ -17,7 +17,9 @@ import com.stark.wallwallchat.R;
 import com.stark.wallwallchat.Util.Status;
 import com.stark.wallwallchat.adapter.MyAdapter;
 import com.stark.wallwallchat.bean.BaseItem;
+import com.stark.wallwallchat.bean.ItemMargin;
 import com.stark.wallwallchat.bean.ItemSimpleList;
+import com.stark.wallwallchat.bean.ItemSwitch;
 
 import java.util.ArrayList;
 
@@ -39,7 +41,11 @@ public class SetActivity extends Activity {
         ArrayList<BaseItem> mArrays=new ArrayList<BaseItem>();
         MyAdapter adapter=new MyAdapter(SetActivity.this,mArrays);
         listView.setAdapter(adapter);
-        mArrays.add(new ItemSimpleList(6, "退出当前账号", getResources().getDrawable(R.drawable.into_detial)));
+        mArrays.add(new ItemMargin(8));
+        mArrays.add(new ItemSwitch(16, "震动提醒", 0));
+        mArrays.add(new ItemSwitch(16, "通知栏提醒", 1));
+        mArrays.add(new ItemMargin(8));
+        mArrays.add(new ItemSimpleList(6, "退出", getResources().getDrawable(R.drawable.into_detial)));
         adapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new MyOnItemClickListener());
         left.setOnClickListener(Click);
@@ -49,7 +55,7 @@ public class SetActivity extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch(position){
-                case 0:
+                case 5:
                     Intent intent=new Intent(SetActivity.this,Login.class);
                     startActivity(intent);
                     sp.edit().putBoolean("state",false).apply();

@@ -1,6 +1,6 @@
 package com.stark.wallwallchat.Format;
 
-import org.json.JSONArray;
+import java.util.List;
 
 /**
  * Created by Stark on 2017/4/9.
@@ -8,5 +8,5 @@ import org.json.JSONArray;
 public class Get {
     public String Guestid;
     public int Type = 0;
-    public JSONArray Data;
+    public List<Object> Data;
 }

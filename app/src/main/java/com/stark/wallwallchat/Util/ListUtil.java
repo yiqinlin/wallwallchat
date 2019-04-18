@@ -12,7 +12,7 @@ public class ListUtil {
     public static ArrayList<BaseItem> UpadteState(ArrayList<BaseItem> mArrays,String msgCode,String newCode){
         for(int i=mArrays.size()-1;i>=0;i--){
             ItemSMsg temp=(ItemSMsg)mArrays.get(i);
-            if(temp.getMsgCode()!=null&&temp.getMsgCode().equals(msgCode)){
+            if(temp.getMsgCode2()!=null&&temp.getMsgCode2().equals(msgCode)){
                 temp.State = 1;
                 temp.MsgCode=newCode;
                 temp.Date=DateUtil.Mtoy(newCode);

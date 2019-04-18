@@ -48,14 +48,14 @@ public class MyListView extends ListView implements OnScrollListener {
     private RotateAnimation mReverseAnimation;
     private boolean mIsRecored;
     private int mHeadContentHeight;
-    private int mStartX;
     private int mStartY;
-    private int mendX;
     private int mendY;
     private int mFirstItemIndex;
     private int mState;
     private int Offset;
     private boolean mIsBack;
+    private boolean IsBack;
+    private boolean LockBack;
     private boolean mISRefreshable;
     private Context context;
     private OnRefreshListener mRefreshListener;
@@ -175,7 +175,8 @@ public class MyListView extends ListView implements OnScrollListener {
                     if(mFirstItemIndex == 0 && !mIsRecored) {
                         mIsRecored = true;
                     }
-                    mStartX = (int) ev.getX();
+                    IsBack=false;
+                    LockBack=false;
                     mStartY = (int) ev.getY();
                     break;
                 case MotionEvent.ACTION_UP:
@@ -198,13 +199,19 @@ public class MyListView extends ListView implements OnScrollListener {
                     }
                     mIsBack = false;
                     mIsRecored = false;
-                    if(mendY-mStartY<mendX-mStartX){
+                    if(IsBack){
                         onBack();
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    mendX = (int) ev.getX();
                     mendY = (int) ev.getY();
+                    if(!LockBack){
+                        IsBack=true;
+                    }
+                    if(Math.abs(mendY-mStartY)>50){
+                        IsBack=false;
+                        LockBack=true;
+                    }
                     if(!mIsRecored && mFirstItemIndex == 0) {
                         mIsRecored = true;
                         mStartY = mendY;

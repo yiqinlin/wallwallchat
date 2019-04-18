@@ -1,4 +1,4 @@
-<resources>>
+<resources>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -7,5 +7,12 @@
         <item name="android:windowBackground">@drawable/welcome</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/bar</item>
+        <item name="colorPrimaryDark">@color/status</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowAnimationStyle">@style/Activity_Animation</item>
     </style>
 </resources>

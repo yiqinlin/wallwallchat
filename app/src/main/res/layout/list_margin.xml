@@ -5,15 +5,9 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/linearlayout"
-        android:background="#f5f5f5"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="14dp">
-
+        android:layout_height="@dimen/magic_margin">
     </LinearLayout>
-
-
-
 
 </LinearLayout>
